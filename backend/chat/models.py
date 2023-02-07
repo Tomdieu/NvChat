@@ -94,7 +94,7 @@ class Message(models.Model):
         UserProfile, on_delete=models.CASCADE, related_name="reciever"
     )
     message = models.ForeignKey(
-        ImageMessage, on_delete=models.CASCADE, related_name="message"
+        IMessage, on_delete=models.CASCADE, related_name="message"
     )
     timestamp = models.DateTimeField(auto_now_add=True)
     sender_read = models.BooleanField(default=False)
