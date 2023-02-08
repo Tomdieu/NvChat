@@ -12,6 +12,7 @@ User = get_user_model()
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_picture = models.ImageField(upload_to="profiles/", null=True, blank=True)
+    bio = models.CharField(max_length=255,null=True,blank=True)
 
     def __str__(self) -> str:
         return f"{self.user}"
@@ -25,6 +26,9 @@ class IMessage(PolymorphicModel):
 
     message_type = models.CharField(max_length=20,choices=TYPES)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self) -> str:
+        return self.message_type
 
 
 
@@ -63,6 +67,9 @@ class FileMessage(IMessage):
 
     file = models.FileField(upload_to="files/")
     caption = models.TextField(blank=True, null=True)
+    
+    def __str__(self) -> str:
+        return self.file.name
 
 class ChatGroup(models.Model):
     """
@@ -120,7 +127,7 @@ class Video(models.Model):
 
 class File(models.Model):
     file = models.FileField(upload_to="post/files/")
-
+    
     def __str__(self) -> str:
         return self.file.name
 
@@ -162,3 +169,5 @@ class Notification(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+

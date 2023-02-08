@@ -5,8 +5,9 @@ from django.contrib import admin
 from .models import (
     Image,
     ImageMessage,
-    Video,
     VideoMessage,
+    FileMessage,
+    Video,
     File,
     Post,
     PostComment,
@@ -18,23 +19,131 @@ from .models import (
     Message,
     TextMessage,
     GroupMessage,
+    IMessage,
 )
-
+from polymorphic.admin import (
+    PolymorphicParentModelAdmin,
+    PolymorphicChildModelAdmin,
+    PolymorphicChildModelFilter,
+)
 
 # Register your models here.
 
-admin.site.register(Image)
-admin.site.register(ImageMessage)
-admin.site.register(Video)
+
+class ModelIMessageAdmin(PolymorphicChildModelAdmin):
+    base_model = IMessage
+
+
+class IMessageAdmin(PolymorphicParentModelAdmin):
+    base_model = IMessage
+    child_models = (ImageMessage, VideoMessage, TextMessage, FileMessage)
+    list_filter = (PolymorphicChildModelFilter,)
+
+    list_display = ("id", "message_type", "created_at")
+
+
+admin.site.register(IMessage, IMessageAdmin)
+
+
+class ImageAdmin(admin.ModelAdmin):
+    list_display = ("image",)
+
+
+admin.site.register(Image, ImageAdmin)
+
+
+class VideoAdmin(admin.ModelAdmin):
+    list_display = ("id", "video")
+
+
+admin.site.register(Video, VideoAdmin)
+
+
+class FileAdmin(admin.ModelAdmin):
+    list_display = ("id", "file")
+
+
+admin.site.register(File, FileAdmin)
+
+
+class PostAdmin(admin.ModelAdmin):
+    list_display = ("id", "author")
+
+
+admin.site.register(Post, PostAdmin)
+
+
+class ImageMessageAdmin(admin.ModelAdmin):
+    list_display = ("message_type", "caption", "created_at")
+
+
+admin.site.register(ImageMessage, ImageMessageAdmin)
+
+
+class VideoMessageAdmin(admin.ModelAdmin):
+    list_display = ("message_type", "caption", "created_at")
+
+
 admin.site.register(VideoMessage)
-admin.site.register(File)
-admin.site.register(Post)
-admin.site.register(PostComment)
+
+
+class FileMessageAdmin(admin.ModelAdmin):
+    list_display = ("message_type", "caption", "created_at")
+    list_filter = ("file",)
+
+
+admin.site.register(FileMessage, FileMessageAdmin)
+
+
+class TextMessageAdmin(admin.ModelAdmin):
+    list_display = ("message_type", "text", "created_at")
+
+
+admin.site.register(TextMessage, TextMessageAdmin)
+
+
+class PostCommentAdmin(admin.ModelAdmin):
+    list_display = ("id", "post", "text", "created_at")
+
+
+admin.site.register(PostComment, PostCommentAdmin)
 admin.site.register(PostLike)
-admin.site.register(UserProfile)
 admin.site.register(ChatGroup)
 admin.site.register(CommentLike)
-admin.site.register(Notification)
-admin.site.register(Message)
-admin.site.register(TextMessage)
-admin.site.register(GroupMessage)
+
+
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "message", "is_read", "created_at")
+    raw_id_fields = ["user"]
+
+
+admin.site.register(Notification, NotificationAdmin)
+
+
+class MessageAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "sender",
+        "reciever",
+        "sender_read",
+        "reciever_read",
+        "timestamp",
+    )
+    raw_id_fields = ["sender", "reciever"]
+
+
+admin.site.register(Message, MessageAdmin)
+
+class GroupMessageAdmin(admin.ModelAdmin):
+    list_display = ('id',"chat","sender","message")
+    
+admin.site.register(GroupMessage,GroupMessageAdmin)
+
+
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "bio")
+
+    raw_id_fields = ["user"]
+
+
+admin.site.register(UserProfile, UserProfileAdmin)
