@@ -6,7 +6,14 @@ from rest_framework.mixins import (
     UpdateModelMixin,
 )
 
-from chat.models import UserProfile, Message, GroupMessage, ChatGroup
+from chat.models import (
+    UserProfile,
+    Message,
+    GroupMessage,
+    ChatGroup,
+    Post,
+    Notification,
+)
 from .serializers import (
     ChatGroupSerializer,
     MessageSerializer,
@@ -15,6 +22,10 @@ from .serializers import (
     GroupMessageListSerializer,
     GroupMessageCreateSerializer,
     IMessagePolymorphicSerializer,
+    PostSerializer,
+    PostListSerializer,
+    NotificationSerializer,
+    NotificationListSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -63,12 +74,11 @@ class GroupMessageViewSet(
 
         serializer = GroupMessageSerializer(data=data)
         serializer.is_valid(raise_exception=True)
-        dt = serializer.save()  
-        
-        print(dt)
+        dt = serializer.save()
 
         return Response(
-            {"data": GroupMessageListSerializer(instance=dt).data, "success": True}, status=status.HTTP_201_CREATED
+            {"data": GroupMessageListSerializer(instance=dt).data, "success": True},
+            status=status.HTTP_201_CREATED,
         )
 
 
@@ -82,3 +92,31 @@ class MessageViewSet(
 ):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
+
+
+class PostViewSet(
+    CreateModelMixin,
+    RetrieveModelMixin,
+    ListModelMixin,
+    UpdateModelMixin,
+    DestroyModelMixin,
+    GenericViewSet,
+):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+
+class NotificationViewSet(
+    CreateModelMixin,
+    RetrieveModelMixin,
+    ListModelMixin,
+    UpdateModelMixin,
+    DestroyModelMixin,
+    GenericViewSet,
+):
+    def get_serializer_class(self):
+        if self.request.method.upper() in ["GET"]:
+            return NotificationListSerializer
+        return NotificationSerializer
+
+    queryset = Notification.objects.all()

@@ -97,24 +97,6 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class PostSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        fields = "__all__"
-
-
-class PostCommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PostComment
-        fields = "__all__"
-
-
-class PostLikeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PostLike
-        fields = "__all__"
-
-
 class VideoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Video
@@ -130,6 +112,42 @@ class FileSerializer(serializers.ModelSerializer):
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
+        fields = "__all__"
+
+
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = "__all__"
+        
+class PostListSerializer(serializers.ModelSerializer):
+    author = UserProfileSerializer()
+    images = ImageSerializer()
+    files = FileSerializer()
+    video = VideoSerializer()
+    
+    class Meta:
+        model = Post
+        fields = "__all__"
+
+
+class PostCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostComment
+        fields = "__all__"
+
+
+class PostCommentListSerializer(serializers.ModelSerializer):
+    user = UserProfileSerializer()
+    post = PostCommentSerializer()
+    class Meta:
+        model = PostComment
+        fields = '__all__'
+
+class PostLikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostLike
         fields = "__all__"
 
 
@@ -167,6 +185,12 @@ class CommentLikeSerializer(serializers.ModelSerializer):
 
 
 class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = "__all__"
+
+class NotificationListSerializer(serializers.ModelSerializer):
+    user = UserProfileSerializer()
     class Meta:
         model = Notification
         fields = "__all__"

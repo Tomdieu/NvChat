@@ -145,6 +145,7 @@ class PostLike(models.Model):
         UserProfile, on_delete=models.CASCADE, related_name="user_liking"
     )
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class PostComment(models.Model):
