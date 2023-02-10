@@ -10,7 +10,7 @@ User = get_user_model()
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,related_name="profile")
     profile_picture = models.ImageField(upload_to="profiles/", null=True, blank=True)
     bio = models.CharField(max_length=255,null=True,blank=True)
 
@@ -22,9 +22,9 @@ class IMessage(PolymorphicModel):
     Define an interface for a message with a single responsibility
     """
 
-    TYPES = (("TEXT", "TEXT"), ("IMAGE", "IMAGE"), ("VIDEO", "VIDEO"), ("FILE", "FILE"))
+    # TYPES = (("TEXT", "TEXT"), ("IMAGE", "IMAGE"), ("VIDEO", "VIDEO"), ("FILE", "FILE"))
 
-    message_type = models.CharField(max_length=20,choices=TYPES)
+    # message_type = models.CharField(max_length=20,choices=TYPES)
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self) -> str:
@@ -70,18 +70,43 @@ class FileMessage(IMessage):
     
     def __str__(self) -> str:
         return self.file.name
-
+    
+class UrlMessage(IMessage):
+    url = models.URLField()
+    
+    def __str__(self) -> str:
+        return self.url
+    
+class InvitationMessage(IMessage):
+    sender = models.ForeignKey(UserProfile,on_delete=models.CASCADE,related_name="send_invitation")
+    recipient  = models.ForeignKey(UserProfile,on_delete=models.CASCADE,related_name="received_invitations")
+    status = models.CharField(max_length=10,default='pending',choices=[('pending','pending'),('accepted','rejected'),('rejected','accepted')])
+    
+    class Meta:
+        unique_together = (('sender','recipient'),)
+    
+class GroupInvitationMessage(InvitationMessage):
+    group_chat = models.ForeignKey("ChatGroup",on_delete=models.CASCADE,related_name="invitations")
+    
 class ChatGroup(models.Model):
     """
     Model to represent a group
     """
 
     chat_name = models.CharField(max_length=255)
+    created_by = models.ForeignKey(UserProfile,on_delete=models.CASCADE,related_name="created_by")
     participant = models.ManyToManyField(UserProfile,blank=True)
 
     def __str__(self) -> str:
         return self.chat_name
 
+class ChatGroupMembers(models.Model):
+    user = models.ForeignKey(UserProfile,on_delete=models.CASCADE,related_name="user_groups")
+    group = models.ForeignKey(ChatGroup,on_delete=models.CASCADE,related_name="groups")
+    joined_on = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = (('user', 'group'),)
 
 class GroupMessage(models.Model):
     """
@@ -160,6 +185,14 @@ class PostComment(models.Model):
 class CommentLike(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     comment = models.ForeignKey(PostComment, on_delete=models.CASCADE)
+
+class Friends(models.Model):
+    user = models.ForeignKey(UserProfile,on_delete=models.CASCADE,related_name="users")
+    friend = models.ForeignKey(UserProfile,on_delete=models.CASCADE,related_name='friends')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = (("user", "friend"),)
 
 
 class Notification(models.Model):

@@ -4,6 +4,9 @@ from chat.models import (
     VideoMessage,
     TextMessage,
     FileMessage,
+    UrlMessage,
+    InvitationMessage,
+    GroupInvitationMessage,
     Message,
     Post,
     PostComment,
@@ -12,10 +15,12 @@ from chat.models import (
     File,
     Image,
     ChatGroup,
+    ChatGroupMembers,
     GroupMessage,
     CommentLike,
     Notification,
     UserProfile,
+    Friends,
 )
 
 from rest_framework import serializers
@@ -34,18 +39,14 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "password",
             "is_superuser",
-            "is_staff",
         ]
-        
-        extra_kwargs = {
-            'password':{
-                'write_only':True
-            }
-        }
+
+        extra_kwargs = {"password": {"write_only": True}}
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+
     class Meta:
         model = UserProfile
         fields = "__all__"
@@ -54,7 +55,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class ImessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = IMessage
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ImageMessageSerializer(serializers.ModelSerializer):
@@ -80,6 +81,45 @@ class FileMessageSerializer(serializers.ModelSerializer):
         model = FileMessage
         fields = "__all__"
 
+class UrlMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        mode = UrlMessage
+        fiels = "__all__"
+
+
+class InvitationMessageSerializer(serializers.ModelSerializer):
+    sender = UserProfileSerializer()
+    recipient = UserProfileSerializer()
+
+    class Meta:
+        model = InvitationMessage
+        fields = "__all__"
+
+
+class InvitationMessageCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvitationMessage
+        fields = "__all__"
+
+
+class ChatGroupSerializer(serializers.ModelSerializer):
+    participant = UserProfileSerializer(many=True)
+    created_by = UserProfileSerializer()
+
+    class Meta:
+        model = ChatGroup
+        fields = "__all__"
+
+
+class GroupInvitationMessageSerializer(serializers.ModelSerializer):
+    group_chat = ChatGroupSerializer()
+    sender = UserProfileSerializer()
+    recipient = UserProfileSerializer()
+
+    class Meta:
+        model = GroupInvitationMessage
+        fields = "__all__"
+
 
 class IMessagePolymorphicSerializer(PolymorphicSerializer):
     model_serializer_mapping = {
@@ -87,11 +127,25 @@ class IMessagePolymorphicSerializer(PolymorphicSerializer):
         VideoMessage: VideoMessageSerializer,
         TextMessage: TextMessageSerializer,
         FileMessage: FileMessageSerializer,
+        InvitationMessage: InvitationMessageSerializer,
+        GroupInvitationMessage: GroupInvitationMessageSerializer,
+        UrlMessage:UrlMessageSerializer
     }
 
 
 class MessageSerializer(serializers.ModelSerializer):
     message = IMessagePolymorphicSerializer(many=False)
+    sender = UserProfileSerializer()
+    reciever = UserProfileSerializer()
+
+    class Meta:
+        model = Message
+        fields = "__all__"
+
+
+class MessageCreateSerializer(serializers.ModelSerializer):
+    message = IMessagePolymorphicSerializer(many=False)
+
     class Meta:
         model = Message
         fields = "__all__"
@@ -115,18 +169,18 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = "__all__"
-        
+
+
 class PostListSerializer(serializers.ModelSerializer):
     author = UserProfileSerializer()
     images = ImageSerializer()
     files = FileSerializer()
     video = VideoSerializer()
-    
+
     class Meta:
         model = Post
         fields = "__all__"
@@ -141,9 +195,11 @@ class PostCommentSerializer(serializers.ModelSerializer):
 class PostCommentListSerializer(serializers.ModelSerializer):
     user = UserProfileSerializer()
     post = PostCommentSerializer()
+
     class Meta:
         model = PostComment
-        fields = '__all__'
+        fields = "__all__"
+
 
 class PostLikeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -151,11 +207,27 @@ class PostLikeSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ChatGroupSerializer(serializers.ModelSerializer):
+class ChatGroupMembersSerializer(serializers.ModelSerializer):
+    user = UserProfileSerializer()
+    group = ChatGroupSerializer()
+
+    class Meta:
+        model = ChatGroupMembers
+        fields = "__all__"
+
+
+class ChatGroupMembersCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChatGroupMembers
+        fields = "__all__"
+
+
+class ChatGroupCreateSerializer(serializers.ModelSerializer):
     # participant = UserProfileSerializer(many=True)
     class Meta:
         model = ChatGroup
         fields = "__all__"
+        extra_kwargs = {"created_by": {"read_only": True}}
 
 
 class GroupMessageSerializer(serializers.ModelSerializer):
@@ -163,16 +235,20 @@ class GroupMessageSerializer(serializers.ModelSerializer):
         model = GroupMessage
         fields = "__all__"
 
+
 class GroupMessageListSerializer(serializers.ModelSerializer):
     message = IMessagePolymorphicSerializer()
     sender = UserProfileSerializer()
     chat = ChatGroupSerializer()
+
     class Meta:
         model = GroupMessage
         fields = "__all__"
-        
+
+
 class GroupMessageCreateSerializer(serializers.ModelSerializer):
     message = IMessagePolymorphicSerializer()
+
     class Meta:
         model = GroupMessage
         fields = "__all__"
@@ -189,8 +265,30 @@ class NotificationSerializer(serializers.ModelSerializer):
         model = Notification
         fields = "__all__"
 
+
 class NotificationListSerializer(serializers.ModelSerializer):
     user = UserProfileSerializer()
+
     class Meta:
         model = Notification
         fields = "__all__"
+
+
+class FriendsSerializer(serializers.ModelSerializer):
+    user = UserProfileSerializer()
+    friend = UserProfileSerializer()
+
+    class Meta:
+        model = Friends
+        fields = "__all__"
+
+
+class FriendsCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Friends
+        fields = "__all__"
+
+
+class AuthenticationSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True, max_length=255)
+    password = serializers.CharField(required=True, max_length=255)

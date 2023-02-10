@@ -7,6 +7,9 @@ from .models import (
     ImageMessage,
     VideoMessage,
     FileMessage,
+    InvitationMessage,
+    GroupInvitationMessage,
+    UrlMessage,
     Video,
     File,
     Post,
@@ -14,6 +17,8 @@ from .models import (
     PostLike,
     UserProfile,
     ChatGroup,
+    ChatGroupMembers,
+    Friends,
     CommentLike,
     Notification,
     Message,
@@ -36,10 +41,10 @@ class ModelIMessageAdmin(PolymorphicChildModelAdmin):
 
 class IMessageAdmin(PolymorphicParentModelAdmin):
     base_model = IMessage
-    child_models = (ImageMessage, VideoMessage, TextMessage, FileMessage)
+    child_models = (ImageMessage, VideoMessage, TextMessage, FileMessage,UrlMessage,InvitationMessage,GroupInvitationMessage)
     list_filter = (PolymorphicChildModelFilter,)
 
-    list_display = ("id", "message_type", "created_at")
+    list_display = ("id", "created_at")
 
 
 admin.site.register(IMessage, IMessageAdmin)
@@ -74,21 +79,21 @@ admin.site.register(Post, PostAdmin)
 
 
 class ImageMessageAdmin(admin.ModelAdmin):
-    list_display = ("message_type", "caption", "created_at")
+    list_display = ("caption", "created_at")
 
 
 admin.site.register(ImageMessage, ImageMessageAdmin)
 
 
 class VideoMessageAdmin(admin.ModelAdmin):
-    list_display = ("message_type", "caption", "created_at")
+    list_display = ("caption", "created_at")
 
 
 admin.site.register(VideoMessage)
 
 
 class FileMessageAdmin(admin.ModelAdmin):
-    list_display = ("message_type", "caption", "created_at")
+    list_display = ("caption", "created_at")
     list_filter = ("file",)
 
 
@@ -96,7 +101,7 @@ admin.site.register(FileMessage, FileMessageAdmin)
 
 
 class TextMessageAdmin(admin.ModelAdmin):
-    list_display = ("message_type", "text", "created_at")
+    list_display = ("text", "created_at")
 
 
 admin.site.register(TextMessage, TextMessageAdmin)
@@ -147,3 +152,39 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 
 admin.site.register(UserProfile, UserProfileAdmin)
+
+class InvitationMessageAdmin(admin.ModelAdmin):
+    
+    list_display = ['sender','recipient','status']
+    
+admin.site.register(InvitationMessage,InvitationMessageAdmin)
+
+class GroupInvitationMessageAdmin(admin.ModelAdmin):
+    
+    list_display = ['sender','recipient','group_chat','status']
+    
+    raw_id_fields = ['sender',"recipient","group_chat"]
+    
+admin.site.register(GroupInvitationMessage,GroupInvitationMessageAdmin)
+
+class UrlMessageAdmin(admin.ModelAdmin):
+    
+    list_display = ['url','created_at']
+
+admin.site.register(UrlMessage, UrlMessageAdmin)
+
+class ChatGroupMembersAdmin(admin.ModelAdmin):
+    
+    list_display = ['user','group','joined_on']
+    
+    raw_id_fields = ['user','group']
+    
+admin.site.register(ChatGroupMembers, ChatGroupMembersAdmin)
+
+class FriendsAdmin(admin.ModelAdmin):
+    
+    list_display = ['user','friend','created_at']
+    
+    raw_id_fields = ['user','friend']
+    
+admin.site.register(Friends,FriendsAdmin)
