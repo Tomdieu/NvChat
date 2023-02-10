@@ -8,6 +8,8 @@ from rest_framework.mixins import (
 
 from rest_framework.generics import CreateAPIView
 
+from django.contrib.auth import authenticate,login
+
 from chat.models import (
     ChatGroupMembers,
     UserProfile,
@@ -44,10 +46,32 @@ from rest_framework import status
 
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-
-class UserViewSet(ListModelMixin, CreateModelMixin, GenericViewSet):
+class UserRegistrationViewSet(GenericViewSet,CreateModelMixin):
+    
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer_class()(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        
+        return Response({
+            "data":serializer.data,
+            "message":"Account Created Successfully"
+        },status=status.HTTP_201_CREATED)
+
+class UserViewSet(ListModelMixin, RetrieveModelMixin,DestroyModelMixin,UpdateModelMixin, GenericViewSet):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+    
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response({
+            "data":serializer.data,
+            "message":"Successfully get profile"
+        })
 
 
 class AuthenticationViewSet(GenericViewSet, CreateAPIView):
@@ -56,10 +80,21 @@ class AuthenticationViewSet(GenericViewSet, CreateAPIView):
     serializer_class = AuthenticationSerializer
 
     def create(self, request, *args, **kwargs):
+        
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raised_exception=True)
+        serializer.is_valid(raise_exception=True)
         username = request.data.get("username")
         password = request.data.get("password")
+        
+        user = authenticate(username=username,password=password)
+        
+        
+        if user is not None:
+            login(request,user)
+            return Response({
+                "token":user.auth_token.key
+            },status=status.HTTP_200_OK)
+        return Response({"message":"Invalid credentials"},status=status.HTTP_400_BAD_REQUEST)
 
 
 class ChatGroupViewSet(
@@ -70,6 +105,9 @@ class ChatGroupViewSet(
     UpdateModelMixin,
     GenericViewSet,
 ):
+    
+    permission_classes = [IsAuthenticated]
+    
     def get_serializer_class(self):
         if self.request.method.upper() in ["POST"]:
             return ChatGroupCreateSerializer
@@ -98,6 +136,9 @@ class ChatGroupViewSet(
 
 class GroupChatMessageViewSet(GenericViewSet,RetrieveModelMixin):
     
+    permission_classes = [IsAuthenticated]
+    
+    
     serializer_class =GroupMessageListSerializer
     
     def get_queryset(self):
@@ -115,13 +156,15 @@ class GroupChatMessageViewSet(GenericViewSet,RetrieveModelMixin):
     
 class GroupChatMembersViewSet(GenericViewSet,RetrieveModelMixin):
     
+    # permission_classes = [IsAuthenticated]
+    
     queryset = ChatGroupMembers.objects.all()
     
     serializer_class = ChatGroupMembersSerializer   
     
     def retrieve(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        instance = queryset.filter(chat=kwargs.get('pk'))
+        instance = queryset.filter(group=kwargs.get('pk'))
         if not instance.exists():
             return Response({
                 "data":[]    
@@ -135,6 +178,8 @@ class GroupMessageViewSet(
     UpdateModelMixin,
     GenericViewSet,
 ):
+    permission_classes = [IsAuthenticated]
+    
     def get_serializer_class(self):
         if self.request.method.upper() in ["GET"]:
             return GroupMessageListSerializer
@@ -173,6 +218,8 @@ class MessageViewSet(
     DestroyModelMixin,
     GenericViewSet,
 ):
+    permission_classes = [IsAuthenticated]
+    
     def get_serializer_class(self):
         if self.request.method.upper() in ["GET", "PATCH", "DELETE"]:
             return MessageSerializer
@@ -190,6 +237,8 @@ class PostViewSet(
     DestroyModelMixin,
     GenericViewSet,
 ):
+    permission_classes = [IsAuthenticated]
+    
     def get_serializer_class(self):
         if self.request.method.upper() in ["GET"]:
             return PostListSerializer
@@ -206,12 +255,15 @@ class NotificationViewSet(
     DestroyModelMixin,
     GenericViewSet,
 ):
+    permission_classes = [IsAuthenticated]
+    
     def get_serializer_class(self):
         if self.request.method.upper() in ["GET"]:
             return NotificationListSerializer
         return NotificationSerializer
 
-    queryset = Notification.objects.all()
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user)
 
 
 class FriendViewSet(
@@ -222,6 +274,8 @@ class FriendViewSet(
     DestroyModelMixin,
     GenericViewSet,
 ):
+    permission_classes = [IsAuthenticated]
+    
     def get_serializer_class(self):
         if self.request.method.upper() in ["GET"]:
             return FriendsSerializer

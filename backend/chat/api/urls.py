@@ -7,6 +7,7 @@ from . import views
 router = DefaultRouter()
 
 router.register("authenticate",views.AuthenticationViewSet,basename="authenticate")
+router.register("register",views.UserRegistrationViewSet,basename="register")
 router.register('users',views.UserViewSet,basename="users")
 router.register("groups",views.ChatGroupViewSet,basename="groups")
 router.register("chat-group-message",views.GroupChatMessageViewSet,basename="chat-group-message")

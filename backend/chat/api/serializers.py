@@ -51,6 +51,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = "__all__"
 
+    def create(self, validated_data):
+        user_data = validated_data.pop("user")
+        user = User.objects.create(**user_data)
+        validated_data["user"] = user
+        profile = UserProfile.objects.create(**validated_data)
+
+        return profile
+
 
 class ImessageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -80,6 +88,7 @@ class FileMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = FileMessage
         fields = "__all__"
+
 
 class UrlMessageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -129,7 +138,7 @@ class IMessagePolymorphicSerializer(PolymorphicSerializer):
         FileMessage: FileMessageSerializer,
         InvitationMessage: InvitationMessageSerializer,
         GroupInvitationMessage: GroupInvitationMessageSerializer,
-        UrlMessage:UrlMessageSerializer
+        UrlMessage: UrlMessageSerializer,
     }
 
 

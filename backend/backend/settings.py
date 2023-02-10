@@ -207,3 +207,6 @@ if DEBUG:
             "channels.layers.InMemoryChannelLayer",
         }
     }
+
+
+LOGIN_URL = 'chat/authenticate'
