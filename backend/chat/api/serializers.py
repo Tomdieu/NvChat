@@ -215,6 +215,13 @@ class PostLikeSerializer(serializers.ModelSerializer):
         model = PostLike
         fields = "__all__"
 
+class PostLikeListSerializer(serializers.ModelSerializer):
+    user = UserProfileSerializer()
+    post = PostSerializer()
+    class Meta:
+        model = PostLike
+        fields = "__all__"
+
 
 class ChatGroupMembersSerializer(serializers.ModelSerializer):
     user = UserProfileSerializer()

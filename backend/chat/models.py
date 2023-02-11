@@ -158,7 +158,7 @@ class File(models.Model):
 
 
 class Post(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author")
+    author = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="author")
     text = models.TextField(blank=True, null=True)
     images = models.ManyToManyField(Image, blank=True)
     files = models.ManyToManyField(File, blank=True)
