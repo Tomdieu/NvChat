@@ -7,6 +7,7 @@ from chat.models import (
     UrlMessage,
     InvitationMessage,
     GroupInvitationMessage,
+    Conversation,
     Message,
     Post,
     PostComment,
@@ -141,12 +142,16 @@ class IMessagePolymorphicSerializer(PolymorphicSerializer):
         UrlMessage: UrlMessageSerializer,
     }
 
+class ConversationSerializer(serializers.ModelSerializer):
+    participants = UserProfileSerializer(many=True)
+    class Meta:
+        model = Conversation
+        fields = '__all__'
 
 class MessageSerializer(serializers.ModelSerializer):
     message = IMessagePolymorphicSerializer(many=False)
     sender = UserProfileSerializer()
-    reciever = UserProfileSerializer()
-
+    conversation = ConversationSerializer()
     class Meta:
         model = Message
         fields = "__all__"

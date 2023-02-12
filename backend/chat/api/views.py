@@ -15,6 +15,7 @@ from chat.models import (
     PostComment,
     PostLike,
     UserProfile,
+    Conversation,
     Message,
     GroupMessage,
     ChatGroup,
@@ -25,6 +26,7 @@ from chat.models import (
 from .serializers import (
     ChatGroupSerializer,
     ChatGroupCreateSerializer,
+    ConversationSerializer,
     MessageSerializer,
     MessageCreateSerializer,
     PostCommentListSerializer,
@@ -223,6 +225,19 @@ class GroupMessageViewSet(
             status=status.HTTP_201_CREATED,
         )
 
+class ConversationViewSet(
+    CreateModelMixin,
+    ListModelMixin,
+    RetrieveModelMixin,
+    UpdateModelMixin,
+    DestroyModelMixin,
+    GenericViewSet
+):
+    permission_classes = [IsAuthenticated]
+    
+    serializer_class = ConversationSerializer
+    
+    queryset = Conversation.objects.all()
 
 class MessageViewSet(
     CreateModelMixin,

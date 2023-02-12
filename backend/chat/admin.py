@@ -21,6 +21,7 @@ from .models import (
     Friends,
     CommentLike,
     Notification,
+    Conversation,
     Message,
     TextMessage,
     GroupMessage,
@@ -124,17 +125,20 @@ class NotificationAdmin(admin.ModelAdmin):
 
 admin.site.register(Notification, NotificationAdmin)
 
+class ConversationAdmin(admin.ModelAdmin):
+    
+    list_display = ("id","created_at")
+    
+admin.site.register(Conversation, ConversationAdmin)
 
 class MessageAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "sender",
-        "reciever",
-        "sender_read",
-        "reciever_read",
+        "is_read",
         "timestamp",
     )
-    raw_id_fields = ["sender", "reciever"]
+    raw_id_fields = ["sender"]
 
 
 admin.site.register(Message, MessageAdmin)

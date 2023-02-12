@@ -26,9 +26,6 @@ class IMessage(PolymorphicModel):
 
     # message_type = models.CharField(max_length=20,choices=TYPES)
     created_at = models.DateTimeField(auto_now_add=True)
-    
-    def __str__(self) -> str:
-        return self.message_type
 
 
 
@@ -117,23 +114,21 @@ class GroupMessage(models.Model):
     sender = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     message = models.OneToOneField(IMessage, on_delete=models.CASCADE)
 
+class Conversation(models.Model):
+    participants = models.ManyToManyField(UserProfile)
+    created_at = models.DateTimeField(auto_now_add=True,null=True)
 
 class Message(models.Model):
+    conversation = models.ForeignKey(Conversation,on_delete=models.CASCADE,related_name="conversation")
     sender = models.ForeignKey(
         UserProfile, on_delete=models.CASCADE, related_name="sender"
-    )
-    reciever = models.ForeignKey(
-        UserProfile, on_delete=models.CASCADE, related_name="reciever"
     )
     message = models.ForeignKey(
         IMessage, on_delete=models.CASCADE, related_name="message"
     )
     timestamp = models.DateTimeField(auto_now_add=True)
-    sender_read = models.BooleanField(default=False)
-    reciever_read = models.BooleanField(default=False)
+    is_read = models.BooleanField(default=False)
 
-    class Meta:
-        unique_together = (("sender", "reciever"),)
 
 
 class Image(models.Model):
