@@ -150,7 +150,7 @@ admin.site.register(GroupMessage,GroupMessageAdmin)
 
 
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "bio")
+    list_display = ("id", "user", 'country','phone_number',"bio")
 
     raw_id_fields = ["user"]
 
