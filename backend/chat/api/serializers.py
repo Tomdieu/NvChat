@@ -1,64 +1,25 @@
 from chat.models import (
+    GroupMember,
     IMessage,
     ImageMessage,
     VideoMessage,
     TextMessage,
     FileMessage,
-    UrlMessage,
     InvitationMessage,
     GroupInvitationMessage,
     Conversation,
     Message,
-    Post,
-    PostComment,
-    PostLike,
-    Video,
-    File,
-    Image,
     ChatGroup,
-    ChatGroupMembers,
     GroupMessage,
-    CommentLike,
-    Notification,
-    UserProfile,
-    Friends,
 )
 
 from rest_framework import serializers
 from rest_polymorphic.serializers import PolymorphicSerializer
 
-from django.contrib.auth import get_user_model
+from account.api.serializers import UserProfileSerializer
+from account.models import UserProfile
 
-User = get_user_model()
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = [
-            "username",
-            "email",
-            "password",
-            "is_superuser",
-        ]
-
-        extra_kwargs = {"password": {"write_only": True}}
-
-
-class UserProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-
-    class Meta:
-        model = UserProfile
-        fields = "__all__"
-
-    def create(self, validated_data):
-        user_data = validated_data.pop("user")
-        user = User.objects.create(**user_data)
-        validated_data["user"] = user
-        profile = UserProfile.objects.create(**validated_data)
-
-        return profile
+from django.db.models import Q
 
 
 class ImessageSerializer(serializers.ModelSerializer):
@@ -90,11 +51,6 @@ class FileMessageSerializer(serializers.ModelSerializer):
         model = FileMessage
         fields = "__all__"
 
-
-class UrlMessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        mode = UrlMessage
-        fiels = "__all__"
 
 
 class InvitationMessageSerializer(serializers.ModelSerializer):
@@ -138,20 +94,68 @@ class IMessagePolymorphicSerializer(PolymorphicSerializer):
         TextMessage: TextMessageSerializer,
         FileMessage: FileMessageSerializer,
         InvitationMessage: InvitationMessageSerializer,
-        GroupInvitationMessage: GroupInvitationMessageSerializer,
-        UrlMessage: UrlMessageSerializer,
+        GroupInvitationMessage: GroupInvitationMessageSerializer
     }
 
+
+class GroupMessageListSerializer(serializers.ModelSerializer):
+    message = IMessagePolymorphicSerializer()
+    sender = UserProfileSerializer()
+    chat = ChatGroupSerializer()
+
+    class Meta:
+        model = GroupMessage
+        fields = "__all__"
+
+
+class MessageListSerializer(serializers.ModelSerializer):
+    message = IMessagePolymorphicSerializer(many=False)
+    sender = UserProfileSerializer()
+
+    class Meta:
+        model = Message
+        fields = "__all__"
+
+
 class ConversationSerializer(serializers.ModelSerializer):
-    participants = UserProfileSerializer(many=True)
+    participants = UserProfileSerializer(
+        many=True,
+    )
+    title = serializers.SerializerMethodField()
+    latest_message = serializers.SerializerMethodField()
+    messages = serializers.SerializerMethodField()
+    imageUrl = serializers.SerializerMethodField()
+
     class Meta:
         model = Conversation
-        fields = '__all__'
+        fields = "__all__"
+
+    def get_user(self, obj: Conversation) -> UserProfile:
+        return obj.participants.get(~Q(user=self.context["request"].user))
+
+    def get_title(self, obj: Conversation):
+        return self.get_user(obj).user.get_username()
+
+    def get_latest_message(self, obj: Conversation):
+        return MessageListSerializer(obj.messages.last(), context=self.context).data
+
+    def get_messages(self, obj: Conversation):
+        return MessageListSerializer(
+            obj.messages.all(), many=True, context=self.context
+        ).data
+
+    def get_imageUrl(self, obj: Conversation):
+        user = self.get_user(obj)
+        if user.profile_picture:
+            return self.context["request"].build_absolute_uri(user.profile_picture)
+        return None
+
 
 class MessageSerializer(serializers.ModelSerializer):
     message = IMessagePolymorphicSerializer(many=False)
     sender = UserProfileSerializer()
     conversation = ConversationSerializer()
+
     class Meta:
         model = Message
         fields = "__all__"
@@ -165,81 +169,18 @@ class MessageCreateSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class VideoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Video
-        fields = "__all__"
-
-
-class FileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = File
-        fields = "__all__"
-
-
-class ImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Image
-        fields = "__all__"
-
-
-class PostSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        fields = "__all__"
-
-
-class PostListSerializer(serializers.ModelSerializer):
-    author = UserProfileSerializer()
-    images = ImageSerializer()
-    files = FileSerializer()
-    video = VideoSerializer()
-
-    class Meta:
-        model = Post
-        fields = "__all__"
-
-
-class PostCommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PostComment
-        fields = "__all__"
-
-
-class PostCommentListSerializer(serializers.ModelSerializer):
-    user = UserProfileSerializer()
-    post = PostCommentSerializer()
-
-    class Meta:
-        model = PostComment
-        fields = "__all__"
-
-
-class PostLikeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PostLike
-        fields = "__all__"
-
-class PostLikeListSerializer(serializers.ModelSerializer):
-    user = UserProfileSerializer()
-    post = PostSerializer()
-    class Meta:
-        model = PostLike
-        fields = "__all__"
-
-
-class ChatGroupMembersSerializer(serializers.ModelSerializer):
+class GroupMemberSerializer(serializers.ModelSerializer):
     user = UserProfileSerializer()
     group = ChatGroupSerializer()
 
     class Meta:
-        model = ChatGroupMembers
+        model = GroupMember
         fields = "__all__"
 
 
-class ChatGroupMembersCreateSerializer(serializers.ModelSerializer):
+class ChatGroupMemberCreateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ChatGroupMembers
+        model = GroupMember
         fields = "__all__"
 
 
@@ -275,41 +216,23 @@ class GroupMessageCreateSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class CommentLikeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CommentLike
-        fields = "__all__"
-
-
-class NotificationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Notification
-        fields = "__all__"
-
-
-class NotificationListSerializer(serializers.ModelSerializer):
-    user = UserProfileSerializer()
-
-    class Meta:
-        model = Notification
-        fields = "__all__"
-
-
-class FriendsSerializer(serializers.ModelSerializer):
-    user = UserProfileSerializer()
-    friend = UserProfileSerializer()
-
-    class Meta:
-        model = Friends
-        fields = "__all__"
-
-
-class FriendsCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Friends
-        fields = "__all__"
-
-
 class AuthenticationSerializer(serializers.Serializer):
     username = serializers.CharField(required=True, max_length=255)
     password = serializers.CharField(required=True, max_length=255)
+
+
+class ChatGroupListSerializer(serializers.ModelSerializer):
+    participant = UserProfileSerializer(many=True)
+    created_by = UserProfileSerializer()
+    latest_message = serializers.SerializerMethodField()
+    messages = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ChatGroup
+        fields = "__all__"
+
+    def get_latest_message(self, obj: ChatGroup):
+        return GroupMessageSerializer(obj.messages.last())
+
+    def get_messages(self, obj: ChatGroup):
+        return GroupMessageSerializer(obj.messages.all(), many=True)

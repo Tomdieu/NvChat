@@ -11,48 +11,35 @@ from rest_framework.generics import CreateAPIView
 from django.contrib.auth import authenticate, login
 
 from chat.models import (
-    ChatGroupMembers,
-    PostComment,
-    PostLike,
-    UserProfile,
+    GroupMember,
     Conversation,
     Message,
     GroupMessage,
     ChatGroup,
-    Post,
-    Notification,
-    Friends,
 )
+
+from account.models import UserProfile
+from account.api.serializers import UserProfileSerializer
+
 from .serializers import (
     ChatGroupSerializer,
     ChatGroupCreateSerializer,
     ConversationSerializer,
     MessageSerializer,
     MessageCreateSerializer,
-    PostCommentListSerializer,
-    PostCommentSerializer,
-    PostLikeListSerializer,
-    PostLikeSerializer,
-    UserProfileSerializer,
     GroupMessageSerializer,
     GroupMessageListSerializer,
     GroupMessageCreateSerializer,
     IMessagePolymorphicSerializer,
-    PostSerializer,
-    PostListSerializer,
-    ChatGroupMembersSerializer,
-    ChatGroupMembersCreateSerializer,
-    NotificationSerializer,
-    NotificationListSerializer,
-    FriendsSerializer,
-    FriendsCreateSerializer,
+    GroupMemberSerializer,
     AuthenticationSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework import status
 
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 class UserRegistrationViewSet(GenericViewSet, CreateModelMixin):
@@ -173,9 +160,9 @@ class GroupChatMessageViewSet(GenericViewSet, RetrieveModelMixin):
 class GroupChatMembersViewSet(GenericViewSet, RetrieveModelMixin):
     permission_classes = [IsAuthenticated]
 
-    queryset = ChatGroupMembers.objects.all()
+    queryset = GroupMember.objects.all()
 
-    serializer_class = ChatGroupMembersSerializer
+    serializer_class = GroupMemberSerializer
 
     def retrieve(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -225,19 +212,22 @@ class GroupMessageViewSet(
             status=status.HTTP_201_CREATED,
         )
 
+
 class ConversationViewSet(
     CreateModelMixin,
     ListModelMixin,
     RetrieveModelMixin,
     UpdateModelMixin,
     DestroyModelMixin,
-    GenericViewSet
+    GenericViewSet,
 ):
     permission_classes = [IsAuthenticated]
-    
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
     serializer_class = ConversationSerializer
-    
+
     queryset = Conversation.objects.all()
+
 
 class MessageViewSet(
     CreateModelMixin,
@@ -256,130 +246,3 @@ class MessageViewSet(
             return MessageCreateSerializer
 
     queryset = Message.objects.all()
-
-
-class PostViewSet(
-    CreateModelMixin,
-    RetrieveModelMixin,
-    ListModelMixin,
-    UpdateModelMixin,
-    DestroyModelMixin,
-    GenericViewSet,
-):
-    permission_classes = [IsAuthenticated]
-
-    def get_serializer_class(self):
-        if self.request.method.upper() in ["GET"]:
-            return PostListSerializer
-        return PostSerializer
-
-    queryset = Post.objects.all()
-
-
-class UserPostViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
-    permission_classes = [IsAuthenticated]
-
-    serializer_class = PostListSerializer
-    queryset = Post.objects.all()
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset().filter(author=request.user.profile)
-
-        return Response(
-            {
-                "data": UserProfileSerializer(queryset, many=True).data,
-            },
-            status=status.HTTP_200_OK,
-        )
-
-    def retrieve(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        user_profile = UserProfile.objects.get(id=kwargs.get("pk"))
-        instance = queryset.filter(author=user_profile)
-        if not instance.exists():
-            return Response({"data": []})
-        return Response(
-            {"data": self.get_serializer(instance).data}, status=status.HTTP_200
-        )
-
-
-class NotificationViewSet(
-    CreateModelMixin,
-    RetrieveModelMixin,
-    ListModelMixin,
-    UpdateModelMixin,
-    DestroyModelMixin,
-    GenericViewSet,
-):
-    permission_classes = [IsAuthenticated]
-
-    def get_serializer_class(self):
-        if self.request.method.upper() in ["GET"]:
-            return NotificationListSerializer
-        return NotificationSerializer
-
-    def get_queryset(self):
-        return Notification.objects.filter(user=self.request.user)
-
-
-class FriendViewSet(
-    CreateModelMixin,
-    RetrieveModelMixin,
-    ListModelMixin,
-    UpdateModelMixin,
-    DestroyModelMixin,
-    GenericViewSet,
-):
-    permission_classes = [IsAuthenticated]
-
-    def get_serializer_class(self):
-        if self.request.method.upper() in ["GET"]:
-            return FriendsSerializer
-        return FriendsCreateSerializer
-
-    queryset = Friends.objects.all()
-
-
-class ChatGroupMembersViewSet(
-    CreateModelMixin,
-    RetrieveModelMixin,
-    UpdateModelMixin,
-    DestroyModelMixin,
-    GenericViewSet,
-):
-    def get_serializer_class(self):
-        if self.request.method.upper() in ["GET"]:
-            return ChatGroupMembersSerializer
-        return ChatGroupMembersCreateSerializer
-
-    queryset = ChatGroupMembers.objects.all()
-
-
-class PostLikeViewSet(
-    CreateModelMixin,
-    ListModelMixin,
-    UpdateModelMixin,
-    DestroyModelMixin,
-    GenericViewSet,
-):
-    def get_serializer_class(self):
-        if self.request.method.upper() in ["GET"]:
-            return PostLikeListSerializer
-        return PostLikeSerializer
-
-    queryset = PostLike.objects.all()
-
-
-class PostCommentViewSet(
-    CreateModelMixin,
-    ListModelMixin,
-    UpdateModelMixin,
-    DestroyModelMixin,
-    GenericViewSet,
-):
-    def get_serializer_class(self):
-        if self.request.method.upper() in ["GET"]:
-            return PostCommentListSerializer
-        return PostCommentSerializer
-
-    queryset = PostComment.objects.all()
