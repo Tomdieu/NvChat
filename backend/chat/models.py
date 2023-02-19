@@ -92,7 +92,9 @@ class ChatGroup(models.Model):
     created_by = models.ForeignKey(
         UserProfile, on_delete=models.CASCADE, related_name="created_by"
     )
-    members = models.ManyToManyField(UserProfile, through="GroupMember", blank=True)
+    members = models.ManyToManyField(
+        UserProfile, through="GroupMember", blank=True, null=True
+    )
     image = models.ImageField(upload_to="group_image/", blank=True, null=True)
 
     @property
@@ -111,6 +113,7 @@ class GroupMember(models.Model):
         ChatGroup, on_delete=models.CASCADE, related_name="groups"
     )
     is_active = models.BooleanField(default=False)
+    is_manager = models.BooleanField(default=False)
     joined_on = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -124,6 +127,13 @@ class GroupMessage(models.Model):
 
     chat = models.ForeignKey(
         ChatGroup, related_name="chat_messages", on_delete=models.CASCADE
+    )
+    parent_message = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="reply_messages",
     )
     sender = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     message = models.OneToOneField(IMessage, on_delete=models.CASCADE)
@@ -140,6 +150,13 @@ class Message(models.Model):
     )
     sender = models.ForeignKey(
         UserProfile, on_delete=models.CASCADE, related_name="sender"
+    )
+    parent_message = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        related_name="reply_messages",
+        null=True,
+        blank=True,
     )
     message = models.ForeignKey(
         IMessage, on_delete=models.CASCADE, related_name="message"

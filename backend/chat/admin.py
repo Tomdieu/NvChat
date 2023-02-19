@@ -8,6 +8,7 @@ from .models import (
     FileMessage,
     InvitationMessage,
     GroupInvitationMessage,
+    ChatGroup,
     GroupMember,
     Conversation,
     Message,
@@ -75,8 +76,14 @@ class TextMessageAdmin(admin.ModelAdmin):
 admin.site.register(TextMessage, TextMessageAdmin)
 
 
+class MessageAdminInline(admin.StackedInline):
+    model = Message
+    extra = 0
+
+
 class ConversationAdmin(admin.ModelAdmin):
     list_display = ("id", "created_at")
+    inlines = [MessageAdminInline]
 
 
 admin.site.register(Conversation, ConversationAdmin)
@@ -93,6 +100,19 @@ class MessageAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Message, MessageAdmin)
+
+
+class GroupMessageAdminInline(admin.StackedInline):
+    model = GroupMessage
+    extra = 0
+
+
+class ChatGroupAdmin(admin.ModelAdmin):
+    list_display = ("chat_name", "created_by")
+    inlines = [GroupMessageAdminInline]
+
+
+admin.site.register(ChatGroup, ChatGroupAdmin)
 
 
 class GroupMessageAdmin(admin.ModelAdmin):
