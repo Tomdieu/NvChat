@@ -49,8 +49,9 @@ INSTALLED_APPS = [
     "corsheaders",
 
     # Local Apps
-
-    'chat'
+    'account',
+    'chat',
+    'post'
 ]
 
 MIDDLEWARE = [
@@ -136,6 +137,10 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media/'
 
+STATICFILES_DIRS = [
+    BASE_DIR/'static/'
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
@@ -151,7 +156,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
         # 'rest_framework.authentication.BasicAuthentication',
     ),
     'DEFAULT_PERMISSIONS_CLASSES': (
