@@ -92,9 +92,7 @@ class ChatGroup(models.Model):
     created_by = models.ForeignKey(
         UserProfile, on_delete=models.CASCADE, related_name="created_by"
     )
-    members = models.ManyToManyField(
-        UserProfile, through="GroupMember", blank=True, null=True
-    )
+    members = models.ManyToManyField(UserProfile, through="GroupMember", blank=True,related_name='group_members')
     image = models.ImageField(upload_to="group_image/", blank=True, null=True)
 
     @property
@@ -104,13 +102,16 @@ class ChatGroup(models.Model):
     def __str__(self) -> str:
         return self.chat_name
 
+class GroupOptions(models.Model):
+    group = models.ForeignKey(ChatGroup,on_delete=models.CASCADE,related_name='options')
+    
 
 class GroupMember(models.Model):
     user = models.ForeignKey(
         UserProfile, on_delete=models.CASCADE, related_name="user_groups"
     )
     group = models.ForeignKey(
-        ChatGroup, on_delete=models.CASCADE, related_name="groups"
+        ChatGroup, on_delete=models.CASCADE,related_name="group_members"
     )
     is_active = models.BooleanField(default=False)
     is_manager = models.BooleanField(default=False)
@@ -139,8 +140,14 @@ class GroupMessage(models.Model):
     message = models.OneToOneField(IMessage, on_delete=models.CASCADE)
 
 
+class GroupMessageView(models.Model):
+    viewer = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    message = models.ForeignKey(GroupMessage, on_delete=models.CASCADE)
+    viewed_at = models.DateTimeField(auto_now_add=True)
+
+
 class Conversation(models.Model):
-    participants = models.ManyToManyField(UserProfile)
+    participants = models.ManyToManyField(UserProfile,blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
 
