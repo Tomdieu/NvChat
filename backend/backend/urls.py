@@ -53,7 +53,7 @@ urlpatterns = [
     re_path(
         r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
     ),
-    path("favicon.ico", lambda _: redirect("static/favicon.ico", permanent=True)),
+    path("favicon.ico", lambda _: redirect("static/favicon.svg", permanent=True)),
 ]
 
 if settings.DEBUG:

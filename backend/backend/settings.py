@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'polymorphic',
+    'nested_admin',
     "drf_yasg",
     # "django_celery_beat",
     "corsheaders",
