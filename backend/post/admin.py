@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from polymorphic.admin import PolymorphicParentModelAdmin, PolymorphicChildModelFilter
 
-from .models import Image, Video, File, Post, Like, PostLike, PostComment, CommentLike,Friends
+from .models import Image, Video, File, Post, Like, PostLike, PostComment, CommentLike,Follower
 
 
 admin.site.register(Image)
@@ -58,4 +58,4 @@ class PostCommentAdmin(admin.ModelAdmin):
 admin.site.register(PostComment, PostCommentAdmin)
 
 
-admin.site.register(Friends)
+admin.site.register(Follower)
