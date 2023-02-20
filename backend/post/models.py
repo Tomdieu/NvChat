@@ -81,7 +81,7 @@ class CommentLike(Like):
         PostComment, on_delete=models.CASCADE, related_name="comment_like"
     )
 
-class Friends(models.Model):
+class Follower(models.Model):
     user = models.ForeignKey(UserProfile,on_delete=models.CASCADE,related_name="users")
     friend = models.ForeignKey(UserProfile,on_delete=models.CASCADE,related_name='friends')
     created_at = models.DateTimeField(auto_now_add=True)
