@@ -10,6 +10,7 @@ from .models import (
     GroupInvitationMessage,
     ChatGroup,
     GroupMember,
+    GroupMessageView,
     Conversation,
     Message,
     TextMessage,
@@ -21,6 +22,8 @@ from polymorphic.admin import (
     PolymorphicChildModelAdmin,
     PolymorphicChildModelFilter,
 )
+
+from nested_admin import NestedModelAdmin, NestedStackedInline, NestedTabularInline
 
 # Register your models here.
 
@@ -79,6 +82,7 @@ admin.site.register(TextMessage, TextMessageAdmin)
 class MessageAdminInline(admin.StackedInline):
     model = Message
     extra = 0
+    raw_id_fields = ['sender']
 
 
 class ConversationAdmin(admin.ModelAdmin):
@@ -89,37 +93,48 @@ class ConversationAdmin(admin.ModelAdmin):
 admin.site.register(Conversation, ConversationAdmin)
 
 
-class MessageAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "sender",
-        "is_read",
-        "timestamp",
-    )
-    raw_id_fields = ["sender"]
+# class MessageAdmin(admin.ModelAdmin):
+#     list_display = (
+#         "id",
+#         "sender",
+#         "is_read",
+#         "timestamp",
+#     )
+#     raw_id_fields = ["sender"]
 
 
-admin.site.register(Message, MessageAdmin)
+# admin.site.register(Message, MessageAdmin)
 
+class GroupMessageViewAdminInline(NestedStackedInline):
+    model = GroupMessageView
+    extra = 0
+    
 
-class GroupMessageAdminInline(admin.StackedInline):
+class GroupMessageAdminInline(NestedStackedInline):
     model = GroupMessage
     extra = 0
+    inlines = [GroupMessageViewAdminInline]
 
-
-class ChatGroupAdmin(admin.ModelAdmin):
+class GroupMemberAdminInline(NestedStackedInline):
+    model = GroupMember
+    extra = 0
+    
+class ChatGroupAdmin(NestedModelAdmin):
     list_display = ("chat_name", "created_by")
-    inlines = [GroupMessageAdminInline]
+    inlines = [GroupMessageAdminInline,GroupMemberAdminInline]
 
 
 admin.site.register(ChatGroup, ChatGroupAdmin)
 
 
-class GroupMessageAdmin(admin.ModelAdmin):
-    list_display = ("id", "chat", "sender", "message")
+# class GroupMessageAdmin(NestedModelAdmin):
+#     list_display = ("id", "chat", "sender", "message")
+#     inlines = [GroupMessageViewAdminInline]
 
 
-admin.site.register(GroupMessage, GroupMessageAdmin)
+# admin.site.register(GroupMessage, GroupMessageAdmin)
+
+# admin.site.register(GroupMessageView)
 
 
 class InvitationMessageAdmin(admin.ModelAdmin):
@@ -138,10 +153,10 @@ class GroupInvitationMessageAdmin(admin.ModelAdmin):
 admin.site.register(GroupInvitationMessage, GroupInvitationMessageAdmin)
 
 
-class GroupMemberAdmin(admin.ModelAdmin):
-    list_display = ["user", "group", "joined_on"]
+# class GroupMemberAdmin(admin.ModelAdmin):
+#     list_display = ["user", "group", "joined_on"]
 
-    raw_id_fields = ["user", "group"]
+#     raw_id_fields = ["user", "group"]
 
 
-admin.site.register(GroupMember, GroupMemberAdmin)
+# admin.site.register(GroupMember, GroupMemberAdmin)
