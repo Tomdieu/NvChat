@@ -19,6 +19,8 @@ from rest_polymorphic.serializers import PolymorphicSerializer
 from account.api.serializers import UserProfileSerializer
 from account.models import UserProfile
 
+from django.db import transaction
+
 from django.db.models import Q
 
 
@@ -52,7 +54,6 @@ class FileMessageSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-
 class InvitationMessageSerializer(serializers.ModelSerializer):
     sender = UserProfileSerializer()
     recipient = UserProfileSerializer()
@@ -67,14 +68,43 @@ class InvitationMessageCreateSerializer(serializers.ModelSerializer):
         model = InvitationMessage
         fields = "__all__"
 
+# class GroupMemberCreateSerializer(serializers.ModelSerializer):
+    
+#     class Meta:
+#         model = GroupMember
+#         fields = '__all__'
+
+class GroupMemberSerializer(serializers.ModelSerializer):
+    user = UserProfileSerializer(read_only=True)
+
+    class Meta:
+        model = GroupMember
+        fields = "__all__"
+        
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user.profile        
+        group_member =  GroupMember.objects.create(**validated_data)
+
+        return group_member 
 
 class ChatGroupSerializer(serializers.ModelSerializer):
-    participant = UserProfileSerializer(many=True)
-    created_by = UserProfileSerializer()
+    created_by = UserProfileSerializer(read_only=True)
+    group_members = GroupMemberSerializer(read_only=True, many=True)
+
+    latest_message = serializers.SerializerMethodField()
+    messages = serializers.SerializerMethodField()
 
     class Meta:
         model = ChatGroup
-        fields = "__all__"
+        exclude = ["members"]
+
+    def get_latest_message(self, obj: ChatGroup):
+        if obj.messages.last() == None:
+            return None
+        return GroupMessageSerializer(obj.messages.last()).data
+
+    def get_messages(self, obj: ChatGroup):
+        return GroupMessageSerializer(obj.messages.all(), many=True).data
 
 
 class GroupInvitationMessageSerializer(serializers.ModelSerializer):
@@ -94,7 +124,7 @@ class IMessagePolymorphicSerializer(PolymorphicSerializer):
         TextMessage: TextMessageSerializer,
         FileMessage: FileMessageSerializer,
         InvitationMessage: InvitationMessageSerializer,
-        GroupInvitationMessage: GroupInvitationMessageSerializer
+        GroupInvitationMessage: GroupInvitationMessageSerializer,
     }
 
 
@@ -117,10 +147,61 @@ class MessageListSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class CreateConversationSerializer(serializers.Serializer):
+    # TODO user1 and user2 represents the id of user 1 and 2  respectively
+
+    user1 = serializers.IntegerField()
+    user2 = serializers.IntegerField()
+
+    def get_user(self, id):
+        return UserProfile.objects.filter(id=id)
+
+    def validate_user1(self, value):
+        user1 = self.get_user(id=value)
+
+        if not user1.exists():
+            raise serializers.ValidationError(
+                "Sorry the user with id %s does not exist" % (value)
+            )
+
+        return user1
+
+    def validate_user2(self, value):
+        user2 = self.get_user(id=value)
+
+        if not user2.exists():
+            raise serializers.ValidationError(
+                "Sorry the user with id %s does not exist" % (value)
+            )
+
+        return user2
+
+    def validate(self, attrs):
+        if attrs.get("user1") == attrs.get("user2"):
+            raise serializers.ValidationError("User 1 and user 2 must be different")
+        return super().validate(attrs)
+
+    def create(self, validated_data):
+        print(validated_data)
+        user1 = validated_data["user1"]
+        print(user1)
+        user2 = validated_data["user2"]
+        print(user2)
+
+        # if user1.id == user2.id:
+        #     raise serializers.ValidationError("user 1 and user 2 must be different!")
+        with transaction.atomic():
+            conversation = Conversation.objects.create()
+
+            conversation.participants.add(user1.first(), user2.first())
+
+            conversation.save()
+
+            return conversation
+
+
 class ConversationSerializer(serializers.ModelSerializer):
-    participants = UserProfileSerializer(
-        many=True,
-    )
+    participants = UserProfileSerializer(many=True)
     title = serializers.SerializerMethodField()
     latest_message = serializers.SerializerMethodField()
     messages = serializers.SerializerMethodField()
@@ -137,7 +218,9 @@ class ConversationSerializer(serializers.ModelSerializer):
         return self.get_user(obj).user.get_username()
 
     def get_latest_message(self, obj: Conversation):
-        return MessageListSerializer(obj.messages.last(), context=self.context).data
+        if obj.messages.last():
+            return MessageListSerializer(obj.messages.last(), context=self.context).data
+        return None
 
     def get_messages(self, obj: Conversation):
         return MessageListSerializer(
@@ -166,15 +249,6 @@ class MessageCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = "__all__"
-
-
-class GroupMemberSerializer(serializers.ModelSerializer):
-    user = UserProfileSerializer()
-    group = ChatGroupSerializer()
-
-    class Meta:
-        model = GroupMember
         fields = "__all__"
 
 
@@ -222,7 +296,7 @@ class AuthenticationSerializer(serializers.Serializer):
 
 
 class ChatGroupListSerializer(serializers.ModelSerializer):
-    participant = UserProfileSerializer(many=True)
+    members = UserProfileSerializer(many=True)
     created_by = UserProfileSerializer()
     latest_message = serializers.SerializerMethodField()
     messages = serializers.SerializerMethodField()
