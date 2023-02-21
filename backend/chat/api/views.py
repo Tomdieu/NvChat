@@ -24,6 +24,7 @@ from account.api.serializers import UserProfileSerializer
 from .serializers import (
     ChatGroupSerializer,
     ChatGroupCreateSerializer,
+    CreateConversationSerializer,
     ConversationSerializer,
     MessageSerializer,
     MessageCreateSerializer,
@@ -32,6 +33,7 @@ from .serializers import (
     GroupMessageCreateSerializer,
     IMessagePolymorphicSerializer,
     GroupMemberSerializer,
+    # GroupMemberCreateSerializer,
     AuthenticationSerializer,
 )
 from rest_framework.response import Response
@@ -139,6 +141,28 @@ class ChatGroupViewSet(
         return super().partial_update(request, *args, **kwargs)
 
 
+class JoinGroupViewSet(GenericViewSet, CreateModelMixin):
+    serializer_class = GroupMemberSerializer
+
+    # def get_serializer_class(self):
+    #     if self.request.method.upper() in ["GET"]:
+    #         return GroupMemberSerializer
+
+    #     else:
+    #         return GroupMemberCreateSerializer
+
+    permission_classes = [IsAuthenticated]
+    
+    queryset = GroupMember.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
 class GroupChatMessageViewSet(GenericViewSet, RetrieveModelMixin):
     permission_classes = [IsAuthenticated]
 
@@ -157,62 +181,6 @@ class GroupChatMessageViewSet(GenericViewSet, RetrieveModelMixin):
         )
 
 
-class GroupChatMembersViewSet(GenericViewSet, RetrieveModelMixin):
-    permission_classes = [IsAuthenticated]
-
-    queryset = GroupMember.objects.all()
-
-    serializer_class = GroupMemberSerializer
-
-    def retrieve(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        instance = queryset.filter(group=kwargs.get("pk"))
-        if not instance.exists():
-            return Response({"data": []})
-        return Response(
-            {"data": self.get_serializer(instance).data}, status=status.HTTP_200
-        )
-
-
-class GroupMessageViewSet(
-    ListModelMixin,
-    CreateModelMixin,
-    DestroyModelMixin,
-    UpdateModelMixin,
-    GenericViewSet,
-):
-    permission_classes = [IsAuthenticated]
-
-    def get_serializer_class(self):
-        if self.request.method.upper() in ["GET"]:
-            return GroupMessageListSerializer
-        if self.request.method.upper() in ["POST"]:
-            return GroupMessageCreateSerializer
-        return GroupMessageSerializer
-
-    queryset = GroupMessage.objects.all()
-
-    def create(self, request, *args, **kwargs):
-        data = request.data
-
-        imessageSerializer = IMessagePolymorphicSerializer(
-            data=request.data.get("message")
-        )
-        imessageSerializer.is_valid(raise_exception=True)
-        imessage = imessageSerializer.save()
-
-        data["message"] = imessage.id
-
-        serializer = GroupMessageSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        dt = serializer.save()
-
-        return Response(
-            {"data": GroupMessageListSerializer(instance=dt).data, "success": True},
-            status=status.HTTP_201_CREATED,
-        )
-
-
 class ConversationViewSet(
     CreateModelMixin,
     ListModelMixin,
@@ -224,9 +192,14 @@ class ConversationViewSet(
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
-    serializer_class = ConversationSerializer
+    def get_serializer_class(self):
+        if self.request.method.upper() in ["POST"]:
+            return CreateConversationSerializer
+        return ConversationSerializer
 
-    queryset = Conversation.objects.all()
+    def get_queryset(self):
+        print(Conversation.objects.all(), self.request.user)
+        return Conversation.objects.filter(participants__user=self.request.user)
 
 
 class MessageViewSet(
@@ -246,3 +219,59 @@ class MessageViewSet(
             return MessageCreateSerializer
 
     queryset = Message.objects.all()
+
+
+# class GroupChatMembersViewSet(GenericViewSet, RetrieveModelMixin):
+#     permission_classes = [IsAuthenticated]
+
+#     queryset = GroupMember.objects.all()
+
+#     serializer_class = GroupMemberSerializer
+
+#     def retrieve(self, request, *args, **kwargs):
+#         queryset = self.get_queryset()
+#         instance = queryset.filter(group=kwargs.get("pk"))
+#         if not instance.exists():
+#             return Response({"data": []})
+#         return Response(
+#             {"data": self.get_serializer(instance).data}, status=status.HTTP_200
+#         )
+
+
+# class GroupMessageViewSet(
+#     ListModelMixin,
+#     CreateModelMixin,
+#     DestroyModelMixin,
+#     UpdateModelMixin,
+#     GenericViewSet,
+# ):
+#     permission_classes = [IsAuthenticated]
+
+#     def get_serializer_class(self):
+#         if self.request.method.upper() in ["GET"]:
+#             return GroupMessageListSerializer
+#         if self.request.method.upper() in ["POST"]:
+#             return GroupMessageCreateSerializer
+#         return GroupMessageSerializer
+
+#     queryset = GroupMessage.objects.all()
+
+#     def create(self, request, *args, **kwargs):
+#         data = request.data
+
+#         imessageSerializer = IMessagePolymorphicSerializer(
+#             data=request.data.get("message")
+#         )
+#         imessageSerializer.is_valid(raise_exception=True)
+#         imessage = imessageSerializer.save()
+
+#         data["message"] = imessage.id
+
+#         serializer = GroupMessageSerializer(data=data)
+#         serializer.is_valid(raise_exception=True)
+#         dt = serializer.save()
+
+#         return Response(
+#             {"data": GroupMessageListSerializer(instance=dt).data, "success": True},
+#             status=status.HTTP_201_CREATED,
+#         )
