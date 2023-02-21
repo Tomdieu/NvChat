@@ -9,6 +9,10 @@ from account.models import UserProfile
 User = get_user_model()
 
 
+class AuthenticationSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True, max_length=255)
+    password = serializers.CharField(required=True, max_length=255)
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
