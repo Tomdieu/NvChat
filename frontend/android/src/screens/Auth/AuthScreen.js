@@ -1,35 +1,83 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import React from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
+import { Formik } from "formik";
+import * as Yup from "yup";
 
 export default function LoginScreen() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const initialValues = { username: "", password: "" };
 
-  const handleLogin = () => {
+  const loginSchema = Yup.object().shape({
+    username: Yup.string().required("Username is required"),
+    password: Yup.string().required("Password is required"),
+  });
+
+  const handleLogin = (values, actions) => {
     // handle login logic here
+    actions.setSubmitting(false);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome!</Text>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Username"
-          value={username}
-          onChangeText={setUsername}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry={true}
-        />
-      </View>
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
+      <Text style={styles.title}>NvChat</Text>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={loginSchema}
+        onSubmit={handleLogin}
+      >
+        {({
+          values,
+          handleChange,
+          handleSubmit,
+          errors,
+          touched,
+          isValid,
+          isSubmitting,
+        }) => (
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[
+                styles.input,
+                errors.username && touched.username && styles.inputError,
+              ]}
+              placeholder="Username"
+              value={values.username}
+              onChangeText={handleChange("username")}
+            />
+            {errors.username && touched.username && (
+              <Text style={styles.errorText}>{errors.username}</Text>
+            )}
+            <TextInput
+              style={[
+                styles.input,
+                errors.password && touched.password && styles.inputError,
+              ]}
+              placeholder="Password"
+              value={values.password}
+              onChangeText={handleChange("password")}
+              secureTextEntry={true}
+            />
+            {errors.password && touched.password && (
+              <Text style={styles.errorText}>{errors.password}</Text>
+            )}
+            <TouchableOpacity
+              style={[
+                styles.button,
+                isValid && !isSubmitting && styles.buttonEnabled,
+              ]}
+              onPress={handleSubmit}
+              disabled={!isValid || isSubmitting}
+            >
+              <Text style={styles.buttonText}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </Formik>
     </View>
   );
 }
@@ -37,41 +85,52 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
     // alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 32,
-    textAlign:'center'
+    textAlign: "center",
   },
   inputContainer: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
+    margin: 5,
     borderRadius: 8,
     padding: 16,
     marginBottom: 16,
   },
   input: {
-    // height: 40,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 4,
-    padding: 10,
+    padding: 8,
     marginBottom: 16,
-    fontSize:20
+    fontSize: 20,
+  },
+  inputError: {
+    borderColor: "red",
+    borderWidth: 1,
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 16,
   },
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     borderRadius: 8,
     padding: 16,
-    margin:5
+    opacity: 0.5,
+  },
+  buttonEnabled: {
+    opacity: 1,
   },
   buttonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: 'bold',
-    textAlign:'center',
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });

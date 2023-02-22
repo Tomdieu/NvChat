@@ -10,7 +10,13 @@ import ForgotPasswordPage from "@pages/auth/forgot-password";
 import LandingPage from "@pages/landingPage";
 import NotFound from "@pages/NotFound";
 import ProtectedRoute from "@components/ProtectedRoute";
-import Chat from '@pages/chat'
+import Chat from "@pages/chat";
+
+import Topbar from '@components/Topbar'
+
+import { CssBaseline } from "@mui/material";
+
+import Layout from "@components/Layout";
 
 let theme = createTheme();
 theme = responsiveFontSizes(theme);
@@ -18,21 +24,28 @@ theme = responsiveFontSizes(theme);
 const AppRoutes = () => {
   return (
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <Router>
         <Routes>
           <Route path="/">
-            <Route path="" element={<LandingPage/>}/>
+            <Route path="" element={<LandingPage />} />
             <Route path="auth/">
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
               <Route path="forgot-password" element={<ForgotPasswordPage />} />
             </Route>
             <Route path="chat/" element={<ProtectedRoute isAllowed={true} />}>
-              <Route path="" element={<Chat/>} />
-              <Route path="xx" element={<Register/>} />
-
+              <Route path="" element={<Topbar />} />
+              <Route
+                path="discussion/"
+                element={
+                  <Layout>
+                    <LandingPage />
+                  </Layout>
+                }
+              />
             </Route>
-            <Route path="/*" element={<NotFound/>} />
+            <Route path="/*" element={<NotFound />} />
           </Route>
         </Routes>
       </Router>

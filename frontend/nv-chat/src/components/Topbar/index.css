@@ -1,0 +1,13 @@
+.topbarContainer{
+    height: 50px;
+    width: 100%;
+    background-color: blue;
+    display: flex;
+    align-items: center;
+    position: static;
+    top: 0;
+}
+
+.topbarImage{
+    width: 25px;
+}

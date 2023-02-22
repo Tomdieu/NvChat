@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@component/*": ["./src/components/*"],
-      "@utils/*":["./src/utils/*"]
-    }
-  }
-}
