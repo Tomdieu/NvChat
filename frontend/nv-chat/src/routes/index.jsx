@@ -12,11 +12,11 @@ import NotFound from "@pages/NotFound";
 import ProtectedRoute from "@components/ProtectedRoute";
 import Chat from "@pages/chat";
 
-import Topbar from '@components/Topbar'
+import ChatRoutes from "./ChatRoutes";
 
 import { CssBaseline } from "@mui/material";
 
-import Layout from "@components/Layout";
+import Layout from "@pages/Layout";
 
 let theme = createTheme();
 theme = responsiveFontSizes(theme);
@@ -35,15 +35,16 @@ const AppRoutes = () => {
               <Route path="forgot-password" element={<ForgotPasswordPage />} />
             </Route>
             <Route path="chat/" element={<ProtectedRoute isAllowed={true} />}>
-              <Route path="" element={<Topbar />} />
-              <Route
+              <Route path="" element={<Layout />} />
+              <Route path="_/*" element={<ChatRoutes/>}/>
+              {/* <Route
                 path="discussion/"
                 element={
                   <Layout>
                     <LandingPage />
                   </Layout>
                 }
-              />
+              /> */}
             </Route>
             <Route path="/*" element={<NotFound />} />
           </Route>
