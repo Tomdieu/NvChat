@@ -23,8 +23,8 @@ from polymorphic.admin import (
     PolymorphicChildModelFilter,
 )
 
-from nested_admin import NestedModelAdmin, NestedStackedInline, NestedTabularInline
-
+# from nested_admin import NestedModelAdmin, NestedStackedInline, NestedInlineModelAdmin
+from nested_admin import nested
 # Register your models here.
 
 
@@ -79,10 +79,10 @@ class TextMessageAdmin(admin.ModelAdmin):
 admin.site.register(TextMessage, TextMessageAdmin)
 
 
-class MessageAdminInline(admin.StackedInline):
+class MessageAdminInline(admin.TabularInline):
     model = Message
     extra = 0
-    raw_id_fields = ['sender']
+    raw_id_fields = ["sender"]
 
 
 class ConversationAdmin(admin.ModelAdmin):
@@ -105,36 +105,40 @@ admin.site.register(Conversation, ConversationAdmin)
 
 # admin.site.register(Message, MessageAdmin)
 
-class GroupMessageViewAdminInline(NestedStackedInline):
+
+class GroupMessageViewAdminInline(admin.TabularInline,nested.NestedTabularInline):
     model = GroupMessageView
     extra = 0
-    
 
-class GroupMessageAdminInline(NestedStackedInline):
+
+class GroupMessageAdminInline(nested.NestedStackedInline):
     model = GroupMessage
     extra = 0
+    raw_id_fields = ["sender"]
     inlines = [GroupMessageViewAdminInline]
 
-class GroupMemberAdminInline(NestedStackedInline):
+
+class GroupMemberAdminInline(admin.TabularInline,nested.NestedTabularInline):
     model = GroupMember
     extra = 0
-    
-class ChatGroupAdmin(NestedModelAdmin):
+
+
+class ChatGroupAdmin(nested.NestedModelAdmin):
     list_display = ("chat_name", "created_by")
-    inlines = [GroupMessageAdminInline,GroupMemberAdminInline]
+    inlines = [GroupMemberAdminInline, GroupMessageAdminInline]
 
 
 admin.site.register(ChatGroup, ChatGroupAdmin)
 
 
-# class GroupMessageAdmin(NestedModelAdmin):
-#     list_display = ("id", "chat", "sender", "message")
-#     inlines = [GroupMessageViewAdminInline]
+class GroupMessageAdmin(admin.ModelAdmin):
+    list_display = ("id", "chat", "sender", "message")
+    inlines = [GroupMessageViewAdminInline]
 
 
 # admin.site.register(GroupMessage, GroupMessageAdmin)
 
-# admin.site.register(GroupMessageView)
+admin.site.register(GroupMessageView)
 
 
 class InvitationMessageAdmin(admin.ModelAdmin):
