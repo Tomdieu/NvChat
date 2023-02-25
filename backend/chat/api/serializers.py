@@ -11,6 +11,7 @@ from chat.models import (
     Message,
     ChatGroup,
     GroupMessage,
+    GroupMessageView,
 )
 
 from rest_framework import serializers
@@ -68,11 +69,13 @@ class InvitationMessageCreateSerializer(serializers.ModelSerializer):
         model = InvitationMessage
         fields = "__all__"
 
+
 # class GroupMemberCreateSerializer(serializers.ModelSerializer):
-    
+
 #     class Meta:
 #         model = GroupMember
 #         fields = '__all__'
+
 
 class GroupMemberSerializer(serializers.ModelSerializer):
     user = UserProfileSerializer(read_only=True)
@@ -80,12 +83,13 @@ class GroupMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroupMember
         fields = "__all__"
-        
-    def create(self, validated_data):
-        validated_data['user'] = self.context['request'].user.profile        
-        group_member =  GroupMember.objects.create(**validated_data)
 
-        return group_member 
+    def create(self, validated_data):
+        validated_data["user"] = self.context["request"].user.profile
+        group_member = GroupMember.objects.create(**validated_data)
+
+        return group_member
+
 
 class ChatGroupSerializer(serializers.ModelSerializer):
     created_by = UserProfileSerializer(read_only=True)
@@ -267,19 +271,55 @@ class ChatGroupCreateSerializer(serializers.ModelSerializer):
 
 
 class GroupMessageSerializer(serializers.ModelSerializer):
+    message = IMessagePolymorphicSerializer()
+    sender = UserProfileSerializer()
+    # message =
     class Meta:
         model = GroupMessage
         fields = "__all__"
+
+
+class GroupMessageViewSerializer(serializers.ModelSerializer):
+    viewer = UserProfileSerializer()
+
+    class Meta:
+        model = GroupMessageView
+        # fields = '__all__'
+        exclude = ["message"]
 
 
 class GroupMessageListSerializer(serializers.ModelSerializer):
     message = IMessagePolymorphicSerializer()
     sender = UserProfileSerializer()
-    chat = ChatGroupSerializer()
+    # chat = ChatGroupSerializer()
+    parent_message = serializers.SerializerMethodField()
+
+    view_by = serializers.SerializerMethodField()
+
+    number_of_non_view_message = serializers.SerializerMethodField()
 
     class Meta:
         model = GroupMessage
-        fields = "__all__"
+        # fields = "__all__"
+        exclude = ["chat"]
+
+    def get_parent_message(self, obj:GroupMessage):
+        if obj.parent_message is None:
+            return None
+        serializer = self.__class__(obj.parent_message)
+        return serializer.data
+        # return GroupMessageSerializer(obj.parent_message).data
+
+    def get_view_by(self, obj: GroupMessage):
+        try:
+            if(obj.viewed.all()):
+                
+                return GroupMessageViewSerializer(obj.viewed.all(), many=True).data
+        except:
+            return None
+
+    def get_number_of_non_view_message(self, obj: GroupMessage):
+        return 0
 
 
 class GroupMessageCreateSerializer(serializers.ModelSerializer):
@@ -288,11 +328,6 @@ class GroupMessageCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroupMessage
         fields = "__all__"
-
-
-class AuthenticationSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True, max_length=255)
-    password = serializers.CharField(required=True, max_length=255)
 
 
 class ChatGroupListSerializer(serializers.ModelSerializer):
@@ -306,7 +341,7 @@ class ChatGroupListSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_latest_message(self, obj: ChatGroup):
-        return GroupMessageSerializer(obj.messages.last())
+        return GroupMessageListSerializer(obj.messages.last()).data
 
     def get_messages(self, obj: ChatGroup):
-        return GroupMessageSerializer(obj.messages.all(), many=True)
+        return GroupMessageListSerializer(obj.messages.all(), many=True).data
