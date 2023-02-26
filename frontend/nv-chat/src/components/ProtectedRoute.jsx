@@ -1,12 +1,14 @@
 import { ROUTES } from "@constants/index";
+import { useAuthContext } from "context/AuthContext";
 import { Navigate,Outlet } from "react-router-dom";
 
 const ProtectedRoute = ({
-  isAllowed,
+  isAllowed=false,
   redirectPath = ROUTES.LOGIN,
   children,
 }) => {
-  if (!isAllowed) {
+  const {userToken} = useAuthContext()
+  if (userToken===null) {
     return <Navigate to={redirectPath} replace />;
   }
 

@@ -3,11 +3,11 @@ import React from "react";
 import { Box, Grid } from "@mui/material";
 
 
-const index = (props) => {
+const Layout = (props) => {
   const { children } = props;
   return (
 
-    <Grid container width={'100vw'} height={'100vh'}>
+    <Grid container>
 
       <Grid item md={3}>LeftBar</Grid>
       <Grid item md={6}>Center</Grid>
@@ -17,4 +17,4 @@ const index = (props) => {
   );
 };
 
-export default index;
+export default Layout;

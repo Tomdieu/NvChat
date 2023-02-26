@@ -3,6 +3,7 @@ import { Box, Button, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router-dom";
 import { COLORS } from "@constants/index";
+import { Helmet } from "react-helmet";
 
 import LogoIcon from "@assets/logo.svg";
 import { ArrowLeft, TheaterComedySharp } from "@mui/icons-material";
@@ -53,7 +54,9 @@ const NotFound = () => {
 
   return (
     <Box className={classes.root}>
-      
+      <Helmet>
+        <title>Not Found</title>
+      </Helmet>
       <Box
         sx={(theme) => ({
           padding: theme.spacing(2),

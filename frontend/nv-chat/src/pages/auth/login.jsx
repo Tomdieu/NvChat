@@ -12,6 +12,10 @@ import { Helmet } from "react-helmet";
 import LogoIcon from "@assets/logo.svg";
 import { makeStyles } from "@mui/styles";
 
+import { useState,useEffect } from "react";
+import { useAuthContext } from "context/AuthContext";
+import {useNavigate} from 'react-router-dom'
+
 const useStyles = makeStyles((theme) => ({
   flex: {
     display: "flex",
@@ -33,6 +37,35 @@ const useStyles = makeStyles((theme) => ({
 const Login = () => {
   const date = new Date();
   const classes = useStyles();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate()
+  const { login, setUserProfile, setUserToken,userToken } = useAuthContext();
+
+  useEffect(()=>{
+    if(userToken){
+      navigate("/app/chat")
+    }
+  },[])
+
+  const handleClick = () => {
+    login(username, password)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setUserProfile(data.data);
+          setUserToken(data.token);
+          navigate("/app/chat")
+        } else {
+          setError(data.message);
+        }
+      })
+      .catch((err) => {
+        setError(err.message);
+        // console.log(err.message);
+      });
+  };
   return (
     <Grid
       container
@@ -69,11 +102,41 @@ const Login = () => {
           <Typography textAlign={"center"} variant={"h3"}>
             Login
           </Typography>
+          {error && (
+            <Box
+              sx={(theme) => ({
+                backgroundColor: "#de7878",
+                padding: theme.spacing(2),
+                borderRadius: theme.shape.borderRadius,
+              })}
+            >
+              <Typography
+                fontWeight={"600"}
+                color={"#fff"}
+                textAlign={"center"}
+              >
+                {error}
+              </Typography>
+            </Box>
+          )}
+
           <Box>
-            <TextField label={"username"} type={"text"} fullWidth />
+            <TextField
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              label={"username"}
+              type={"text"}
+              fullWidth
+            />
           </Box>
           <Box>
-            <TextField label={"password"} type={"password"} fullWidth />
+            <TextField
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              label={"password"}
+              type={"password"}
+              fullWidth
+            />
           </Box>
           <Box className={classes.flex}>
             <Box sx={(theme) => ({ display: "flex", alignItems: "center" })}>
@@ -87,7 +150,14 @@ const Login = () => {
             </Typography>
           </Box>
           <Box>
-            <Button value={"Login"} variant="contained" size="large" fullWidth>
+            <Button
+              disabled={Boolean(username === "" || password === "")}
+              value={"Login"}
+              variant="contained"
+              size="large"
+              fullWidth
+              onClick={() => handleClick()}
+            >
               Login
             </Button>
           </Box>

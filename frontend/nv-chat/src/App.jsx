@@ -1,18 +1,18 @@
-import { ProSidebarProvider } from 'react-pro-sidebar'
-import Routes from './routes'
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
+// import { ProSidebarProvider } from "react-pro-sidebar";
+import Routes from "./routes";
+import "@fontsource/roboto/400.css";
+import AuthProvider from "provider/AuthProvider";
+import ChatProvider from "provider/ChatProvider";
+// import { ProSidebarProvider } from "react-pro-sidebar";
 
 function App() {
-
   return (
-    <ProSidebarProvider>
-
-   <Routes />
-    </ProSidebarProvider>
-  )
+    <AuthProvider>
+      <ChatProvider>
+        <Routes />
+      </ChatProvider>
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;

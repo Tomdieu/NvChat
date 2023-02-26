@@ -93,7 +93,7 @@ const Register = ({ navigation }) => {
               confirmPassword: "",
             }}
             onSubmit={(values) => {
-              console.log(values);
+              // console.log(values);
             }}
             validationSchema={registerSchema}
           >

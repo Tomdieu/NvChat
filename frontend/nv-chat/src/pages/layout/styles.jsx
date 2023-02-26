@@ -5,7 +5,12 @@ export const useStyles = makeStyles((theme) => ({
     backgroundColor: "#929693c9",
   },
   leftContainer: {
-    backgroundColor: "rgb(134, 202, 184)",
+    // backgroundColor: "rgb(134, 202, 184)",
+    maxHeight:'100vh',
+    overflow:'none',
+    overflowY:'auto',
+    backgroundColor: '#458',
+  
   },
   headerContainer: {
     display: "flex",
