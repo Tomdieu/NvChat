@@ -145,10 +145,16 @@ class GroupMessageListSerializer(serializers.ModelSerializer):
 class MessageListSerializer(serializers.ModelSerializer):
     message = IMessagePolymorphicSerializer(many=False)
     sender = UserProfileSerializer()
-
+    parent_message = serializers.SerializerMethodField()
     class Meta:
         model = Message
         fields = "__all__"
+
+    def get_parent_message(self,obj):
+        if obj.parent_message is None:
+            return None
+        serializer = self.__class__(obj.parent_message)
+        return serializer.data
 
 
 class CreateConversationSerializer(serializers.Serializer):

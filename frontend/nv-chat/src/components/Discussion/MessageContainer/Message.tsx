@@ -67,7 +67,8 @@ const Message = (props: Props) => {
               },
             }}
           >
-            <Typography>{message.message.text}</Typography>
+
+            <p style={{marginRight:5}}>{message.message.text}</p>
           </Box>
         </div>
       )}

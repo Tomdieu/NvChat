@@ -1,9 +1,9 @@
 export interface IMessage {
-  id: number;
+  id?: null|number;
   // polymorphic_ctype: number;
   resourcetype: "TextMessage" | "ImageMessage" | "VideoMessage" | "FileMessage";
-  created_at: Date;
-  updated_at: Date;
+  created_at?: Date;
+  updated_at?: Date;
   // type: "text" | "image" | "video"|"file"
 }
 

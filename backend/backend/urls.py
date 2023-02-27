@@ -38,6 +38,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+     re_path('^nested_admin/', include('nested_admin.urls')),
     path(
         "api/",
         include(

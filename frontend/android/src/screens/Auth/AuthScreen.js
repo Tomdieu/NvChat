@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import ApiService from "../../utils/ApiService";
 
 export default function LoginScreen() {
   const initialValues = { username: "", password: "" };
@@ -19,12 +20,16 @@ export default function LoginScreen() {
 
   const handleLogin = (values, actions) => {
     // handle login logic here
+    ApiService.login(values.username,values.password).then(res=>res.json()).then(data=>{
+      console.log(data)
+    })
+    .catch(err=>console.log(err))
     actions.setSubmitting(false);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>NvChat</Text>
+      <Text style={styles.title}>Nv Chat</Text>
       <Formik
         initialValues={initialValues}
         validationSchema={loginSchema}

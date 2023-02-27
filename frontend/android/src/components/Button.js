@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React from "react";
+import PropTypes from "prop-types";
 
 const Button = (props) => {
   const { children, style, color = "#000"} = props;
@@ -11,6 +12,11 @@ const Button = (props) => {
 };
 
 export default Button;
+
+// Button.propTypes = {
+//   children:PropTypes.element,
+//   // styles:
+// }
 
 const styles = StyleSheet.create({
   button: {

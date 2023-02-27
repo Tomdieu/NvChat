@@ -39,11 +39,12 @@ class AuthenticationViewSet(GenericViewSet, CreateAPIView):
                 {
                     "data": UserProfileSerializer(user.profile).data,
                     "token": user.auth_token.key,
+                    "success":True
                 },
                 status=status.HTTP_200_OK,
             )
         return Response(
-            {"message": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST
+            {"success":False,"message": "Invalid credentials username or password incorrect"}, status=status.HTTP_400_BAD_REQUEST
         )
 
 

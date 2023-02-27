@@ -34,27 +34,27 @@ const Discussion = (props: Props) => {
     ? "Today"
     : formattedDate;
 
-  const webSocket = new WebSocket(
-    ApiService.wsEndPoint +
-      `ws/discussion_chat/${conversation.id}/?token=${userToken}`
-  );
+  // const webSocket = new WebSocket(
+  //   ApiService.wsEndPoint +
+  //     `ws/discussion_chat/${conversation.id}/?token=${userToken}`
+  // );
 
-  useEffect(() => {
-    webSocket.onopen = (e) => {
-      console.log("WebSocket Client Connected", { e });
-    };
-    webSocket.onmessage = (message) => {
-      console.log(message);
-      // const messageData = JSON.parse(message.data);
-      // setMessages((prevMessages) => [...prevMessages, messageData]);
-    };
-    webSocket.onclose = () => {
-      console.log("WebSocket Client Disconnected");
-    };
-    return () => {
-      webSocket.close();
-    };
-  }, []);
+  // useEffect(() => {
+  //   webSocket.onopen = (e) => {
+  //     console.log("WebSocket Client Connected", { e });
+  //   };
+  //   webSocket.onmessage = (message) => {
+  //     console.log(message);
+  //     // const messageData = JSON.parse(message.data);
+  //     // setMessages((prevMessages) => [...prevMessages, messageData]);
+  //   };
+  //   webSocket.onclose = () => {
+  //     console.log("WebSocket Client Disconnected");
+  //   };
+  //   return () => {
+  //     webSocket.close();
+  //   };
+  // }, []);
   
   const navigate = useNavigate()
   return (

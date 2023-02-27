@@ -92,7 +92,9 @@ class ChatGroup(models.Model):
     created_by = models.ForeignKey(
         UserProfile, on_delete=models.CASCADE, related_name="created_by"
     )
-    members = models.ManyToManyField(UserProfile, through="GroupMember", blank=True,related_name='group_members')
+    members = models.ManyToManyField(
+        UserProfile, through="GroupMember", blank=True, related_name="group_members"
+    )
     image = models.ImageField(upload_to="group_image/", blank=True, null=True)
 
     @property
@@ -102,16 +104,13 @@ class ChatGroup(models.Model):
     def __str__(self) -> str:
         return self.chat_name
 
-# class GroupOptions(models.Model):
-#     group = models.ForeignKey(ChatGroup,on_delete=models.CASCADE,related_name='options')
-    
 
 class GroupMember(models.Model):
     user = models.ForeignKey(
         UserProfile, on_delete=models.CASCADE, related_name="user_groups"
     )
     group = models.ForeignKey(
-        ChatGroup, on_delete=models.CASCADE,related_name="group_members"
+        ChatGroup, on_delete=models.CASCADE, related_name="group_members"
     )
     is_active = models.BooleanField(default=False)
     is_manager = models.BooleanField(default=False)
@@ -119,7 +118,7 @@ class GroupMember(models.Model):
 
     class Meta:
         unique_together = (("user", "group"),)
-        
+
     def __str__(self) -> str:
         return f"{self.user} in group {self.group}"
 
@@ -141,25 +140,27 @@ class GroupMessage(models.Model):
     )
     sender = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     message = models.OneToOneField(IMessage, on_delete=models.CASCADE)
-    
+
     def __str__(self) -> str:
-        return f'Group: {self.chat} Message: {self.message} Sender: {self.sender}'
+        return f"Group: {self.chat} Message: {self.message} Sender: {self.sender}"
 
 
 class GroupMessageView(models.Model):
     viewer = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    message = models.ForeignKey(GroupMessage, on_delete=models.CASCADE)
+    message = models.ForeignKey(GroupMessage, on_delete=models.CASCADE,related_name='viewed')
     viewed_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return f'{self.message} view by {self.viewer} at {self.viewed_at}'
+        return f"{self.message} view by {self.viewer} at {self.viewed_at}"
+
 
 class Conversation(models.Model):
-    participants = models.ManyToManyField(UserProfile,blank=True)
+    participants = models.ManyToManyField(UserProfile, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self) -> str:
-        return f'Conversation {self.id}'
+        return f"Conversation {self.id}"
+
 
 class Message(models.Model):
     conversation = models.ForeignKey(

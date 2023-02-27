@@ -132,13 +132,13 @@ admin.site.register(ChatGroup, ChatGroupAdmin)
 
 
 class GroupMessageAdmin(admin.ModelAdmin):
-    list_display = ("id", "chat", "sender", "message")
+    list_display = ("id", "chat", "sender","parent_message", "message")
     inlines = [GroupMessageViewAdminInline]
 
 
 # admin.site.register(GroupMessage, GroupMessageAdmin)
 
-admin.site.register(GroupMessageView)
+# admin.site.register(GroupMessageView)
 
 
 class InvitationMessageAdmin(admin.ModelAdmin):
