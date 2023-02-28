@@ -1,6 +1,6 @@
 import TopChatBar from "components/TopChatBar";
 import { useChatContext } from "context/ChatContext";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 
 import MessageContainer from "components/Discussion/MessageContainer";
@@ -10,6 +10,7 @@ import { useAuthContext } from "context/AuthContext";
 import ApiService from "utils/ApiService";
 import { TextMessage } from "types/AbstractMessage";
 import { Conversation } from "types/ConversationSerializer";
+import { Message } from "types/Message";
 
 type Props = {};
 
@@ -21,6 +22,11 @@ const index = (props: Props) => {
     discussionsList,
     setDiscussionsList,
   } = useChatContext();
+
+  const fileInputRef = useRef(null);
+  const imageInputRef = useRef(null);
+
+  const [text, setText] = useState("");
   const { userToken, userProfile } = useAuthContext();
   const [message, setMessage] = useState(null);
   const [messages, setMessages] = useState(selectedDiscussion.messages);
@@ -36,8 +42,11 @@ const index = (props: Props) => {
       console.log("WebSocket Established", { e });
     };
     webSocket.onmessage = (message) => {
-      console.log(message);
-      // const messageData = JSON.parse(message.data);
+      // console.log("Recieve Message : ", { message });
+      const messageData = JSON.parse(message.data);
+      // console.log("Recieve Message : ");
+      // console.log(messageData.message)
+      addRecieveMessage(messageData.message);
       // setMessages((prevMessages) => [...prevMessages, messageData]);
     };
     webSocket.onclose = () => {
@@ -48,27 +57,13 @@ const index = (props: Props) => {
     // };
   }, []);
 
-  const handleSendMessage = (msg: TextMessage) => {
-    // console.log(discussionsList)
+  const addRecieveMessage = (newMessage: Message) => {
     const filterDiscussion = discussionsList.find(
       (disc: Conversation) => disc.id === Number(id)
     );
     console.log(filterDiscussion);
-    filterDiscussion.latest_message = {
-      conversation: id,
-      sender: userProfile,
-      parent_message: null,
-      message: msg,
-      timestamp: `${new Date()}`,
-    };
-    filterDiscussion.messages.push({
-      id: Number(Math.random() + 100),
-      conversation: id,
-      sender: userProfile,
-      parent_message: null,
-      message: msg,
-      timestamp: `${new Date()}`,
-    });
+    filterDiscussion.latest_message = newMessage;
+    filterDiscussion.messages.push(newMessage);
     console.log(discussionsList);
 
     let newDiscussion = [];
@@ -85,11 +80,62 @@ const index = (props: Props) => {
     }
 
     setDiscussionsList(newDiscussion);
-    // setDiscussionsList((previousMessage) => [...previousMessage, filterDiscussion]);
-    if (msg) {
-      webSocket.send(JSON.stringify({ message: msg }));
+  };
+
+  const handleSend = () => {
+    if (text) {
+      const textMessage: TextMessage = {
+        text: text,
+        resourcetype: "TextMessage",
+      };
+      handleSendMessage(textMessage);
     }
   };
+
+  const handleKeyUp = (e:React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (e.key === "Enter") {
+      return handleSend();
+    }
+  };
+
+  const handleSendMessage = (msg: TextMessage) => {
+    if (msg) {
+      webSocket.send(JSON.stringify({ message: msg }));
+      setText("");
+    }
+  };
+
+  const handleClick = () => {
+    return handleSend();
+  };
+
+  const handleTyping = () => {};
+
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setText(event.target.value);
+    return handleTyping();
+  };
+
+  const handleFileSelected = (event) => {
+    const files = event.target.files;
+    // Do something with the selected files
+  };
+
+  const handleImageSelected = (event) => {
+    const images = event.target.files;
+    // Do something with the selected images
+  };
+
+  const handleFileButtonClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleImageButtonClick = () => {
+    imageInputRef.current.click();
+  };
+
   return (
     <Box
       sx={{
@@ -98,11 +144,39 @@ const index = (props: Props) => {
         flexDirection: "column",
         flex: 1,
         height: "100%",
+        maxHeight: "100vh",
+        overflowY: "auto",
+        overflowX: "none",
       }}
     >
       <TopChatBar chatType={selectedChatType} name={name} />
       <MessageContainer messages={messages} />
-      <InputMessageContainer handleSendMessage={handleSendMessage} />
+      <InputMessageContainer
+        handleSendMessage={handleSendMessage}
+        value={text}
+        onFileClick={handleFileButtonClick}
+        onImageClick={handleImageButtonClick}
+        onChange={handleChange}
+        onKeyUp={handleKeyUp}
+        onClick={handleClick}
+      />
+
+      {/* inputs */}
+      {/* files */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        onChange={handleFileSelected}
+      />
+      {/* images or videos */}
+      <input
+        type="file"
+        ref={imageInputRef}
+        style={{ display: "none" }}
+        accept="image/*,video/*"
+        onChange={handleImageSelected}
+      />
     </Box>
   );
 };
