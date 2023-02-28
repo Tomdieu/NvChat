@@ -1,8 +1,9 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 from channels.db import database_sync_to_async
+from asgiref.sync import sync_to_async,async_to_sync
 
-from django.core.files.storage import default_storage
+# from django.core.files.storage import default_storage
 
 from .models import (
     ChatGroup,
@@ -14,22 +15,21 @@ from .models import (
     Conversation,
 )
 from .api.serializers import (
-    IMessagePolymorphicSerializer,
     GroupMessageListSerializer,
     MessageListSerializer,
     Message,
     GroupMessage,
 )
 
+global_var = 1
 
-def create_message(messageType: str, conversationId: int, message: dict, sender):
+def create_message(messageType: str, conversationId: int, message: dict, sender,parent_message=None):
     msgContent = message
     resourceType = msgContent.pop("resourcetype")
-    messageType = None
     if resourceType == "TextMessage":
-        messageType = TextMessage.objects.create(**msgContent)
+        msgContent = TextMessage.objects.create(**msgContent)
     elif resourceType == "ImageMessage":
-        messageType = ImageMessage.objects.create(**msgContent)
+        msgContent = ImageMessage.objects.create(**msgContent)
     elif resourceType == "VideoMessage":
         msgContent = VideoMessage.objects.create(**msgContent)
     elif resourceType == "FileMessage":
@@ -39,14 +39,15 @@ def create_message(messageType: str, conversationId: int, message: dict, sender)
     # serializer.is_valid()
     # msgContent = serializer.save()
 
-    print(messageType,conversationId,msgContent,sender)
+    print("Message type : ",messageType,"Conversation Id ",conversationId,"Message Content ",msgContent,"Sender ",sender)
 
     if messageType == "conversation":
         conversation = Conversation.objects.get(id=conversationId)
-        msgContent["message"] = msgContent
-        msgContent["chat"] = conversation
-        msgContent["sender"] = sender
-        return Message.objects.create(**msgContent)
+        newMessage = {}
+        newMessage["conversation"] = conversation
+        newMessage['message'] = msgContent
+        newMessage["sender"] = sender
+        return Message.objects.create(**newMessage)
     elif messageType == "group":
         chat_group = ChatGroup.objects.get(id=conversationId)
         msgContent["message"] = msgContent
@@ -74,41 +75,34 @@ class ConversationConsumer(AsyncWebsocketConsumer):
         type:str = text_data_json.get('type')
         print("Recieve message : ", message,type)
         # Send message to room group
+
+        instance = await self.save_message(message)
+        print(instance)
+        serializer = MessageListSerializer(instance)
         await self.channel_layer.group_send(
-            self.room_group_name, {"type": "send_message", "message": message,"message_type":type}
+            self.room_group_name, {"type": "send_message", "message": serializer.data,"message_type":type}
         )
 
     async def send_message(self, event):
         message = event["message"]
-
-        instance = self.save_chat_message(message)
-        print(instance)
-        print(dir(instance))
+        print("Message ",message)
+        # instance = await self.save_message(message)
+        # print(instance)
         # serializer = MessageListSerializer(instance)
+
+        
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({"message": message}))
 
-    @database_sync_to_async
-    def save_chat_message(self, message):
-        return create_message(
+    @sync_to_async
+    def save_message(self, message):
+        return  create_message(
             messageType="conversation",
             message=message,
             conversationId=self.room_name,
             sender=self.scope["user"].profile,
         )
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
