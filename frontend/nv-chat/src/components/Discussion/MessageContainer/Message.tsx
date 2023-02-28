@@ -13,62 +13,74 @@ const Message = (props: Props) => {
   return (
     <>
       {isSender ? (
-        <div style={{ display: "flex", alignItems: "center",width:'100%',justifyContent: isSender ? "flex-end" : "flex-start", }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            width: "100%",
+            justifyContent: isSender ? "flex-end" : "flex-start",
+            padding: "9px 5px",
+          }}
+        >
           <Box
             component={Paper}
-            sx={{
+            sx={(theme) => ({
               position: "relative",
               bgcolor: "#fff",
-              borderRadius: "5px",
-                
-              m: 2,
-              p: 2,
-              "&::before": {
-                content: '""',
-                position: "absolute",
-                width: "25px",
-                height: "25px",
-                right: -9,
-                bottom: 10,
-                backgroundColor: "#fff",
-
-                transform: "rotate(45deg)",
-              },
-            }}
+              borderRadius: theme.shape.borderRadius,
+              mr: 1,
+              maxWidth: "60%",
+              // p: 2,
+            })}
           >
-            <Typography>{message.message.text}</Typography>
+            {message.message.resourcetype === "TextMessage" ? (
+              <Typography
+                variant="h6"
+                sx={(theme) => ({ px: theme.spacing(1) })}
+              >
+                {message.message.text}
+              </Typography>
+            ) : null}
           </Box>
-          <Avatar />
+          <Avatar
+            src={message.sender.profile_picture}
+            alt={message.sender.user.username}
+          />
         </div>
       ) : (
-        <div style={{ display: "flex", alignItems: "center",width:'100%',justifyContent: isSender ? "flex-end" : "flex-start", }}>
-          <Avatar />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            width: "100%",
+            justifyContent: isSender ? "flex-end" : "flex-start",
+            padding: "9px 5px",
+          }}
+        >
+          <Avatar
+            src={message.sender.profile_picture}
+            alt={message.sender.user.username}
+          />
 
           <Box
             component={Paper}
-            sx={{
-              //   maxWidth: "20%",
+            sx={(theme) => ({
               position: "relative",
               bgcolor: "#fff",
-              borderRadius: "5px",
+              borderRadius: theme.shape.borderRadius,
               float: "right",
-              m: 2,
-              p: 2,
-              "&::before": {
-                content: '""',
-                position: "absolute",
-                width: "20px",
-                height: "20px",
-                left: -8,
-                bottom: 12,
-                backgroundColor: "#fff",
-
-                transform: "rotate(45deg)",
-              },
-            }}
+              ml: 1,
+              maxWidth: "60%",
+            })}
           >
-
-            <p style={{marginRight:5}}>{message.message.text}</p>
+            {message.message.resourcetype === "TextMessage" ? (
+              <Typography
+                variant="h6"
+                sx={(theme) => ({ px: theme.spacing(1) })}
+              >
+                {message.message.text}
+              </Typography>
+            ) : null}
           </Box>
         </div>
       )}
