@@ -4,6 +4,10 @@ from account.models import UserProfile
 
 from polymorphic.models import PolymorphicModel
 
+from django.core.exceptions import ValidationError
+
+from django.utils.translation import gettext_lazy as _
+
 # Create your models here.
 
 
@@ -144,14 +148,41 @@ class GroupMessage(models.Model):
     def __str__(self) -> str:
         return f"Group: {self.chat} Message: {self.message} Sender: {self.sender}"
 
+    def clean_fields(self, exclude=None) -> None:
+        super().clean_fields(exclude)
+
+        if not self.chat.members.filter(user=self.sender).exists():
+            raise ValidationError(
+                {
+                    "sender": _(
+                        "Sorry this user can not send a message into this chat group because he doesnot belong to that group"
+                    )
+                }
+            )
+
 
 class GroupMessageView(models.Model):
     viewer = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    message = models.ForeignKey(GroupMessage, on_delete=models.CASCADE,related_name='viewed')
+    message = models.ForeignKey(
+        GroupMessage, on_delete=models.CASCADE, related_name="viewed"
+    )
     viewed_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return f"{self.message} view by {self.viewer} at {self.viewed_at}"
+
+    def clean_fields(self, exclude=None) -> None:
+        super().clean_fields(exclude)
+        if not self.message.chat.members.filter(user=self.viewer).exists():
+            raise ValidationError(
+                {
+                    "viewer": _(
+                        "!This viewer can view this message because he doest not belong to the group {}".format(
+                            self.message.chat
+                        )
+                    )
+                }
+            )
 
 
 class Conversation(models.Model):
@@ -160,6 +191,17 @@ class Conversation(models.Model):
 
     def __str__(self) -> str:
         return f"Conversation {self.id}"
+
+    def clean_fields(self, exclude=None) -> None:
+        super().clean_fields(exclude)
+        if len(self.participants.all()) > 2:
+            raise ValidationError(
+                {
+                    "participants": _(
+                        "Sorry this single chat conversation can only accept 2 people"
+                    )
+                }
+            )
 
 
 class Message(models.Model):
@@ -181,3 +223,11 @@ class Message(models.Model):
     )
     timestamp = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
+
+    def clean_fields(self, exclude=None) -> None:
+        super().clean_fields(exclude)
+        if not self.conversation.participants.filter(user__id=self.sender.id).exists():
+            raise ValidationError(_("This user can send message in this single chat"))
+
+    def __str__(self) -> str:
+        return f"Message of : {self.sender} in {self.conversation}"
