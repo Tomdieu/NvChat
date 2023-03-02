@@ -4,4 +4,18 @@ from django.contrib import admin
 
 from .models import UserProfile
 
-admin.site.register(UserProfile)
+
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = [
+        "user",
+        "phone_number",
+        "country",
+        "profile_picture",
+        "bio",
+        "online",
+    ]
+    search_fields = ["user__username", "phone_number", "country", "bio"]
+    list_filter = ["country", "online"]
+
+
+admin.site.register(UserProfile, UserProfileAdmin)
