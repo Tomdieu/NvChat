@@ -1,15 +1,13 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 from channels.db import database_sync_to_async
-from asgiref.sync import sync_to_async, async_to_sync
+from asgiref.sync import sync_to_async
 
-from django.core.files.storage import default_storage,Storage,FileSystemStorage
+from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 import os
 
 from django.core import files
-from PIL import Image as PILImage
-from io import BytesIO
 import base64
 
 
@@ -30,86 +28,97 @@ from .api.serializers import (
 )
 
 
-def isImage(message):
-    msg = message
-    return msg.pop("resourcetype") == "ImageMessage"
-
-def isFile(message):
-    msg = message
-    return msg.pop("resourcetype") == "FileMessage"
-
-def isVideo(message):
-    msg = message
-    return msg.pop("resourcetype") == "VideoMessage"
+def save_file(url: str, file_bytes: bytes, folder: str):
+    if not os.path.exists(folder):
+        os.mkdir(folder)
+    storage = FileSystemStorage(location=url)
+    with storage.open("", "wb+") as destination:
+        destination.write(file_bytes)
+        destination.close()
 
 
 def create_message(
-    messageType: str, conversationId: int, message: dict, sender, parent_message=None,filename=None
+    messageType: str,
+    conversationId: int,
+    message: dict,
+    sender,
+    parent_message=None,
+    filename=None,
 ):
     msgContent = message
     resourceType = msgContent.pop("resourcetype")
     if resourceType == "TextMessage":
         msgContent = TextMessage.objects.create(**msgContent)
     elif resourceType == "ImageMessage":
-        image_data = msgContent['image'].split(';base64,')[-1]
+        image_data = msgContent["image"].split(";base64,")[-1]
         image_bytes = base64.b64decode(image_data)
 
-        url = os.path.join(settings.MEDIA_ROOT ,ImageMessage.image.field.upload_to,filename)
+        url = os.path.join(
+            settings.MEDIA_ROOT, ImageMessage.image.field.upload_to, filename
+        )
 
-        storage = FileSystemStorage(location=url)
-        with storage.open('','wb+') as destination:
-            destination.write(image_bytes)
-            destination.close()
-            
-        
-        imageMessage = ImageMessage(caption=msgContent['caption'])
+        save_file(
+            url,
+            image_bytes,
+            folder=f"{settings.MEDIA_ROOT}/{ImageMessage.image.field.upload_to}",
+        )
+
+        imageMessage = ImageMessage(caption=msgContent["caption"])
         imageMessage.save()
-        imageMessage.image.save(filename,files.File(open(url,'rb')),save=True)
+        imageMessage.image.save(filename, files.File(open(url, "rb")), save=True)
         imageMessage.save()
 
-        storage.delete()
+        # storage.delete()
+
+        os.remove(url)
 
         msgContent = imageMessage
     elif resourceType == "VideoMessage":
-        video_data = msgContent['video'].split(';base64,')[-1]
+        video_data = msgContent["video"].split(";base64,")[-1]
         video_bytes = base64.b64decode(video_data)
 
-        url = os.path.join(settings.MEDIA_ROOT ,VideoMessage.video.field.upload_to,filename)
+        url = os.path.join(
+            settings.MEDIA_ROOT, VideoMessage.video.field.upload_to, filename
+        )
 
-        storage = FileSystemStorage(location=url)
-        with storage.open('','wb+') as destination:
-            destination.write(video_bytes)
-            destination.close()
-        
-        videoMessage = VideoMessage(caption=msgContent['caption'])
+        save_file(
+            url,
+            video_bytes,
+            folder=f"{settings.MEDIA_ROOT}/{VideoMessage.video.field.upload_to}",
+        )
+
+        videoMessage = VideoMessage(caption=msgContent["caption"])
         videoMessage.save()
-        videoMessage.video.save(filename,files.File(open(url,'rb')),save=True)
+        videoMessage.video.save(filename, files.File(open(url, "rb")), save=True)
         videoMessage.save()
-        storage.delete()
-        
+        # storage.delete()
+        os.remove(url)
         msgContent = videoMessage
     elif resourceType == "FileMessage":
-        image_data = msgContent['file'].split(';base64,')[-1]
-        image_bytes = base64.b64decode(image_data)
+        image_data = msgContent["file"].split(";base64,")[-1]
+        file_bytes = base64.b64decode(image_data)
 
-        url = os.path.join(settings.MEDIA_ROOT ,ImageMessage.image.field.upload_to,filename)
+        url = os.path.join(
+            settings.MEDIA_ROOT, FileMessage.file.field.upload_to, filename
+        )
 
-        storage = FileSystemStorage(location=url)
-        with storage.open('','wb+') as destination:
-            destination.write(image_bytes)
-            destination.close()
-            
-        fileMessage = FileMessage(caption=msgContent['caption'])
+        save_file(
+            url,
+            file_bytes,
+            folder=f"{settings.MEDIA_ROOT}/{FileMessage.file.field.upload_to}",
+        )
+
+        fileMessage = FileMessage(caption=msgContent["caption"])
         fileMessage.save()
-        fileMessage.file.save(filename,files.File(open(url,'rb')),save=True)
+        fileMessage.file.save(filename, files.File(open(url, "rb")), save=True)
 
-
-        storage.delete()
+        # storage.delete()
 
         msgContent = fileMessage
-
+        os.remove(url)
 
     if messageType == "conversation":
+        print(msgContent)
         conversation = Conversation.objects.get(id=conversationId)
         newMessage = {}
         newMessage["conversation"] = conversation
@@ -141,35 +150,9 @@ class ConversationConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
-        file_name = text_data_json.get('filename')
-        # type: str = text_data_json.get("type")
-        # Send message to room group
-        # print("Image : ",message['image'])
-        # if bytes_data:
-        #     new_path = ""
-        #     print("Byte Data : ",bytes_data)
-        #     if isImage(message):
-        #         new_path = settings.MEDIA_ROOT + ImageMessage.image.field.upload_to
-        #     if isVideo(message):
-        #         new_path = settings.MEDIA_ROOT + VideoMessage.video.field.upload_to
-                
-        #     if isFile(message):
-        #         new_path = settings.MEDIA_ROOT + FileMessage.file.field.upload_to
-        #     request_file = bytes_data
-        #     fs = FileSystemStorage()
-        #     file = fs.save(request_file.name,request_file)
-        #     fileUrl = fs.url(file)
+        file_name = text_data_json.get("filename")
 
-        # if True:
-        #     image_data= text_data_json['image'].split(";base64;")[-1]
-        #     image_bytes = base64.b64decode(image_data)
-        #     image_file = BytesIO(image_bytes)
-        #     image = PILImage.open(image_file)
-
-        #     # image_message.image.save(filename,image,save=True)
-                
-
-        instance = await self.save_message(message,fileName=file_name)
+        instance = await self.save_message(message, fileName=file_name)
         # print(instance)
         serializer = MessageListSerializer(instance)
         await self.channel_layer.group_send(
@@ -183,14 +166,14 @@ class ConversationConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"message": message}))
 
     @sync_to_async
-    def save_message(self, message,parent_message=None,fileName=None):
+    def save_message(self, message, parent_message=None, fileName=None):
         return create_message(
             messageType="conversation",
             message=message,
             conversationId=self.room_name,
             sender=self.scope["user"].profile,
             parent_message=parent_message,
-            filename=fileName
+            filename=fileName,
         )
 
 
