@@ -151,11 +151,11 @@ class GroupMessage(models.Model):
     def clean_fields(self, exclude=None) -> None:
         super().clean_fields(exclude)
 
-        if not self.chat.members.filter(user=self.sender).exists():
+        if not self.chat.members.filter(user=self.sender.user).exists():
             raise ValidationError(
                 {
                     "sender": _(
-                        "Sorry this user can not send a message into this chat group because he doesnot belong to that group"
+                        "Sorry this user can not send a message into this chat group because he does not belong to that group"
                     )
                 }
             )
@@ -173,7 +173,7 @@ class GroupMessageView(models.Model):
 
     def clean_fields(self, exclude=None) -> None:
         super().clean_fields(exclude)
-        if not self.message.chat.members.filter(user=self.viewer).exists():
+        if not self.message.chat.members.filter(user=self.viewer.user).exists():
             raise ValidationError(
                 {
                     "viewer": _(
