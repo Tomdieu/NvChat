@@ -28,7 +28,8 @@ from .api.serializers import (
 )
 
 
-def save_file(url: str, file_bytes: bytes, folder: str):
+# This function is use to save a file
+def save_file(url: str, file_bytes: bytes, folder: str) -> None:
     if not os.path.exists(folder):
         os.mkdir(folder)
     storage = FileSystemStorage(location=url)
@@ -37,6 +38,7 @@ def save_file(url: str, file_bytes: bytes, folder: str):
         destination.close()
 
 
+# this function is use to create a message and assigning that message to a GroupMessage or a Message
 def create_message(
     messageType: str,
     conversationId: int,
@@ -95,8 +97,8 @@ def create_message(
         os.remove(url)
         msgContent = videoMessage
     elif resourceType == "FileMessage":
-        image_data = msgContent["file"].split(";base64,")[-1]
-        file_bytes = base64.b64decode(image_data)
+        file_data = msgContent["file"].split(";base64,")[-1]
+        file_bytes = base64.b64decode(file_data)
 
         url = os.path.join(
             settings.MEDIA_ROOT, FileMessage.file.field.upload_to, filename
@@ -134,6 +136,9 @@ def create_message(
         return GroupMessage.objects.create(**msgContent)
 
 
+# Single Chat Consumer
+
+
 class ConversationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["conversation_id"]
@@ -151,13 +156,41 @@ class ConversationConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         file_name = text_data_json.get("filename")
+        typing = text_data_json.get("typing")
 
-        instance = await self.save_message(message, fileName=file_name)
-        # print(instance)
-        serializer = MessageListSerializer(instance)
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {"type": "send_message", "message": serializer.data},
+        if typing == True:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {"type": "send_typing", "message": message, "typing": True},
+            )
+
+        elif typing == False:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {"type": "send_typing", "message": message, "typing": False},
+            )
+        if typing == None:
+            instance = await self.save_message(message, fileName=file_name)
+            # print(instance)
+            serializer = MessageListSerializer(instance)
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {"type": "send_message", "message": serializer.data},
+            )
+
+    async def send_typing(self, event):
+        message = event["message"]
+        typing = event["typing"]
+        username = self.scope["user"].username
+        print("Username : ", username)
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "message": message,
+                    "typing": typing,
+                    "sender": await username,
+                }
+            )
         )
 
     async def send_message(self, event):
@@ -177,6 +210,7 @@ class ConversationConsumer(AsyncWebsocketConsumer):
         )
 
 
+# Group Chat Consumer
 class GroupChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["group_chat_id"]
@@ -193,26 +227,54 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
-        # Send message to room group
-        await self.channel_layer.group_send(
-            self.room_group_name, {"type": "send_message", "message": message}
+        file_name = text_data_json.get("filename")
+        typing = text_data_json.get("typing")
+
+        if typing == True:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {"type": "send_typing", "message": message, "typing": True},
+            )
+
+        elif typing == False:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {"type": "send_typing", "message": message, "typing": False},
+            )
+        if typing == None:
+            instance = await self.save_chat_message(message, fileName=file_name)
+            serializer = GroupMessageListSerializer(instance)
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {"type": "send_message", "message": serializer.data},
+            )
+
+    async def send_typing(self, event):
+        message = event["message"]
+        typing = event["typing"]
+        username = self.scope["user"].username
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "message": message,
+                    "typing": typing,
+                    "sender": await username,
+                }
+            )
         )
 
     async def send_message(self, event):
         message = event["message"]
-
-        save_message = await self.save_chat_message(message)
-
-        serializer = GroupMessageListSerializer(save_message)
-
         # Send message to WebSocket
-        await self.send(text_data=json.dumps({"message": serializer.data}))
+        await self.send(text_data=json.dumps({"message": message}))
 
-    @database_sync_to_async
-    def save_chat_message(self, message):
+    @sync_to_async
+    def save_chat_message(self, message, parent_message=None, fileName=None):
         return create_message(
             messageType="group",
             message=message,
             conversationId=self.room_name,
             sender=self.scope["user"].profile,
+            parent_message=parent_message,
+            filename=fileName,
         )
