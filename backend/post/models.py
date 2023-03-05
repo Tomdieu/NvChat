@@ -41,6 +41,19 @@ class Post(models.Model):
     files = models.ManyToManyField(File, blank=True)
     video = models.ManyToManyField(Video, blank=True)
 
+    views = models.ManyToManyField(
+        UserProfile, through="PostView", blank=True, related_name="view_by"
+    )
+
+    def __str__(self) -> str:
+        return f"{self.author} Post"
+
+
+class PostView(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    view_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
 
 class Like(PolymorphicModel):
     user = models.ForeignKey(
@@ -81,10 +94,15 @@ class CommentLike(Like):
         PostComment, on_delete=models.CASCADE, related_name="comment_like"
     )
 
+
 class Follower(models.Model):
-    user = models.ForeignKey(UserProfile,on_delete=models.CASCADE,related_name="users")
-    friend = models.ForeignKey(UserProfile,on_delete=models.CASCADE,related_name='friends')
+    user = models.ForeignKey(
+        UserProfile, on_delete=models.CASCADE, related_name="follower"
+    )
+    followers = models.ForeignKey(
+        UserProfile, on_delete=models.CASCADE, related_name="my_followers"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
-        unique_together = (("user", "friend"),)
+        unique_together = (("user", "followers"),)
