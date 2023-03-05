@@ -26,27 +26,39 @@ from drf_yasg import openapi
 schema_view = get_schema_view(
     openapi.Info(
         title="NvChat API",
-        default_version="v1",
+        default_version="v4.0.1",
         description="NvChat API Docs",
         terms_of_service="https://www.google.com/policies/terms/",
-        contact=openapi.Contact(email="ivantomdio@gmail.com"),
+        contact=openapi.Contact(
+            email="ivantomdio@gmail.com",
+            name="ivantom",
+            url="https://github.com/tomdieu",
+        ),
         license=openapi.License(name="BSD License"),
     ),
     public=True,
     permission_classes=[permissions.AllowAny],
 )
 
+admin.site.site_header = "Nv Chat Admin"
+admin.site.site_title = "Nv Chat Admin"
+# admin.site.site_url = "https:trix-car-backend.vercel.app"
+admin.site.index_title = "Nv Chat Administration"
+admin.empty_value_display = "**Empty**"
+
 urlpatterns = [
     path("admin/", admin.site.urls),
-     re_path('^nested_admin/', include('nested_admin.urls')),
+    re_path("^nested_admin/", include("nested_admin.urls")),
     path(
         "api/",
         include(
             [
                 path("chat/", include("chat.urls")),
                 path("account/", include("account.urls")),
-                re_path(
-                    r"^docs/",
+                path("friends/", include("friends.urls")),
+                path("notifications/", include("notifications.urls")),
+                path(
+                    "docs/",
                     include(
                         [
                             re_path(
@@ -70,22 +82,7 @@ urlpatterns = [
             ]
         ),
     ),
-    path("chat/", include("chat.urls")),
-    path("account/", include("account.urls")),
-    # API DOCS ROUTES
-    re_path(
-        r"^swagger(?P<format>\.json|\.yaml)$",
-        schema_view.without_ui(cache_timeout=0),
-        name="schema-json",
-    ),
-    re_path(
-        r"^swagger/$",
-        schema_view.with_ui("swagger", cache_timeout=0),
-        name="schema-swagger-ui",
-    ),
-    re_path(
-        r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
-    ),
+    path("api-auth/", include("rest_framework.urls"), name="api-auth"),
     path("favicon.ico", lambda _: redirect("static/favicon.svg", permanent=True)),
 ]
 
