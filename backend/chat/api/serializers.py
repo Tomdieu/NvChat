@@ -146,11 +146,12 @@ class MessageListSerializer(serializers.ModelSerializer):
     message = IMessagePolymorphicSerializer(many=False)
     sender = UserProfileSerializer()
     parent_message = serializers.SerializerMethodField()
+
     class Meta:
         model = Message
         fields = "__all__"
 
-    def get_parent_message(self,obj):
+    def get_parent_message(self, obj):
         if obj.parent_message is None:
             return None
         serializer = self.__class__(obj.parent_message)
@@ -192,11 +193,11 @@ class CreateConversationSerializer(serializers.Serializer):
         return super().validate(attrs)
 
     def create(self, validated_data):
-        print(validated_data)
+        # print(validated_data)
         user1 = validated_data["user1"]
-        print(user1)
+        # print(user1)
         user2 = validated_data["user2"]
-        print(user2)
+        # print(user2)
 
         # if user1.id == user2.id:
         #     raise serializers.ValidationError("user 1 and user 2 must be different!")
@@ -208,6 +209,12 @@ class CreateConversationSerializer(serializers.Serializer):
             conversation.save()
 
             return conversation
+
+
+class UserProfileImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ["profile_picture"]
 
 
 class ConversationSerializer(serializers.ModelSerializer):
@@ -239,8 +246,12 @@ class ConversationSerializer(serializers.ModelSerializer):
 
     def get_imageUrl(self, obj: Conversation):
         user = self.get_user(obj)
+        # print(user.profile_picture.url)
+        # print(dir(self.context["request"]))
         if user.profile_picture:
-            return self.context["request"].build_absolute_uri(user.profile_picture)
+            return UserProfileImageSerializer(user, context=self.context).data.get(
+                "profile_picture"
+            )
         return None
 
 
@@ -279,6 +290,7 @@ class ChatGroupCreateSerializer(serializers.ModelSerializer):
 class GroupMessageSerializer(serializers.ModelSerializer):
     message = IMessagePolymorphicSerializer()
     sender = UserProfileSerializer()
+
     # message =
     class Meta:
         model = GroupMessage
@@ -309,7 +321,7 @@ class GroupMessageListSerializer(serializers.ModelSerializer):
         # fields = "__all__"
         exclude = ["chat"]
 
-    def get_parent_message(self, obj:GroupMessage):
+    def get_parent_message(self, obj: GroupMessage):
         if obj.parent_message is None:
             return None
         serializer = self.__class__(obj.parent_message)
@@ -318,8 +330,7 @@ class GroupMessageListSerializer(serializers.ModelSerializer):
 
     def get_view_by(self, obj: GroupMessage):
         try:
-            if(obj.viewed.all()):
-                
+            if obj.viewed.all():
                 return GroupMessageViewSerializer(obj.viewed.all(), many=True).data
         except:
             return None
