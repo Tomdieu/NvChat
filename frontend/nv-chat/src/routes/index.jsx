@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/styles";
@@ -23,11 +23,12 @@ const AppRoutes = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
+      <>
         <Routes>
           <Route path="/">
             <Route path="" element={<LandingPage />} />
             <Route path="auth/">
+              <Route path="" element={<Login />} />
               <Route path="login" element={<Login />} />
               <Route path="register" element={<Register />} />
               <Route path="forgot-password" element={<ForgotPasswordPage />} />
@@ -38,7 +39,7 @@ const AppRoutes = () => {
             <Route path="/*" element={<NotFound />} />
           </Route>
         </Routes>
-      </Router>
+      </>
     </ThemeProvider>
   );
 };

@@ -3,7 +3,7 @@ import { Outlet, Route, Routes } from "react-router-dom";
 
 import { Container } from "layouts/index.tsx";
 
-import DiscussionPage from "pages/chat/discussion"
+import DiscussionPage from "pages/chat/discussion";
 import ProtectedRoute from "components/ProtectedRoute";
 
 const ChatRoutes = () => {
@@ -12,7 +12,7 @@ const ChatRoutes = () => {
       <Container>
         <Routes>
           <Route path="" element={<div>Welcome</div>} />
-          <Route path="discussion/:id" element={<ProtectedRoute><DiscussionPage/></ProtectedRoute>} />
+          <Route path="discussion/:id" element={<DiscussionPage />} />
           <Route path="group/:id" element={<div>Group Id</div>} />
         </Routes>
 

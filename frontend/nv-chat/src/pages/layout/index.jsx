@@ -30,8 +30,6 @@ const index = () => {
     setTabBarValue(newValue);
   };
 
-  // const [discussion,setDiscussion] = useState(disData)
-  // const [groups,setGroups] = useState(groupData)
   return (
     <Grid
       container

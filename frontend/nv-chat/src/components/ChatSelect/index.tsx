@@ -11,26 +11,27 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import BtnOption from "./BtnOption";
 import { useChatContext } from "context/ChatContext";
 
-type Props = {};
+type Props = {
+  height: number | string;
+};
 
 const Index = (props: Props) => {
   const { selectedButton, handleClick } = useChatContext();
-
+  const { height = "10%" } = props;
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "row",
-        overflowX: "auto",
+        overflow: "hidden",
         alignItems: "center",
         justifyContent: "space-between",
         scrollbarWidth: "2",
         "::-webkit-scrollbar": {
           display: "none",
         },
-        overflow: "none",
         width: "100%",
-        msOverflowY: "auto",
+        height: height,
         overflowWrap: "auto",
         backgroundColor: "#fff",
       }}

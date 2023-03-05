@@ -12,14 +12,17 @@ const AuthProvider = (props: Props) => {
   const [userProfile, setUserProfile] = useState<null | UserProfile>(null);
   const [userToken, setUserToken] = useState<null | string>(null);
 
-  // console.log(userToken)
-
   const login = async (username: string, password: string) => {
     const res = await ApiService.login(username, password);
     return res;
   };
 
-  const logout = () => {};
+  const logout = () => {
+    setUserProfile(null);
+    setUserToken(null);
+
+    localStorage.clear();
+  };
 
   useEffect(() => {
     if (userProfile) {

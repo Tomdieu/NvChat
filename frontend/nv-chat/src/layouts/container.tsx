@@ -1,5 +1,12 @@
-import { Close, Search } from "@mui/icons-material";
-import { Box, Grid, IconButton, Typography } from "@mui/material";
+import {
+  Add,
+  AddComment,
+  Close,
+  Message,
+  PlusOne,
+  Search,
+} from "@mui/icons-material";
+import { Box, Grid, IconButton, Paper, Typography } from "@mui/material";
 import ChatSelect from "components/ChatSelect";
 import ListDiscussion from "components/Discussion/ListDiscussion";
 import ListGroups from "components/Discussion/ListGroups";
@@ -16,12 +23,12 @@ import InputMessageContainer from "components/Discussion/InputMessageContainer";
 import MessageContainer from "components/Discussion/MessageContainer";
 
 type Props = {
-  children:React.ReactNode
+  children: React.ReactNode;
 };
 
 const container = (props: Props) => {
   const classes = useStyles();
-  const {children} = props;
+  const { children } = props;
   const {
     selectedButton,
     isRightOpen,
@@ -37,24 +44,10 @@ const container = (props: Props) => {
     selectedDiscussion,
   } = useChatContext();
 
-  // console.log("Chat Type : ", { selectedChatType });
-  // console.log("Group Selected : ", { selectedGroup });
-  // console.log("Discussion Selected : ", { selectedDiscussion });
-
-  // useEffect(() => {
-  //   if (selectedButton === "chat") {
-  //     getDiscussions();
-  //   }
-  //   if (selectedButton === "group") {
-  //     getGroups();
-  //   }
-  // }, [selectedButton]);
-
-  useEffect(()=>{
-    getDiscussions()
+  useEffect(() => {
+    getDiscussions();
     getGroups();
-
-  },[selectedButton])
+  }, [selectedButton]);
 
   console.log(selectedButton);
   return (
@@ -74,6 +67,8 @@ const container = (props: Props) => {
             flexDirection: "column",
             justifyContent: "space-between",
             width: "100%",
+            flex: 1,
+            height: "100%",
           }}
         >
           {/* top */}
@@ -84,6 +79,7 @@ const container = (props: Props) => {
               justifyContent: "space-between",
               padding: 1.5,
               bgcolor: "tomato",
+              height: "7vh",
             }}
           >
             <Typography className={classes.header} variant={"h4"}>
@@ -115,32 +111,110 @@ const container = (props: Props) => {
               flex: 1,
               flexDirection: "column",
               bgcolor: "#ccc",
+              height: "93vh",
             }}
           >
-            <ChatSelect />
+            <ChatSelect height={"5vh"} />
             <Box
               sx={{
+                display: "flex",
                 flex: 1,
+                flexDirection: "column",
                 position: "relative",
-                overflow: "none",
-                overflowY: "auto",
+                overflow: "auto",
+                // height: "88vh",
+                maxHeight: "88vh",
               }}
             >
               <TabPanel
                 label={"chat"}
                 value={selectedButton}
-                style={{ padding: 3 }}
+                style={{
+                  padding: 3,
+                  display: "flex",
+                  flex: 1,
+                  flexDirection: "column",
+                  gap: 5,
+                  // height: "85vh",
+                  // maxHeight: "88vh",
+                  overflow: "auto",
+                  marginBottom: 10,
+                }}
               >
                 {/* <Typography>Discussion</Typography> */}
+
                 <ListDiscussion conversations={discussionsList} />
+
+                <IconButton
+                  component={Paper}
+                  elevation={5}
+                  sx={(theme) => ({
+                    position: "absolute",
+                    width: 64,
+                    height: 64,
+                    borderRadius: "50%",
+                    backgroundColor: theme.palette.primary.main,
+                    cursor: "pointer",
+                    bottom: theme.spacing(3),
+                    right: theme.spacing(3),
+                    zIndex: theme.zIndex,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    ":active": {
+                      bgcolor: theme.palette.primary.main,
+                      // transform: "scale(0.9)",
+                    },
+                    ":hover": {
+                      bgcolor: theme.palette.primary.main,
+                    },
+                  })}
+                >
+                  <Message sx={{ color: "#fff" }} />
+                </IconButton>
               </TabPanel>
               <TabPanel
                 label={"group"}
                 value={selectedButton}
-                style={{ padding: 3 }}
+                style={{
+                  padding: 3,
+                  display: "flex",
+                  flex: 1,
+                  flexDirection: "column",
+                  gap: 5,
+                  overflow: "auto",
+                  marginBottom: 10,
+                }}
               >
                 {/* <Typography>Group</Typography> */}
                 <ListGroups groups={groupsList} />
+                <IconButton
+                  // component={Paper}
+                  title="New Group"
+                  sx={(theme) => ({
+                    position: "absolute",
+                    width: 64,
+                    height: 64,
+                    borderRadius: "50%",
+                    backgroundColor: theme.palette.primary.main,
+                    cursor: "pointer",
+                    bottom: theme.spacing(3),
+                    right: theme.spacing(3),
+                    zIndex: theme.zIndex,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    ":active": {
+                      bgcolor: theme.palette.primary.main,
+                      // transform: "scale(0.9)",
+                    },
+                    ":hover": {
+                      bgcolor: theme.palette.primary.main,
+                    },
+                  })}
+                >
+                  <Add sx={{ color: "#fff" }} />
+                </IconButton>
               </TabPanel>
               <TabPanel
                 label={"post"}

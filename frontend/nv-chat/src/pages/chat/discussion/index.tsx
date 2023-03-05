@@ -1,16 +1,18 @@
 import TopChatBar from "components/TopChatBar";
 import { useChatContext } from "context/ChatContext";
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 
 import MessageContainer from "components/Discussion/MessageContainer";
 import InputMessageContainer from "components/Discussion/InputMessageContainer";
 import { Box } from "@mui/material";
 import { useAuthContext } from "context/AuthContext";
 import ApiService from "utils/ApiService";
-import { TextMessage } from "types/AbstractMessage";
+import { TextMessage, VideoMessage } from "types/AbstractMessage";
 import { Conversation } from "types/ConversationSerializer";
 import { Message } from "types/Message";
+
+import "./index.css";
 
 type Props = {};
 
@@ -18,25 +20,74 @@ const index = (props: Props) => {
   const { id } = useParams();
   const {
     selectedChatType,
+    setSelectedChatType,
     selectedDiscussion,
+    setSelectedDiscussion,
     discussionsList,
     setDiscussionsList,
   } = useChatContext();
+  const { userToken, userProfile } = useAuthContext();
+
+  const [loading, setLoading] = useState<Boolean>(false);
+
+  const [typing, setTyping] = useState("");
+
+  const [chat, setChat] = useState({
+    name: (selectedDiscussion && selectedDiscussion.title) || "",
+    messages: (selectedDiscussion && selectedDiscussion.messages) || [],
+    type: selectedChatType || "dicussion",
+    icon: null,
+    participants: [],
+  });
+
+  const loadData = () => {
+    ApiService.getDiscussion(userToken, Number(id))
+      .then((res) => res.json())
+      .then((data) => {
+        // console.log("Results : ", data);
+        setChat({
+          ...chat,
+          name: data.title,
+          messages: data.messages,
+          icon: data.imageUrl,
+          participants: data.participants,
+        });
+        setSelectedDiscussion(data);
+        setTimeout(() => {
+          setLoading(false);
+        }, 3000);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  useEffect(() => {
+    if (userToken) {
+      setLoading(true);
+
+      loadData();
+    }
+  }, []);
+
+  // console.log({ chat });
+
+  useEffect(() => {
+    if (!chat.name) {
+      loadData();
+    }
+  }, [chat]);
 
   const fileInputRef = useRef(null);
   const imageInputRef = useRef(null);
 
   const [text, setText] = useState("");
-  const { userToken, userProfile } = useAuthContext();
-  const [message, setMessage] = useState(null);
-  const [messages, setMessages] = useState(selectedDiscussion.messages);
-  const name = selectedDiscussion.title;
-  const [replyMessage, setReplyMessage] = useState(null);
+  // const [message, setMessage] = useState(null);
+  // const messages = selectedDiscussion && selectedDiscussion.messages;
+  // const name = selectedDiscussion && selectedDiscussion.title;
+  // const [replyMessage, setReplyMessage] = useState(null);
 
   const webSocket = new WebSocket(
     ApiService.wsEndPoint + `ws/discussion_chat/${id}/?token=${userToken}`
   );
-
   useEffect(() => {
     webSocket.onopen = (e) => {
       console.log("WebSocket Established", { e });
@@ -46,8 +97,17 @@ const index = (props: Props) => {
       const messageData = JSON.parse(message.data);
       // console.log("Recieve Message : ");
       // console.log(messageData.message)
-      addRecieveMessage(messageData.message);
-      // setMessages((prevMessages) => [...prevMessages, messageData]);
+      if (messageData.typing && messageData.typing === true) {
+        console.log(messageData.message);
+        console.log({ messageData });
+        setTyping(messageData.message);
+      } else if (messageData.typing && messageData.typing === false) {
+        console.log({ messageData });
+
+        setTyping("");
+      } else {
+        addRecieveMessage(messageData.message);
+      }
     };
     webSocket.onclose = () => {
       console.log("WebSocket Client Disconnected");
@@ -58,6 +118,10 @@ const index = (props: Props) => {
   }, []);
 
   const addRecieveMessage = (newMessage: Message) => {
+    const oldMessages = chat.messages;
+    oldMessages.push(newMessage);
+    // setChat({ ...chat, messages:  });
+
     const filterDiscussion = discussionsList.find(
       (disc: Conversation) => disc.id === Number(id)
     );
@@ -92,9 +156,24 @@ const index = (props: Props) => {
     }
   };
 
-  const handleKeyUp = (e:React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleKeyUp = (
+    e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     if (e.key === "Enter") {
       return handleSend();
+    }
+    return handleNotTyping();
+  };
+
+  const handleNotTyping = () => {
+    webSocket.readyState;
+    if (webSocket.OPEN === webSocket.readyState) {
+      webSocket.send(
+        JSON.stringify({
+          message: ``,
+          typing: false,
+        })
+      );
     }
   };
 
@@ -109,7 +188,17 @@ const index = (props: Props) => {
     return handleSend();
   };
 
-  const handleTyping = () => {};
+  const handleTyping = () => {
+    console.log("Websocket ReadyState : ", webSocket.readyState);
+    if (webSocket.OPEN === webSocket.readyState) {
+      webSocket.send(
+        JSON.stringify({
+          message: `${userProfile.user.username} is typing`,
+          typing: true,
+        })
+      );
+    }
+  };
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -120,11 +209,114 @@ const index = (props: Props) => {
 
   const handleFileSelected = (event) => {
     const files = event.target.files;
+    console.log(files, files.length);
+    for (let index = 0; index < files.length; index++) {
+      const file = files[index];
+      const fileName = file.name.toLowerCase();
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const isImage =
+          fileName.endsWith(".jpg") ||
+          fileName.endsWith(".jpeg") ||
+          fileName.endsWith(".png") ||
+          fileName.endsWith(".gif");
+        const isVideo =
+          fileName.endsWith(".mp4") ||
+          fileName.endsWith(".mov") ||
+          fileName.endsWith(".avi") ||
+          fileName.endsWith(".wmv");
+
+        if (isVideo) {
+          const videoMessage = {
+            video: reader.result,
+            caption: text || null,
+            resourcetype: "VideoMessage",
+          };
+          // console.log(videoMessage);
+          webSocket.send(
+            JSON.stringify({ message: videoMessage, filename: fileName })
+          );
+        }
+        if (isImage) {
+          const imageMessage = {
+            image: reader.result,
+            caption: text || null,
+            resourcetype: "ImageMessage",
+          };
+          // console.log(imageMessage);
+          webSocket.send(
+            JSON.stringify({ message: imageMessage, filename: fileName })
+          );
+        }
+
+        if (!isImage && !isVideo) {
+          const fileMessage = {
+            file: reader.result,
+            caption: text || null,
+            resourcetype: "FileMessage",
+          };
+          webSocket.send(
+            JSON.stringify({ message: fileMessage, filename: fileName })
+          );
+        }
+      };
+
+      reader.readAsDataURL(file);
+    }
     // Do something with the selected files
   };
 
   const handleImageSelected = (event) => {
     const images = event.target.files;
+    // console.log(images, images.length);
+    for (let index = 0; index < images.length; index++) {
+      const image = images[index];
+      const fileName = image.name.toLowerCase();
+      const isImage =
+        fileName.endsWith(".jpg") ||
+        fileName.endsWith(".jpeg") ||
+        fileName.endsWith(".png") ||
+        fileName.endsWith(".gif");
+      const isVideo =
+        fileName.endsWith(".mp4") ||
+        fileName.endsWith(".mov") ||
+        fileName.endsWith(".avi") ||
+        fileName.endsWith(".wmv");
+      // console.log(image, fileName, isImage, isVideo);
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        // console.log(reader.result);
+        if (isVideo) {
+          const videoMessage = {
+            video: reader.result,
+            caption: text || null,
+            resourcetype: "VideoMessage",
+          };
+          // console.log(videoMessage);
+          webSocket.send(
+            JSON.stringify({ message: videoMessage, filename: fileName })
+          );
+        }
+        if (isImage) {
+          const imageMessage = {
+            image: reader.result,
+            caption: text || null,
+            resourcetype: "ImageMessage",
+          };
+          // console.log(imageMessage);
+          webSocket.send(
+            JSON.stringify({ message: imageMessage, filename: fileName })
+          );
+        }
+      };
+
+      reader.readAsDataURL(image);
+    }
+
     // Do something with the selected images
   };
 
@@ -136,7 +328,36 @@ const index = (props: Props) => {
     imageInputRef.current.click();
   };
 
+  if (loading) {
+    return (
+      <Box
+        width={"100%"}
+        height={"100%"}
+        display={"flex"}
+        justifyContent={"center"}
+        alignItems={"center"}
+        flex={1}
+      >
+        <Box
+          sx={(theme) => ({
+            width: 200,
+            height: 200,
+            border: "16px solid #ddd",
+            borderRadius: "50%",
+            borderTopColor: "#2f90dfdd",
+            animation: "spin 1s infinite",
+          })}
+        ></Box>
+      </Box>
+    );
+  }
+
   return (
+    // <>
+    //   {chat.name ? (
+
+    //   ) : null}
+    // </>
     <Box
       sx={{
         position: "relative",
@@ -149,8 +370,13 @@ const index = (props: Props) => {
         overflowX: "none",
       }}
     >
-      <TopChatBar chatType={selectedChatType} name={name} />
-      <MessageContainer messages={messages} />
+      <TopChatBar
+        typing={typing}
+        chatType={chat.type}
+        name={chat.name}
+        icon={chat.icon}
+      />
+      <MessageContainer messages={chat.messages} />
       <InputMessageContainer
         handleSendMessage={handleSendMessage}
         value={text}

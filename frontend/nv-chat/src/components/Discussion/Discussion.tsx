@@ -21,7 +21,7 @@ const Discussion = (props: Props) => {
     setSelectedDiscussion,
     selectedChatType,
     setSelectedChatType,
-    setDiscussionId
+    setDiscussionId,
   } = useChatContext();
   const formattedDate = moment(conversation.latest_message?.timestamp).format(
     "DD/MM/YYYY"
@@ -34,37 +34,15 @@ const Discussion = (props: Props) => {
     ? "Today"
     : formattedDate;
 
-  // const webSocket = new WebSocket(
-  //   ApiService.wsEndPoint +
-  //     `ws/discussion_chat/${conversation.id}/?token=${userToken}`
-  // );
-
-  // useEffect(() => {
-  //   webSocket.onopen = (e) => {
-  //     console.log("WebSocket Client Connected", { e });
-  //   };
-  //   webSocket.onmessage = (message) => {
-  //     console.log(message);
-  //     // const messageData = JSON.parse(message.data);
-  //     // setMessages((prevMessages) => [...prevMessages, messageData]);
-  //   };
-  //   webSocket.onclose = () => {
-  //     console.log("WebSocket Client Disconnected");
-  //   };
-  //   return () => {
-  //     webSocket.close();
-  //   };
-  // }, []);
-  
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   return (
     <Box
       // component={Paper}
       onClick={() => {
         setSelectedDiscussion(conversation);
         setSelectedChatType("discussion");
-        setDiscussionId(conversation.id)
-        navigate('/app/chat/discussion/' + conversation.id);
+        setDiscussionId(conversation.id);
+        navigate("/app/chat/discussion/" + conversation.id);
       }}
       sx={(theme) => ({
         display: "flex",

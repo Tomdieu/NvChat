@@ -72,12 +72,13 @@ button:focus-visible {
 
 
 ::-webkit-scrollbar {
-  width: 20px;
-  /* width: 10px; */
+  /* width: 20px; */
+  width: 10px;
   height: 40px;
   border-radius: 4px;
   cursor: pointer;
 }
+
 
 ::-webkit-scrollbar-track {
   background-color: transparent;
@@ -94,8 +95,4 @@ button:focus-visible {
 
 ::-webkit-scrollbar-thumb:hover {
   background-color: #a8bbbf;
-}
-
-* {
-  overflow-x: none;
 }

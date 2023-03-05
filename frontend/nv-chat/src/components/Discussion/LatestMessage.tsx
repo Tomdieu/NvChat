@@ -8,12 +8,13 @@ type Props = {
 
 const LatestMessage = (props) => {
   const { message } = props;
-  console.log({ message });
+  // console.log({ message });
   return (
     <>
       {message?.message.resourcetype === "TextMessage" && (
         <Typography noWrap sx={{ width: 290 }}>
-          {message.conversation ? null : message.sender.user.username +" : "} 
+          {/* {message.conversation ? null : message.sender.user.username + " : "} */}
+          {message.sender.user.username + " : "}
           {message.message.text}
         </Typography>
       )}

@@ -12,9 +12,9 @@ import { Helmet } from "react-helmet";
 import LogoIcon from "@assets/logo.svg";
 import { makeStyles } from "@mui/styles";
 
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuthContext } from "context/AuthContext";
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   flex: {
@@ -40,14 +40,14 @@ const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate()
-  const { login, setUserProfile, setUserToken,userToken } = useAuthContext();
+  const navigate = useNavigate();
+  const { login, setUserProfile, setUserToken, userToken } = useAuthContext();
 
-  useEffect(()=>{
-    if(userToken){
-      navigate("/app/chat")
+  useEffect(() => {
+    if (userToken) {
+      navigate("/app/chat");
     }
-  },[])
+  }, []);
 
   const handleClick = () => {
     login(username, password)
@@ -56,7 +56,7 @@ const Login = () => {
         if (data.success) {
           setUserProfile(data.data);
           setUserToken(data.token);
-          navigate("/app/chat")
+          navigate("/app/chat");
         } else {
           setError(data.message);
         }

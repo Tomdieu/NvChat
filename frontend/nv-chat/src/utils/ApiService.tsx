@@ -39,9 +39,22 @@ export default class ApiService {
     return res;
   }
 
-  static async getDiscussion(token: string) {
-    const url = this.endPoint + "chat/conversation/";
+  static async getDiscussion(token: string, id?: number) {
+    const part = id ? `chat/conversation/${id}` : `chat/conversation/`;
+    const url = this.endPoint + part;
     const res = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `token ${token}`,
+      },
+    });
+    return res;
+  }
+
+  static async saveChatMessage(data: FormData, token: string) {
+    const url = this.endPoint + "chat/messages/";
+    const res = await fetch(url, {
+      body: data,
       headers: {
         "Content-Type": "application/json",
         Authorization: `token ${token}`,

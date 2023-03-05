@@ -63,7 +63,7 @@ const index = (props: Props) => {
       <Box
         sx={(theme) => ({
           display: "flex",
-          alignItems: "center",
+          // alignItems: "center",
           justifyContent: "center",
           padding: theme.spacing(0.5),
         })}
@@ -88,6 +88,8 @@ const index = (props: Props) => {
             onChange={onChange}
             onKeyUp={onKeyUp}
             onKeyDown={onKeyDown}
+            multiline
+            maxRows={5}
             sx={(theme) => ({
               fontSize: 15,
               fontWeight: "600",

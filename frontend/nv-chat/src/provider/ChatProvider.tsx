@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { ChatContext } from "context/ChatContext";
 import ApiService from "utils/ApiService";
 import { useAuthContext } from "context/AuthContext";
+import { Conversation } from "types/ConversationSerializer";
+import { GroupSerializer } from "types/GroupSerializer";
 
 type Props = {
   children: React.ReactNode;
@@ -23,20 +25,55 @@ const ChatProvider = (props: Props) => {
     null | "discussion" | "group" | "post"
   >(null);
 
-  const [discussionsList, setDiscussionsList] = useState([]);
-  const [groupsList, setGroupsList] = useState([]);
+  const [discussionsList, setDiscussionsList] = useState<[] | Conversation[]>(
+    []
+  );
+  const [groupsList, setGroupsList] = useState<GroupSerializer[] | []>([]);
 
-  const [selectedDiscussion, setSelectedDiscussion] = useState({});
+  const [selectedDiscussion, setSelectedDiscussion] =
+    useState<null | Conversation>(null);
 
-  const [selectedGroup, setSelectedGroup] = useState({});
+  const [selectedGroup, setSelectedGroup] = useState<null | GroupSerializer>(
+    null
+  );
 
-  const [isRightOpen, setIsRightOpen] = useState(false);
+  const [isRightOpen, setIsRightOpen] = useState<Boolean>(false);
 
-  const [discussionId, setDiscussionId] = useState(null);
+  const [discussionId, setDiscussionId] = useState<null | number>(null);
 
   const toggleRight = () => setIsRightOpen(!isRightOpen);
 
   const { userToken } = useAuthContext();
+
+  useEffect(() => {
+    if (discussionId) {
+      localStorage.setItem("discussionId", discussionId.toString());
+    }
+    localStorage.setItem("isRightOpen", String(isRightOpen));
+
+    if (selectedDiscussion) {
+      localStorage.setItem(
+        "selectedDiscussion",
+        JSON.stringify(selectedDiscussion)
+      );
+    }
+    if (selectedGroup) {
+      localStorage.setItem("selectedGroup", JSON.stringify(selectedGroup));
+    }
+    if (discussionsList.length > 0) {
+      localStorage.setItem("discussions", JSON.stringify(discussionsList));
+    }
+    if (groupsList.length > 0) {
+      localStorage.setItem("groups", JSON.stringify(groupsList));
+    }
+  }, [
+    discussionId,
+    isRightOpen,
+    selectedDiscussion,
+    selectedGroup,
+    discussionsList,
+    groupsList,
+  ]);
 
   useEffect(() => {
     const discussions = localStorage.getItem("discussions");
@@ -47,16 +84,23 @@ const ChatProvider = (props: Props) => {
     if (groups) {
       setGroupsList(JSON.parse(groups));
     }
+    const discId = localStorage.getItem("discussionId");
+    if (discId) {
+      setDiscussionId(Number(discId));
+    }
+    const iRO = localStorage.getItem("isRightOpen");
+    if (iRO) {
+      setIsRightOpen(Boolean(iRO === "true"));
+    }
+    const selectDisc = localStorage.getItem("selectedDiscussion");
+    if (selectDisc) {
+      setSelectedDiscussion(JSON.parse(selectDisc));
+    }
+    const selectGroup = localStorage.getItem("selectedGroup");
+    if (selectGroup) {
+      setSelectedGroup(JSON.parse(selectGroup));
+    }
   }, []);
-
-  useEffect(() => {
-    if (discussionsList.length > 0) {
-      localStorage.setItem("discussions", JSON.stringify(discussionsList));
-    }
-    if (groupsList.length > 0) {
-      localStorage.setItem("groups", JSON.stringify(groupsList));
-    }
-  }, [discussionsList, groupsList]);
 
   const getGroups = () => {
     if (userToken) {
@@ -93,8 +137,6 @@ const ChatProvider = (props: Props) => {
       getGroups();
     }
   }, [userToken]);
-
-  console.log("Running every time");
 
   return (
     <ChatContext.Provider

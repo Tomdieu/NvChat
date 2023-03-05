@@ -1,4 +1,4 @@
-import { MoreVert } from "@mui/icons-material";
+import { ArrowBack, MoreVert } from "@mui/icons-material";
 import { Avatar, Box, IconButton, Typography } from "@mui/material";
 import { useChatContext } from "context/ChatContext";
 import React, { useState } from "react";
@@ -22,9 +22,6 @@ const index = (props: Props) => {
     name,
     imageUrl,
   } = props;
-  // console.log('====================================');
-  // console.log(props);
-  // console.log('====================================');
   const { isRightOpen, toggleRight } = useChatContext();
 
   return (
@@ -40,13 +37,16 @@ const index = (props: Props) => {
       })}
     >
       <Box sx={(theme) => ({ display: "flex", alignItems: "center" })}>
-        <Avatar src="imageUrl" sx={{ cursor: "pointer" }} onClick={toggleRight}>
-          {/* <AccountBox/> */}
-          {/* <AccountCircle/> */}
-          {/* <Group/> */}
-        </Avatar>
-        {/* {chatType === "discussion" && (
-        )} */}
+        {isRightOpen && (
+          <IconButton>
+            <ArrowBack />
+          </IconButton>
+        )}
+        <Avatar
+          src="imageUrl"
+          sx={{ cursor: "pointer" }}
+          onClick={toggleRight}
+        ></Avatar>
         <Typography sx={(theme) => ({ ml: theme.spacing(1), color: "#fff" })}>
           {name}
         </Typography>
