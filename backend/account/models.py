@@ -13,7 +13,7 @@ class UserProfile(models.Model):
     country = models.CharField(max_length=255, blank=True, null=True)
     profile_picture = models.ImageField(upload_to="profiles/", null=True, blank=True)
     bio = models.CharField(max_length=255, null=True, blank=True)
-    online = models.BooleanField(default=False)
+    online = models.BooleanField(default=False, blank=True, null=True)
 
     def __str__(self) -> str:
         return f"{self.user}"
