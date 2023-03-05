@@ -25,6 +25,7 @@ from polymorphic.admin import (
 
 # from nested_admin import NestedModelAdmin, NestedStackedInline, NestedInlineModelAdmin
 from nested_admin import nested
+
 # Register your models here.
 
 
@@ -51,21 +52,21 @@ admin.site.register(IMessage, IMessageAdmin)
 
 
 class ImageMessageAdmin(admin.ModelAdmin):
-    list_display = ("caption", "created_at")
+    list_display = ("id", "caption", "created_at")
 
 
 admin.site.register(ImageMessage, ImageMessageAdmin)
 
 
 class VideoMessageAdmin(admin.ModelAdmin):
-    list_display = ("caption", "created_at")
+    list_display = ("id", "caption", "created_at")
 
 
 admin.site.register(VideoMessage)
 
 
 class FileMessageAdmin(admin.ModelAdmin):
-    list_display = ("caption", "created_at")
+    list_display = ("id", "caption", "created_at")
     list_filter = ("file",)
 
 
@@ -106,19 +107,19 @@ admin.site.register(Conversation, ConversationAdmin)
 # admin.site.register(Message, MessageAdmin)
 
 
-class GroupMessageViewAdminInline(admin.TabularInline,nested.NestedTabularInline):
+class GroupMessageViewAdminInline(admin.TabularInline, nested.NestedTabularInline):
     model = GroupMessageView
     extra = 0
 
 
-class GroupMessageAdminInline(nested.NestedStackedInline):
+class GroupMessageAdminInline(admin.StackedInline, nested.NestedStackedInline):
     model = GroupMessage
     extra = 0
-    raw_id_fields = ["sender"]
+    raw_id_fields = ["sender", "message", "parent_message"]
     inlines = [GroupMessageViewAdminInline]
 
 
-class GroupMemberAdminInline(admin.TabularInline,nested.NestedTabularInline):
+class GroupMemberAdminInline(admin.TabularInline, nested.NestedTabularInline):
     model = GroupMember
     extra = 0
 
@@ -132,7 +133,7 @@ admin.site.register(ChatGroup, ChatGroupAdmin)
 
 
 class GroupMessageAdmin(admin.ModelAdmin):
-    list_display = ("id", "chat", "sender","parent_message", "message")
+    list_display = ("id", "chat", "sender", "parent_message", "message")
     inlines = [GroupMessageViewAdminInline]
 
 
