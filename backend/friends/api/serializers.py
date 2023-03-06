@@ -32,9 +32,14 @@ class FriendRequestSerializer(serializers.ModelSerializer):
     sender = UserProfileSerializer()
     reciever = UserProfileSerializer()
 
+    you_send = serializers.SerializerMethodField()
+
     class Meta:
         model = FriendRequest
         fields = "__all__"
+
+    def get_you_send(self, obj: FriendRequest):
+        return obj.sender == self.context["request"].user.profile
 
 
 class SearchFriendSerializer(serializers.ModelSerializer):

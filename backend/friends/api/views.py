@@ -8,6 +8,8 @@ from rest_framework.generics import CreateAPIView, RetrieveAPIView, ListAPIView
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 
+from django.db.models import Q
+
 from account.models import UserProfile
 from ..models import FriendList, FriendRequest
 from .serializers import (
@@ -38,7 +40,13 @@ class FriendRequestViewSet(GenericViewSet, ListModelMixin):
         return FriendRequestCreateSerializer
 
     def get_queryset(self):
-        return FriendRequest.objects.filter(sender=self.request.user.profile)
+        return FriendRequest.objects.filter(
+            (
+                Q(sender=self.request.user.profile)
+                | Q(reciever=self.request.user.profile)
+            )
+            & Q(is_active=True)
+        )
 
 
 class SendFriendRequestView(CreateAPIView):
