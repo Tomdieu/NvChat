@@ -2,8 +2,7 @@ from django.urls import re_path, path
 from . import consumers
 
 
-websocket_urpatterns = [
-    # re_path(r'ws/notifications/(?P<pk>[0-9]+)/$', consumers.UserNotificationConsumer.as_asgi()),
+websocket_urlpatterns = [
     re_path(
         r"ws/group_chat/(?P<group_chat_id>[0-9]+)/$",
         consumers.GroupChatConsumer.as_asgi(),

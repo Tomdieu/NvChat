@@ -1,0 +1,5 @@
+NEW_CONVERSATION = "new_conversation"
+NEW_GROUP = "new_group"
+NOTIFICATIONS = "new_notification"
+NEW_FRIEND_REQUEST = "new_friend_request"
+NEW_FRIEND = "new_friend"

@@ -180,3 +180,7 @@ __pycache__
 
 *.rdb
 celerybeat-schedule
+
+
+other
+InnerProject

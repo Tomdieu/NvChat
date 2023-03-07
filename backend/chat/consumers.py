@@ -120,7 +120,6 @@ def create_message(
         os.remove(url)
 
     if messageType == "conversation":
-        print(msgContent)
         conversation = Conversation.objects.get(id=conversationId)
         newMessage = {}
         newMessage["conversation"] = conversation
@@ -158,20 +157,32 @@ class ConversationConsumer(AsyncWebsocketConsumer):
         file_name = text_data_json.get("filename")
         typing = text_data_json.get("typing")
 
-        if typing == True:
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {"type": "send_typing", "message": message, "typing": True},
-            )
+        print(text_data_json)
 
-        elif typing == False:
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {"type": "send_typing", "message": message, "typing": False},
-            )
-        if typing == None:
+        if typing:
+            if typing == True:
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        "type": "send_typing",
+                        "message": message,
+                        "typing": True,
+                        "sender": self.scope["user"].username,
+                    },
+                )
+
+            elif typing == False:
+                await self.channel_layer.group_send(
+                    self.room_group_name,
+                    {
+                        "type": "send_typing",
+                        "message": message,
+                        "typing": False,
+                        "sender": self.scope["user"].username,
+                    },
+                )
+        else:
             instance = await self.save_message(message, fileName=file_name)
-            # print(instance)
             serializer = MessageListSerializer(instance)
             await self.channel_layer.group_send(
                 self.room_group_name,
@@ -181,14 +192,13 @@ class ConversationConsumer(AsyncWebsocketConsumer):
     async def send_typing(self, event):
         message = event["message"]
         typing = event["typing"]
-        username = self.scope["user"].username
-        print("Username : ", username)
+        username = event["sender"]
         await self.send(
             text_data=json.dumps(
                 {
                     "message": message,
                     "typing": typing,
-                    "sender": await username,
+                    "sender": username,
                 }
             )
         )
@@ -233,13 +243,23 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
         if typing == True:
             await self.channel_layer.group_send(
                 self.room_group_name,
-                {"type": "send_typing", "message": message, "typing": True},
+                {
+                    "type": "send_typing",
+                    "message": message,
+                    "typing": True,
+                    "sender": self.scope["user"].username,
+                },
             )
 
         elif typing == False:
             await self.channel_layer.group_send(
                 self.room_group_name,
-                {"type": "send_typing", "message": message, "typing": False},
+                {
+                    "type": "send_typing",
+                    "message": message,
+                    "typing": False,
+                    "sender": self.scope["user"].username,
+                },
             )
         if typing == None:
             instance = await self.save_chat_message(message, fileName=file_name)
@@ -252,13 +272,13 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
     async def send_typing(self, event):
         message = event["message"]
         typing = event["typing"]
-        username = self.scope["user"].username
+        username = event["username"]
         await self.send(
             text_data=json.dumps(
                 {
                     "message": message,
                     "typing": typing,
-                    "sender": await username,
+                    "sender": username,
                 }
             )
         )
