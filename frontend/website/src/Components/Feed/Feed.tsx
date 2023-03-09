@@ -12,11 +12,6 @@ const Feed = (props: Props) => {
       <div className={classes.feedWrapper}>
         <Share />
         <Post />
-        <Post />
-        <Post />
-        <Post />
-        <Post />
-        <Post />
       </div>
     </div>
   );

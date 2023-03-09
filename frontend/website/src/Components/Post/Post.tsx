@@ -1,6 +1,6 @@
 import React from "react";
 import { useStyles } from "./styles";
-import { Avatar } from "@mui/material";
+import { Avatar, IconButton } from "@mui/material";
 import { MoreVert } from "@mui/icons-material";
 
 type Props = {};
@@ -17,7 +17,9 @@ const Post = (props: Props) => {
             <span className={classes.postDate}>5 mins ago</span>
           </div>
           <div className={classes.postTopRight}>
-            <MoreVert />
+            <IconButton>
+              <MoreVert />
+            </IconButton>
           </div>
         </div>
         <div className={classes.postCenter}>

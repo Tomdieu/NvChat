@@ -38,7 +38,8 @@ export const useStyles = makeStyles((theme) => ({
   },
   shareOptions: {
     display: "flex",
-    alignItems: "center",
+    // alignItems: "center",
+    // justifyContent: "center",
   },
   shareOption: {
     display: "flex",
@@ -48,7 +49,7 @@ export const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     borderRadius: 20,
     "&:hover": {
-      backgroundColor: "grey",
+      backgroundColor: "#e9e7e7b0",
     },
     "&:active": {
       opacity: ".7",

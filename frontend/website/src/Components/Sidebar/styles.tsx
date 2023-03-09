@@ -39,6 +39,10 @@ export const useStyles = makeStyles((theme) => ({
       opacity: 0.8,
       borderRadius: theme.shape.borderRadius,
     },
+    "&:active": {
+      backgroundColor: "#5376f0",
+      color: "#fff",
+    },
   },
   sidebarIcon: {
     marginRight: theme.spacing(1.5),
