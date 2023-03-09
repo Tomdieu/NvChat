@@ -3,15 +3,19 @@ import { makeStyles } from "@mui/styles";
 export const useStyles = makeStyles((theme) => ({
   sidebarContainer: {
     flex: 3,
+    position: "sticky",
+    top: "64px",
+    bottom: 0,
+    left: 0,
     height: "calc(100vh - 64px)",
     overflowY: "auto",
-    "::-webkit-scroll-bar": {
+    "&::-webkit-scroll-bar": {
       width: "5px",
     },
-    "::-webkit-scroll-track": {
+    "&::-webkit-scroll-track": {
       backgroundColor: "#f1f1f1",
     },
-    "::-webkit-scroll-thumb": {
+    "&::-webkit-scroll-thumb": {
       bakgroundColor: "grey",
     },
   },
@@ -26,11 +30,15 @@ export const useStyles = makeStyles((theme) => ({
   sidebarListItem: {
     display: "flex",
     alignItems: "center",
-    // justifyContent: "space-between",
     marginBottom: theme.spacing(2),
 
-    padding: theme.spacing(1),
+    padding: theme.spacing(1.5),
     cursor: "pointer",
+    "&:hover": {
+      backgroundColor: "#ddd",
+      opacity: 0.8,
+      borderRadius: theme.shape.borderRadius,
+    },
   },
   sidebarIcon: {
     marginRight: theme.spacing(1.5),

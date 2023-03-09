@@ -12,22 +12,22 @@ const Home = (props: Props) => {
   return (
     <>
       <Topbar />
-      <Box className={classes.homeContainer}>
+      {/* <Box className={classes.homeContainer}>
         <Sidebar />
         <Feed />
         <Rightbar />
-      </Box>
-      {/* <Grid container>
+      </Box> */}
+      <Grid container>
         <Grid md={3}>
           <Sidebar />
         </Grid>
-        <Grid md={5.5}>
+        <Grid md={5.5} sm={9}>
           <Feed />
         </Grid>
         <Grid md={3.5}>
           <Rightbar />
         </Grid>
-      </Grid> */}
+      </Grid>
     </>
   );
 };

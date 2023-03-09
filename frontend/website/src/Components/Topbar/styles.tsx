@@ -9,8 +9,11 @@ export const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(1),
     gap: theme.spacing(4),
     backgroundColor: "#568",
-    position: "sticky",
+    position: "fixed",
+    width: "100%",
     top: 0,
+    zIndex: 999,
+    // height: "64px",
     "& > *": {
       color: "#fff",
     },
@@ -71,5 +74,6 @@ export const useStyles = makeStyles((theme) => ({
     width: "32px",
     height: "32px",
     objectFit: "cover",
+    marginRight: theme.spacing(1.8),
   },
 }));

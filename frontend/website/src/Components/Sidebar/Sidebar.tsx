@@ -1,5 +1,4 @@
 import React from "react";
-import "./sidebar.css";
 import { useStyles } from "./styles";
 import {
   RssFeed,
@@ -41,82 +40,6 @@ const Sidebar = (props: Props) => {
         </ul>
         <hr />
         <ul className={classes.sidebarFriendList}>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Navi</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Trix Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
-          <li className={classes.sidebarFriend}>
-            <Avatar className={classes.sidebarFriendImg} />
-            <span className={classes.sidebarFriendName}>Ivan Tom</span>
-          </li>
           <li className={classes.sidebarFriend}>
             <Avatar className={classes.sidebarFriendImg} />
             <span className={classes.sidebarFriendName}>Ivan Tom</span>
