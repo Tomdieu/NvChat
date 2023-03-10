@@ -46,40 +46,16 @@ h1 {
   height: 100vh;
 }
 
-/* 
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 40px;
-  border-radius: 4px;
-  cursor: pointer;
+  width: 10px,
 }
 
-
 ::-webkit-scrollbar-track {
-  background-color: transparent;
+  background-color: #f1f1f1;
+  border-radius: 5px;
 
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #d6dee1;
-  border-radius: 20px;
-  border: 6px solid transparent;
-  background-clip: content-box;
-  cursor: pointer;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: #a8bbbf;
-} */
-
-::-webkit-scroll-bar {
-  width: 2px,
-}
-
-::-webkit-scroll-track {
-  background-color: #f1f1f1,
-}
-
-::-webkit-scroll-thumb {
   background-color: rgb(184, 182, 182),
 }
