@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import React from "react";
+import React, { useRef } from "react";
 import Message from "./Message";
 // import { Message as MessageType } from "types/Message";
 // import moment from "moment";
@@ -9,6 +9,7 @@ import ReactScrollable from "react-scrollable-feed";
 
 type Props = {
   messages: any;
+  ref: any;
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -27,8 +28,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const index = (props: Props) => {
-  const { messages } = props;
+  const { messages, ref } = props;
   const classes = useStyles();
+  const bottomOfChat = useRef();
+
   return (
     <Box
       sx={(theme) => ({
@@ -46,6 +49,7 @@ const index = (props: Props) => {
       {messages?.map((msg, index) => (
         <Message message={msg} key={index} />
       ))}
+      <div ref={ref}></div>
     </Box>
   );
 };

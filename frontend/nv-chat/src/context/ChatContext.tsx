@@ -28,9 +28,9 @@ type chatContextType = {
   setSelectedGroup: React.Dispatch<React.SetStateAction<GroupSerializer>>;
   isRightOpen: Boolean;
   setIsRightOpen: React.Dispatch<React.SetStateAction<Boolean>>;
-  discussionsList: [] | Conversation[];
+  discussionsList: Conversation[];
   setDiscussionsList: React.Dispatch<React.SetStateAction<[] | Conversation[]>>;
-  groupsList: [] | GroupSerializer[];
+  groupsList: GroupSerializer[];
   setGroupsList: React.Dispatch<React.SetStateAction<[] | GroupSerializer[]>>;
   discussionId: number;
   setDiscussionId: React.Dispatch<React.SetStateAction<number>>;

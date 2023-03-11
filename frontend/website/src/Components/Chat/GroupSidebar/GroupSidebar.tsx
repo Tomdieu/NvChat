@@ -1,7 +1,7 @@
 import { Avatar, Box, Grid, IconButton, Typography } from "@mui/material";
 import React from "react";
 import { useStyles } from "./styles";
-import { Settings } from "@mui/icons-material";
+import { GroupAdd, Settings } from "@mui/icons-material";
 
 type Props = {};
 
@@ -19,8 +19,20 @@ const GroupSidebar = (props: Props) => {
           </IconButton>
         </Box>
         <Box className={classes.sidebarBottom}>
-          {/* <Typography variant="h6">Discussions</Typography> */}
-          <Box></Box>
+          <Box
+            sx={{ position: "absolute", bottom: 10, right: 20, zIndex: 999 }}
+          >
+            <IconButton
+              sx={{
+                backgroundColor: "#0b66ef",
+                p: 2,
+                "&:active": { backgroundColor: "#0b66ef", opacity: 0.9 },
+                "&:hover": { backgroundColor: "#0b66ef" },
+              }}
+            >
+              <GroupAdd sx={{ width: 32, height: 32, color: "#fff" }} />
+            </IconButton>
+          </Box>
           <Box className={classes.groupList}>
             <Box className={classes.groupItem}>
               <Avatar className={classes.groupIcon} />

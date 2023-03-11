@@ -1,7 +1,7 @@
 import TopChatBar from "components/TopChatBar";
 import { useChatContext } from "context/ChatContext";
 import React, { useEffect, useState, useRef } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import MessageContainer from "components/Discussion/MessageContainer";
 import InputMessageContainer from "components/Discussion/InputMessageContainer";
@@ -13,6 +13,7 @@ import { Conversation } from "types/ConversationSerializer";
 import { Message } from "types/Message";
 
 import "./index.css";
+import { ROUTES } from "@constants";
 
 type Props = {};
 
@@ -26,6 +27,8 @@ const index = (props: Props) => {
     discussionsList,
     setDiscussionsList,
   } = useChatContext();
+  const bottomOfChat = useRef();
+  const navigate = useNavigate();
   const { userToken, userProfile } = useAuthContext();
 
   const [loading, setLoading] = useState<Boolean>(false);
@@ -72,8 +75,14 @@ const index = (props: Props) => {
 
   useEffect(() => {
     if (!chat.name) {
-      loadData();
+      return loadData();
     }
+    setTimeout(() => {
+      bottomOfChat.current.scrollIntoView({
+        behavior: "smoot",
+        block: "start",
+      });
+    }, 100);
   }, [chat]);
 
   const fileInputRef = useRef(null);
@@ -84,7 +93,9 @@ const index = (props: Props) => {
   // const messages = selectedDiscussion && selectedDiscussion.messages;
   // const name = selectedDiscussion && selectedDiscussion.title;
   // const [replyMessage, setReplyMessage] = useState(null);
-
+  // if (!userToken) {
+  //   navigate(ROUTES.LOGIN);
+  // }
   const webSocket = new WebSocket(
     ApiService.wsEndPoint + `ws/discussion_chat/${id}/?token=${userToken}`
   );
@@ -93,18 +104,21 @@ const index = (props: Props) => {
       console.log("WebSocket Established", { e });
     };
     webSocket.onmessage = (message) => {
-      // console.log("Recieve Message : ", { message });
+      console.log("Recieve Message : ", { message });
       const messageData = JSON.parse(message.data);
       // console.log("Recieve Message : ");
       // console.log(messageData.message)
-      if (messageData.typing && messageData.typing === true) {
-        console.log(messageData.message);
-        console.log({ messageData });
-        setTyping(messageData.message);
-      } else if (messageData.typing && messageData.typing === false) {
-        console.log({ messageData });
+      if (messageData.typing) {
+        if (messageData.typing && messageData.typing === true) {
+          // console.log(messageData.message);
+          console.log("T : ", { messageData });
+          setTyping(messageData.message);
+        } else if (messageData.typing && messageData.typing === false) {
+          console.log("Nt : ", { messageData });
+          // console.log(messageData.message);
 
-        setTyping("");
+          setTyping("");
+        }
       } else {
         addRecieveMessage(messageData.message);
       }
@@ -112,9 +126,6 @@ const index = (props: Props) => {
     webSocket.onclose = () => {
       console.log("WebSocket Client Disconnected");
     };
-    // return () => {
-    //   webSocket.close();
-    // };
   }, []);
 
   const addRecieveMessage = (newMessage: Message) => {
@@ -159,6 +170,7 @@ const index = (props: Props) => {
   const handleKeyUp = (
     e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    console.log("Up");
     if (e.key === "Enter") {
       return handleSend();
     }
@@ -376,7 +388,7 @@ const index = (props: Props) => {
         name={chat.name}
         icon={chat.icon}
       />
-      <MessageContainer messages={chat.messages} />
+      <MessageContainer messages={chat.messages} ref={bottomOfChat} />
       <InputMessageContainer
         handleSendMessage={handleSendMessage}
         value={text}

@@ -24,9 +24,6 @@ export const useStyles = makeStyles((theme) => ({
   },
   leftTopContainer: {
     display: "flex",
-    // alignItems: "center",
-    // justifyContent: "space-between",
-    // padding: theme.spacing(2),
   },
   header: {
     fontFamily: "Roboto",

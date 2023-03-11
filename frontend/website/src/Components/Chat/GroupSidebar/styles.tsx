@@ -10,16 +10,16 @@ export const useStyles = makeStyles((theme) => ({
     top: 0,
   },
   sidebarWrapper: {
-    // padding: theme.spacing(1),
     height: "100vh",
     margin: 0,
+    display: "flex",
+    flexDirection: "column",
   },
   sidebarTop: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    // padding: theme.spacing(1),
-    height: "8vh",
+    flex: 0.95,
     paddingLeft: theme.spacing(1),
     margin: 0,
     "& > *": {
@@ -31,7 +31,8 @@ export const useStyles = makeStyles((theme) => ({
     cursor: "pointer",
   },
   sidebarBottom: {
-    height: "92vh",
+    // height: "92vh",
+    flex: 11,
     overflowY: "auto",
     margin: 0,
   },
@@ -64,7 +65,7 @@ export const useStyles = makeStyles((theme) => ({
     cursor: "pointer",
     borderBottom: "1px solid #ddd",
     marginBottom: theme.spacing(0.8),
-    marginLeft: theme.spacing(1),
+    margin: theme.spacing(1),
     "&:hover": {
       opacity: 0.8,
     },
@@ -72,7 +73,6 @@ export const useStyles = makeStyles((theme) => ({
   groupIcon: {},
   groupInfo: {
     flex: 1,
-    // backgroundColor: "red",
     paddingLeft: theme.spacing(1),
   },
   groupName: {

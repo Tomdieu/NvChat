@@ -1,18 +1,34 @@
-import { Box, Paper } from "@mui/material";
-import React from "react";
+import { Box } from "@mui/material";
+import React, { useState } from "react";
 import { useStyles } from "./styles";
 
-type Props = {};
+import GroupMessage from "../Message/GroupMessage";
+import { GroupMessageSerializer } from "types/GroupMessageSerializer";
+
+type Props = {
+  messages: GroupMessageSerializer[];
+};
 
 const MessagesList = (props: Props) => {
   const classes = useStyles();
+  const { messages } = props;
+
+  const getSenderName = (message: GroupMessageSerializer): string => {
+    return message.sender.user.username;
+  };
+
   return (
     <Box className={classes.messageList}>
-      <Box className={classes.messageWrapper}>
-        <Box component={Paper}>
-          <code>from django.contrib.auth import get_user_model</code>
-        </Box>
-      </Box>
+      {messages?.map((message, index) => (
+        <GroupMessage
+          isMine={Boolean(getSenderName(message) === "ivantom")}
+          groupMessage={message}
+        />
+      ))}
+      {/* <GroupMessage isMine={true} />
+      <GroupMessage isMine={false} />
+      <GroupMessage isMine={true} />
+      <GroupMessage isMine={false} /> */}
     </Box>
   );
 };
