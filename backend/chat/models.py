@@ -101,6 +101,8 @@ class ChatGroup(models.Model):
     )
     image = models.ImageField(upload_to="group_image/", blank=True, null=True)
 
+    description = models.TextField(blank=True,null=True)
+
     @property
     def messages(self) -> list:
         return self.chat_messages.all()
