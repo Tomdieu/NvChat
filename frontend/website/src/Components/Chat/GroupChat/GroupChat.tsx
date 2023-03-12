@@ -108,11 +108,12 @@ const GroupChat = (props: Props) => {
       }}
     >
       <TopGroupBar icon={""} />
-      <MessagesList />
+      <MessagesList messages={[]} />
       <MessageInput
         text={message}
         onChange={handleChange}
         onFileClick={handleFileClick}
+        onSendClick={handleSend}
       />
       <input
         style={{ display: "none" }}

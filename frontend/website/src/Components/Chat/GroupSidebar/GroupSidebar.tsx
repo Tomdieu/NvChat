@@ -1,12 +1,34 @@
-import { Avatar, Box, Grid, IconButton, Typography } from "@mui/material";
-import React from "react";
+import {
+  Avatar,
+  Box,
+  Grid,
+  IconButton,
+  Typography,
+  Dialog,
+  Paper,
+  TextField,
+  Button,
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
 import { useStyles } from "./styles";
-import { GroupAdd, Settings } from "@mui/icons-material";
+import { Cancel, GroupAdd, Save, Settings } from "@mui/icons-material";
+import CreateGroupDialog from "../CreateGroupDialog";
+import Group from "../Group/Group";
+import { useGroup } from "Context/GroupContext";
 
 type Props = {};
 
 const GroupSidebar = (props: Props) => {
   const classes = useStyles();
+  const [open, setOpen] = useState(false);
+  const { groups, setGroups, setSelectedGroup } = useGroup();
+
+  useEffect(() => {
+    // loads the groups
+  }, []);
+  const handleClose = () => {
+    setOpen(false);
+  };
   return (
     <Grid item md={3} sm={4} className={classes.sidebar}>
       <Box className={classes.sidebarWrapper}>
@@ -18,11 +40,13 @@ const GroupSidebar = (props: Props) => {
             <Settings />
           </IconButton>
         </Box>
+        <CreateGroupDialog open={open} onClose={handleClose} />
         <Box className={classes.sidebarBottom}>
           <Box
             sx={{ position: "absolute", bottom: 10, right: 20, zIndex: 999 }}
           >
             <IconButton
+              onClick={() => setOpen(true)}
               sx={{
                 backgroundColor: "#0b66ef",
                 p: 2,
@@ -30,221 +54,17 @@ const GroupSidebar = (props: Props) => {
                 "&:hover": { backgroundColor: "#0b66ef" },
               }}
             >
-              <GroupAdd sx={{ width: 32, height: 32, color: "#fff" }} />
+              <GroupAdd sx={{ width: 28, height: 28, color: "#fff" }} />
             </IconButton>
           </Box>
           <Box className={classes.groupList}>
-            <Box className={classes.groupItem}>
-              <Avatar className={classes.groupIcon} />
-              <Box className={classes.groupInfo}>
-                <Typography variant="h6" className={classes.groupName}>
-                  Ivan Tom
-                </Typography>
-                <Typography
-                  variant="caption"
-                  className={classes.groupLatestMessage}
-                >
-                  Latest Message
-                </Typography>
-              </Box>
-              <Box className={classes.groupDateInfo}>19:10</Box>
-            </Box>
-            <Box className={classes.groupItem}>
-              <Avatar className={classes.groupIcon} />
-              <Box className={classes.groupInfo}>
-                <Typography variant="h6" className={classes.groupName}>
-                  Ivan Tom
-                </Typography>
-                <Typography
-                  variant="caption"
-                  className={classes.groupLatestMessage}
-                >
-                  Latest Message
-                </Typography>
-              </Box>
-              <Box className={classes.groupDateInfo}>19:10</Box>
-            </Box>
-            <Box className={classes.groupItem}>
-              <Avatar className={classes.groupIcon} />
-              <Box className={classes.groupInfo}>
-                <Typography variant="h6" className={classes.groupName}>
-                  Ivan Tom
-                </Typography>
-                <Typography
-                  variant="caption"
-                  className={classes.groupLatestMessage}
-                >
-                  Latest Message
-                </Typography>
-              </Box>
-              <Box className={classes.groupDateInfo}>19:10</Box>
-            </Box>
-            <Box className={classes.groupItem}>
-              <Avatar className={classes.groupIcon} />
-              <Box className={classes.groupInfo}>
-                <Typography variant="h6" className={classes.groupName}>
-                  Ivan Tom
-                </Typography>
-                <Typography
-                  variant="caption"
-                  className={classes.groupLatestMessage}
-                >
-                  Latest Message
-                </Typography>
-              </Box>
-              <Box className={classes.groupDateInfo}>19:10</Box>
-            </Box>
-
-            <Box className={classes.groupItem}>
-              <Avatar className={classes.groupIcon} />
-              <Box className={classes.groupInfo}>
-                <Typography variant="h6" className={classes.groupName}>
-                  Ivan Tom
-                </Typography>
-                <Typography
-                  variant="caption"
-                  className={classes.groupLatestMessage}
-                >
-                  Latest Message
-                </Typography>
-              </Box>
-              <Box className={classes.groupDateInfo}>19:10</Box>
-            </Box>
-            <Box className={classes.groupItem}>
-              <Avatar className={classes.groupIcon} />
-              <Box className={classes.groupInfo}>
-                <Typography variant="h6" className={classes.groupName}>
-                  Ivan Tom
-                </Typography>
-                <Typography
-                  variant="caption"
-                  className={classes.groupLatestMessage}
-                >
-                  Latest Message
-                </Typography>
-              </Box>
-              <Box className={classes.groupDateInfo}>19:10</Box>
-            </Box>
-            <Box className={classes.groupItem}>
-              <Avatar className={classes.groupIcon} />
-              <Box className={classes.groupInfo}>
-                <Typography variant="h6" className={classes.groupName}>
-                  Ivan Tom
-                </Typography>
-                <Typography
-                  variant="caption"
-                  className={classes.groupLatestMessage}
-                >
-                  Latest Message
-                </Typography>
-              </Box>
-              <Box className={classes.groupDateInfo}>19:10</Box>
-            </Box>
-            <Box className={classes.groupItem}>
-              <Avatar className={classes.groupIcon} />
-              <Box className={classes.groupInfo}>
-                <Typography variant="h6" className={classes.groupName}>
-                  Ivan Tom
-                </Typography>
-                <Typography
-                  variant="caption"
-                  className={classes.groupLatestMessage}
-                >
-                  Latest Message
-                </Typography>
-              </Box>
-              <Box className={classes.groupDateInfo}>19:10</Box>
-            </Box>
-            <Box className={classes.groupItem}>
-              <Avatar className={classes.groupIcon} />
-              <Box className={classes.groupInfo}>
-                <Typography variant="h6" className={classes.groupName}>
-                  Ivan Tom
-                </Typography>
-                <Typography
-                  variant="caption"
-                  className={classes.groupLatestMessage}
-                >
-                  Latest Message
-                </Typography>
-              </Box>
-              <Box className={classes.groupDateInfo}>19:10</Box>
-            </Box>
-            <Box className={classes.groupItem}>
-              <Avatar className={classes.groupIcon} />
-              <Box className={classes.groupInfo}>
-                <Typography variant="h6" className={classes.groupName}>
-                  Ivan Tom
-                </Typography>
-                <Typography
-                  variant="caption"
-                  className={classes.groupLatestMessage}
-                >
-                  Latest Message
-                </Typography>
-              </Box>
-              <Box className={classes.groupDateInfo}>19:10</Box>
-            </Box>
-            <Box className={classes.groupItem}>
-              <Avatar className={classes.groupIcon} />
-              <Box className={classes.groupInfo}>
-                <Typography variant="h6" className={classes.groupName}>
-                  Ivan Tom
-                </Typography>
-                <Typography
-                  variant="caption"
-                  className={classes.groupLatestMessage}
-                >
-                  Latest Message
-                </Typography>
-              </Box>
-              <Box className={classes.groupDateInfo}>19:10</Box>
-            </Box>
-            <Box className={classes.groupItem}>
-              <Avatar className={classes.groupIcon} />
-              <Box className={classes.groupInfo}>
-                <Typography variant="h6" className={classes.groupName}>
-                  Ivan Tom
-                </Typography>
-                <Typography
-                  variant="caption"
-                  className={classes.groupLatestMessage}
-                >
-                  Latest Message
-                </Typography>
-              </Box>
-              <Box className={classes.groupDateInfo}>19:10</Box>
-            </Box>
-            <Box className={classes.groupItem}>
-              <Avatar className={classes.groupIcon} />
-              <Box className={classes.groupInfo}>
-                <Typography variant="h6" className={classes.groupName}>
-                  Ivan Tom
-                </Typography>
-                <Typography
-                  variant="caption"
-                  className={classes.groupLatestMessage}
-                >
-                  Latest Message
-                </Typography>
-              </Box>
-              <Box className={classes.groupDateInfo}>19:10</Box>
-            </Box>
-            <Box className={classes.groupItem}>
-              <Avatar className={classes.groupIcon} />
-              <Box className={classes.groupInfo}>
-                <Typography variant="h6" className={classes.groupName}>
-                  Ivan Tom
-                </Typography>
-                <Typography
-                  variant="caption"
-                  className={classes.groupLatestMessage}
-                >
-                  Latest Message
-                </Typography>
-              </Box>
-              <Box className={classes.groupDateInfo}>19:10</Box>
-            </Box>
+            {groups?.map((group, index) => (
+              <Group
+                group={group}
+                key={index}
+                onClick={() => setSelectedGroup(group)}
+              />
+            ))}
           </Box>
         </Box>
       </Box>

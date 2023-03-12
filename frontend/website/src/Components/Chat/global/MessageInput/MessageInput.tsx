@@ -12,10 +12,11 @@ type Props = {
   onEmogiClick?: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => void;
+  onSendClick?: () => void;
 };
 
 const MessageInput = (props: Props) => {
-  const { onFileClick, text, onChange, onEmogiClick } = props;
+  const { onFileClick, text, onChange, onEmogiClick, onSendClick } = props;
   const classes = useStyles();
   return (
     <Box className={classes.messageInput}>
@@ -52,7 +53,7 @@ const MessageInput = (props: Props) => {
             />
           </IconButton>
           {text ? (
-            <IconButton className={classes.iconButton}>
+            <IconButton className={classes.iconButton} onClick={onSendClick}>
               <Send className={classes.icon} sx={{ width: 32, height: 32 }} />
             </IconButton>
           ) : (

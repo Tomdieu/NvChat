@@ -55,28 +55,4 @@ export const useStyles = makeStyles((theme) => ({
       cursor: "pointer",
     },
   },
-  groupItem: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: theme.spacing(1),
-    backgroundColor: "#ccc",
-    borderRadius: theme.shape.borderRadius,
-    cursor: "pointer",
-    borderBottom: "1px solid #ddd",
-    marginBottom: theme.spacing(0.8),
-    margin: theme.spacing(1),
-    "&:hover": {
-      opacity: 0.8,
-    },
-  },
-  groupIcon: {},
-  groupInfo: {
-    flex: 1,
-    paddingLeft: theme.spacing(1),
-  },
-  groupName: {
-    fontWeight: "bold",
-    fontSize: "18px",
-  },
 }));

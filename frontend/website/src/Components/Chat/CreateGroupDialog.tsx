@@ -1,4 +1,11 @@
-import { Box, Dialog, Paper, Button, TextField } from "@mui/material";
+import {
+  Box,
+  Dialog,
+  Paper,
+  Button,
+  TextField,
+  Typography,
+} from "@mui/material";
 import React, { useState } from "react";
 import { Cancel, Save } from "@mui/icons-material";
 
@@ -33,12 +40,19 @@ const CreateGroupDialog = (props: Props) => {
           gap: theme.spacing(1),
         })}
       >
+        <Typography variant="h4" textAlign="center"  fontFamily={"fantasy"}>Chat Group</Typography>
         <TextField
           label="Group Name"
           placeholder="Enter the group name to be created"
           fullWidth
           value={name}
           onChange={handleChange}
+        />
+        <TextField
+          label="Description"
+          placeholder="Enter group description"
+          multiline
+          maxRows={10}
         />
         <Box
           sx={{
@@ -50,10 +64,10 @@ const CreateGroupDialog = (props: Props) => {
           <Button
             variant="contained"
             color="error"
-            endIcon={<Cancel />}
+            startIcon={<Cancel />}
             onClick={onClose}
           >
-            Cancel
+            Close
           </Button>
           <Button
             disabled={Boolean(!name)}
