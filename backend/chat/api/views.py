@@ -32,7 +32,9 @@ from .serializers import (
     # GroupMessageSerializer,
     GroupMessageListSerializer,
     # GroupMessageCreateSerializer,
+    GroupMemberCreateSerializer,
     GroupMemberSerializer,
+    GMSerializer,
     # AuthenticationSerializer,
 )
 from rest_framework.response import Response
@@ -41,7 +43,6 @@ from rest_framework import status
 
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
-
 
 
 class ChatGroupViewSet(
@@ -70,9 +71,10 @@ class ChatGroupViewSet(
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
-      
-        return Response({'data':serializer.data,'success':True},status=status.HTTP_200_OK)
 
+        return Response(
+            {"data": serializer.data, "success": True}, status=status.HTTP_200_OK
+        )
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer_class()(data=request.data)
@@ -93,12 +95,64 @@ class ChatGroupViewSet(
         return super().partial_update(request, *args, **kwargs)
 
 
+class AddMemberToGroupViewSet(CreateAPIView, GenericViewSet):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    serializer_class = GMSerializer
+
+    queryset = GroupMember.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        group = serializer.validated_data["group"]
+
+        user = serializer.validated_data["user"]
+
+        chatGroup = ChatGroup.objects.get(id=group.pk)
+
+        chatGroup.add_member(user)
+
+        return Response(
+            {"message": "added member to group", "success": True},
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class removeMemberFromGroupViewSet(CreateAPIView, GenericViewSet):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    serializer_class = GMSerializer
+
+    queryset = GroupMember.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        group = serializer.validated_data["group"]
+
+        user = serializer.validated_data["user"]
+
+        chatGroup = ChatGroup.objects.get(id=group.pk)
+
+        chatGroup.remove_member(user)
+
+        return Response(
+            {"message": "member from group", "success": True},
+            status=status.HTTP_201_CREATED,
+        )
+
+
 class JoinGroupViewSet(GenericViewSet, CreateModelMixin):
-    serializer_class = GroupMemberSerializer
+    serializer_class = GroupMemberCreateSerializer
 
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
-    
+
     queryset = GroupMember.objects.all()
 
     def create(self, request, *args, **kwargs):
