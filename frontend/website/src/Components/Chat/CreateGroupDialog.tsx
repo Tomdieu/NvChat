@@ -5,9 +5,18 @@ import {
   Button,
   TextField,
   Typography,
+  Avatar,
+  IconButton,
+  InputBase,
 } from "@mui/material";
-import React, { useState } from "react";
-import { Cancel, Save } from "@mui/icons-material";
+import React, { useRef, useState } from "react";
+import {
+  Camera,
+  CameraEnhance,
+  Cancel,
+  EmojiEmotions,
+  Save,
+} from "@mui/icons-material";
 
 type Props = {
   open: boolean;
@@ -18,6 +27,8 @@ type Props = {
 const CreateGroupDialog = (props: Props) => {
   const { open, onClose } = props;
   const [name, setName] = useState("");
+
+  const iconRef = useRef();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -40,20 +51,39 @@ const CreateGroupDialog = (props: Props) => {
           gap: theme.spacing(1),
         })}
       >
-        <Typography variant="h4" textAlign="center"  fontFamily={"fantasy"}>Chat Group</Typography>
-        <TextField
-          label="Group Name"
-          placeholder="Enter the group name to be created"
-          fullWidth
-          value={name}
-          onChange={handleChange}
-        />
-        <TextField
+        <Typography variant="h4" textAlign="center" fontFamily={"fantasy"}>
+          Chat Group
+        </Typography>
+        <Box display={"flex"} alignItems={"center"} gap={1}>
+          <Box sx={{ cursor: "pointer", position: "relative" }}>
+            <Avatar ref={iconRef} />
+          </Box>
+          <InputBase
+            // label="Group Name"
+            placeholder="Enter the group name to be created"
+            fullWidth
+            value={name}
+            onChange={handleChange}
+            sx={{
+              borderBottom: "2px solid gray",
+              pl: 0.8,
+              pr: 0.8,
+              lineHeight: "18px",
+              fontSize: "18px",
+              "&:focus-within": { borderBottomColor: "#5376f0" },
+            }}
+          />
+          <IconButton>
+            <EmojiEmotions />
+          </IconButton>
+        </Box>
+
+        {/* <TextField
           label="Description"
           placeholder="Enter group description"
           multiline
           maxRows={10}
-        />
+        /> */}
         <Box
           sx={{
             display: "flex",
@@ -70,7 +100,7 @@ const CreateGroupDialog = (props: Props) => {
             Close
           </Button>
           <Button
-            disabled={Boolean(!name)}
+            disabled={Boolean(name.length <= 3)}
             variant="contained"
             endIcon={<Save />}
             onClick={handleGroupCreate}
@@ -78,6 +108,12 @@ const CreateGroupDialog = (props: Props) => {
             Create
           </Button>
         </Box>
+        <input
+          style={{ display: "none" }}
+          type="file"
+          accept="image/*"
+          ref={iconRef}
+        />
       </Box>
     </Dialog>
   );

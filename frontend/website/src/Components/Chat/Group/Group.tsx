@@ -3,6 +3,7 @@ import { makeStyles } from "@mui/styles";
 import React from "react";
 import { GroupSerializer } from "types/GroupSerializer";
 import moment from "moment";
+import LatestMessage from "./LatestMessage";
 
 const useStyles = makeStyles((theme) => ({
   groupItem: {
@@ -67,7 +68,14 @@ const Group = (props: Props) => {
           {group?.chat_name}
         </Typography>
         <Typography variant="caption" className={classes.groupLatestMessage}>
-          {group?.latest_message?.message.created_at && <>Latest Message</>}
+          {group?.latest_message?.message.created_at ? (
+            <LatestMessage />
+          ) : (
+            <>
+              {" "}
+              <Typography sx={{ lineHeight: "20px" }}> </Typography>
+            </>
+          )}
         </Typography>
       </Box>
       <Box className={classes.groupDateInfo}>
