@@ -70,14 +70,7 @@ class InvitationMessageCreateSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-# class GroupMemberCreateSerializer(serializers.ModelSerializer):
-
-#     class Meta:
-#         model = GroupMember
-#         fields = '__all__'
-
-
-class GroupMemberSerializer(serializers.ModelSerializer):
+class GroupMemberCreateSerializer(serializers.ModelSerializer):
     user = UserProfileSerializer(read_only=True)
 
     class Meta:
@@ -93,7 +86,7 @@ class GroupMemberSerializer(serializers.ModelSerializer):
 
 class ChatGroupSerializer(serializers.ModelSerializer):
     created_by = UserProfileSerializer(read_only=True)
-    group_members = GroupMemberSerializer(read_only=True, many=True)
+    group_members = GroupMemberCreateSerializer(read_only=True, many=True)
 
     latest_message = serializers.SerializerMethodField()
     messages = serializers.SerializerMethodField()
@@ -362,3 +355,28 @@ class ChatGroupListSerializer(serializers.ModelSerializer):
 
     def get_messages(self, obj: ChatGroup):
         return GroupMessageListSerializer(obj.messages.all(), many=True).data
+
+
+class GroupMemberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GroupMember
+        fields = "__all__"
+
+
+class GMSerializer(serializers.Serializer):
+    user = serializers.IntegerField()
+    group = serializers.IntegerField()
+
+    def validate_user(self, user):
+        _user = UserProfile.objects.filter(id=user)
+        if not _user.exists():
+            raise serializers.ValidationError({"user": "this user doesn't exits"})
+
+        return _user.first()
+
+    def validate_group(self, group):
+        _group = ChatGroup.objects.filter(id=group)
+        if not _group.exists():
+            raise serializers.ValidationError({"group": "this group doesn't exits"})
+
+        return _group.first()
