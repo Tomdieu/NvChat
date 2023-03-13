@@ -151,4 +151,46 @@ export default class ApiService {
     });
     return res;
   }
+
+  static async createGroup(groupData: any, token: string) {
+    const url = this.endPoint + "chat/groups/";
+    const res = await fetch(url, {
+      body: JSON.stringify(groupData),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `token ${token}`,
+      },
+    });
+
+    return res;
+  }
+
+  static async addGroupMember(groupMemberData: any, token: string) {
+    const url = this.endPoint + "chat/add-group-member/";
+    const res = await fetch(url, {
+      body: JSON.stringify(groupMemberData),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `token ${token}`,
+      },
+    });
+
+    return res;
+  }
+
+  static async joinGroup(groupMemberData: any, token: string) {
+    const url = this.endPoint + "chat/join-group/";
+    const res = await fetch(url, {
+      body: JSON.stringify(groupMemberData),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `token ${token}`,
+      },
+    });
+
+    return res;
+  }
 }
