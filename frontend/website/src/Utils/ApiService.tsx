@@ -193,4 +193,18 @@ export default class ApiService {
 
     return res;
   }
+
+  static async removeGroup(groupMemberData: any, token: string) {
+    const url = this.endPoint + "chat/remove-group-member/";
+    const res = await fetch(url, {
+      body: JSON.stringify(groupMemberData),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `token ${token}`,
+      },
+    });
+
+    return res;
+  }
 }
