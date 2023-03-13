@@ -101,7 +101,7 @@ class ChatGroup(models.Model):
     )
     image = models.ImageField(upload_to="group_image/", blank=True, null=True)
 
-    description = models.TextField(blank=True,null=True)
+    description = models.TextField(blank=True, null=True)
 
     @property
     def messages(self) -> list:
@@ -109,6 +109,31 @@ class ChatGroup(models.Model):
 
     def __str__(self) -> str:
         return self.chat_name
+
+    def add_member(self, user: UserProfile):
+        member = self.group_members.filter(user=user)
+        if not member.exists():
+            if not member in self.group_members.all():
+                member = GroupMember.objects.create(
+                    user=user, group=self, is_active=True
+                )
+                self.group_members.add(member)
+
+    def remove_member(self, user: UserProfile):
+        member = self.group_members.filter(user=user)
+        print(member, self.group_members.all())
+        if member.exists():
+            _member = member.get(user=user)
+            print(_member)
+            _member.is_active = False
+            _member.save()
+
+    def set_member_as_admin(self, user: UserProfile):
+        member = self.group_members.filter(user=user)
+        if member.exists():
+            _member = member.get(user=user)
+            _member.is_manager = True
+            _member.save()
 
 
 class GroupMember(models.Model):
@@ -152,12 +177,14 @@ class GroupMessage(models.Model):
 
     def clean_fields(self, exclude=None) -> None:
         super().clean_fields(exclude)
-
-        if not self.chat.members.filter(user=self.sender.user).exists():
+        print("Hey : ", self.chat.group_members.all())
+        if not self.chat.group_members.filter(
+            user=self.sender, is_active=True
+        ).exists():
             raise ValidationError(
                 {
                     "sender": _(
-                        "Sorry this user can not send a message into this chat group because he does not belong to that group"
+                        "Sorry this user can not send a message into this chat group because he does not belong to that group or has been remove"
                     )
                 }
             )
