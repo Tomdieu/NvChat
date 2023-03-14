@@ -59,3 +59,7 @@ h1 {
 ::-webkit-scrollbar-thumb {
   background-color: rgb(184, 182, 182),
 }
+
+/* ::selection {
+  background-color: transparent;
+} */

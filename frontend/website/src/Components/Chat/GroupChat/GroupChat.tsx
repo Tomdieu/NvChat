@@ -1,13 +1,14 @@
-import { Grid } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import React, { useRef, useState } from "react";
 import TopGroupBar from "../TopGroupBar/TopGroupBar";
 import MessageInput from "../global/MessageInput/MessageInput";
 import MessagesList from "../global/MessagesList/MessagesList";
+import { useGroup } from "Context/GroupContext";
 
 type Props = {};
 
-const GroupChat = (props: Props) => {
-  const [message, setMessage] = useState<string | null>("Hello");
+const GroupChatBox = (props: Props) => {
+  const [message, setMessage] = useState<string | null>("");
   const [replyMessage, setReplyMessage] = useState(null);
   const [typing, setTyping] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>();
@@ -123,6 +124,49 @@ const GroupChat = (props: Props) => {
       />
     </Grid>
   );
+};
+
+// export default GroupChatBox;
+
+const EmptyPage = () => {
+  return (
+    <Grid
+      item
+      md={9}
+      sm={8}
+      sx={{
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        maxHeight: "100vh",
+        overflow: "hidden",
+        justifyContent: "center",
+        alignItems: "center",
+        bgcolor: "#5e5e5e40",
+      }}
+    >
+      <Typography
+        variant="h3"
+        textAlign={"justify"}
+        fontStyle={"oblique"}
+        fontSize={"3rem"}
+        color={"#117fa7"}
+      >
+        Select a Group Chat and start discussion
+      </Typography>
+    </Grid>
+  );
+};
+
+const GroupChat = () => {
+  const { selectedGroup } = useGroup();
+
+  console.log(selectedGroup);
+  if (selectedGroup) {
+    return <GroupChatBox />;
+  } else {
+    return <EmptyPage />;
+  }
 };
 
 export default GroupChat;
