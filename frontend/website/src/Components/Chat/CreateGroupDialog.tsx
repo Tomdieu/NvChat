@@ -8,6 +8,7 @@ import {
   Avatar,
   IconButton,
   InputBase,
+  CircularProgress,
 } from "@mui/material";
 import React, { useRef, useState } from "react";
 import {
@@ -17,6 +18,7 @@ import {
   EmojiEmotions,
   Save,
 } from "@mui/icons-material";
+import ApiService from "Utils/ApiService";
 
 type Props = {
   open: boolean;
@@ -28,6 +30,8 @@ const CreateGroupDialog = (props: Props) => {
   const { open, onClose } = props;
   const [name, setName] = useState("");
 
+  const [loading, setLoading] = useState(false);
+
   const iconRef = useRef();
 
   const handleChange = (
@@ -37,7 +41,24 @@ const CreateGroupDialog = (props: Props) => {
   };
 
   const handleGroupCreate = () => {
-    onClose();
+    setLoading(true);
+
+    ApiService.createGroup(JSON.stringify({ chat_name: name }), "")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        if (data.detail) {
+          alert(data.detail);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        alert(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+    // onClose();
   };
 
   return (
@@ -96,17 +117,28 @@ const CreateGroupDialog = (props: Props) => {
             color="error"
             startIcon={<Cancel />}
             onClick={onClose}
+            disabled={loading}
           >
             Close
           </Button>
-          <Button
-            disabled={Boolean(name.length <= 3)}
-            variant="contained"
-            endIcon={<Save />}
-            onClick={handleGroupCreate}
-          >
-            Create
-          </Button>
+          {loading ? (
+            <CircularProgress
+              aria-labelledby="btn-create-group"
+              id="btn-create-group"
+              aria-busy={true}
+            />
+          ) : (
+            <Button
+              id="btn-create-group"
+              disabled={Boolean(name.length <= 3)}
+              variant="contained"
+              endIcon={<Save />}
+              onClick={handleGroupCreate}
+              aria-controls={loading ? "btn-create-group" : undefined}
+            >
+              Create
+            </Button>
+          )}
         </Box>
         <input
           style={{ display: "none" }}
