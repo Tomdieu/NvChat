@@ -23,6 +23,12 @@ const useStyles = makeStyles((theme) => ({
 
     "&:active": {
       backgroundColor: "#4798fa",
+      "& > *,p": {
+        color: "#fff",
+      },
+    },
+    "& ::selection": {
+      backgroundColor: "transparent",
     },
   },
   groupIcon: {},
@@ -31,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: theme.spacing(1),
   },
   groupName: {
-    fontWeight: "bold",
+    fontWeight: "lighter",
     fontSize: "18px",
   },
   groupDateInfo: {
@@ -73,7 +79,11 @@ const Group = (props: Props) => {
           ) : (
             <>
               {" "}
-              <Typography sx={{ lineHeight: "20px" }}> </Typography>
+              <Typography
+                sx={{ lineHeight: "20px", color: "grey", fontStyle: "italic" }}
+              >
+                Select chat and start discussing
+              </Typography>
             </>
           )}
         </Typography>
