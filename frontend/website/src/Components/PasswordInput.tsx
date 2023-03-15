@@ -14,29 +14,29 @@ const PasswordInput = (props: Props) => {
   return (
     <Box sx={{ width: "100%", position: "relative" }}>
       <TextField type={type} fullWidth {...other} />
-      <Box
-        sx={{
-          position: "absolute",
-          top: 2,
-          right: 1.8,
-          bottom: 2,
-          zIndex: 999,
-          borderRadius: 2,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "rgba(255,255,255,.3)",
-          backdropFilter: "blur(8px)",
-          p: 0.2,
-          // lineHeight: 32,
-        }}
-      >
-        {value && (
+      {value && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: 4,
+            right: 1.8,
+            // bottom: 2,
+            zIndex: 999,
+            borderRadius: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "rgba(255,255,255,.3)",
+            backdropFilter: "blur(8px)",
+            p: 0.2,
+            // lineHeight: 32,
+          }}
+        >
           <IconButton onClick={toggleType}>
             <RemoveRedEye />
           </IconButton>
-        )}
-      </Box>
+        </Box>
+      )}
     </Box>
   );
 };
