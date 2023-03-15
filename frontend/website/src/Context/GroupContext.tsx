@@ -1,3 +1,4 @@
+import ApiService from "Utils/ApiService";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { GroupSerializer } from "types/GroupSerializer";
 
@@ -14,6 +15,7 @@ type groupContextType = {
 };
 
 export const GroupContext = createContext<groupContextType>(null);
+GroupContext.displayName = "GroupContext";
 
 export const useGroup = () => useContext(GroupContext);
 
@@ -34,6 +36,42 @@ export const GroupContextProvider = (props: Props) => {
     setIsRightOpen(!isRightOpen);
   };
 
+  useEffect(() => {
+    if (groupId) {
+      sessionStorage.setItem("groupId", groupId.toString());
+    }
+    if (selectedGroup) {
+      sessionStorage.setItem("selectedGroup", JSON.stringify(selectedGroup));
+    }
+  }, [groupId, selectedGroup]);
+
+  useEffect(() => {
+    const _groupId = sessionStorage.getItem("groupId");
+    if (_groupId) {
+      setGroupId(Number(_groupId));
+    }
+    const _groups = localStorage.getItem("groups");
+    if (_groups) {
+      setGroups(JSON.parse(_groups));
+    }
+    const _selectedGroup = sessionStorage.getItem("selectedGroup");
+    if (_selectedGroup) {
+      const x: GroupSerializer = JSON.parse(_selectedGroup);
+      setSelectedGroup(x);
+    }
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("userToken");
+    if (token) {
+      ApiService.getGroups(token)
+        .then((res) => res.json())
+        .then((data) => {
+          setGroups(data.data);
+        })
+        .catch((err) => console.log(err));
+    }
+  }, []);
   useEffect(() => {
     if (groups.length > 0) {
       localStorage.setItem("groups", JSON.stringify(groups));
