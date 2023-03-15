@@ -63,7 +63,7 @@ class ChatGroupViewSet(
         if self.request.method.upper() in ["POST"]:
             return ChatGroupCreateSerializer
         else:
-            return ChatGroupListSerializer
+            return ChatGroupSerializer
             # return ChatGroupSerializer
 
     # queryset = ChatGroup.objects.all()
