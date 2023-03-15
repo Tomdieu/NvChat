@@ -39,12 +39,16 @@ class AuthenticationViewSet(GenericViewSet, CreateAPIView):
                 {
                     "data": UserProfileSerializer(user.profile).data,
                     "token": user.auth_token.key,
-                    "success":True
+                    "success": True,
                 },
                 status=status.HTTP_200_OK,
             )
         return Response(
-            {"success":False,"message": "Invalid credentials username or password incorrect"}, status=status.HTTP_400_BAD_REQUEST
+            {
+                "success": False,
+                "message": "Invalid credentials username or password incorrect",
+            },
+            status=status.HTTP_400_BAD_REQUEST,
         )
 
 
@@ -55,12 +59,16 @@ class UserRegistrationViewSet(GenericViewSet, CreateModelMixin):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer_class()(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        userProfile: UserProfile = serializer.save()
 
         return Response(
-            {"data": serializer.data, "message": "Account Created Successfully"},
+            {
+                "data": serializer.data,
+                "message": "Account Created Successfully",
+                "token": userProfile.user.auth_token.key,
+            },
             status=status.HTTP_201_CREATED,
-        )   
+        )
 
 
 class UserViewSet(
