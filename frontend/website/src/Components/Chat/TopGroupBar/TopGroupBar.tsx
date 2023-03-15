@@ -1,11 +1,12 @@
 import { Avatar, Box, IconButton, Typography } from "@mui/material";
-import React from "react";
+
 import { useStyles } from "./styles";
 import { Call, MoreVert } from "@mui/icons-material";
 import { GroupMember } from "types/GroupMember";
+import { useAuth } from "Context/AuthContext";
 
 type Props = {
-  name?: string;
+  name: string;
   participants?: GroupMember[];
   typing?: string;
   icon: string;
@@ -14,6 +15,7 @@ type Props = {
 const TopGroupBar = (props: Props) => {
   const classes = useStyles();
   const { name, participants, typing, icon } = props;
+  const { userProfile } = useAuth();
   const isTyping = Boolean(typing);
   return (
     <Box className={classes.topbar}>
@@ -21,21 +23,40 @@ const TopGroupBar = (props: Props) => {
         <Avatar className={classes.topbarImg} src={icon} alt={name} />
         <Box className={classes.topbarCenter}>
           <Typography variant="h6" sx={{ fontSize: 16, fontWeight: "bold" }}>
-            {name && name}
+            {name}
           </Typography>
-          <Typography
-            variant="subtitle2"
-            noWrap
-            sx={{
-              letterSpacing: 2,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {participants?.map((participant, index) => (
-              <>{participant.user.user.username}</>
-            ))}
-          </Typography>
+          {!isTyping ? (
+            <Typography
+              variant="subtitle2"
+              noWrap
+              sx={{
+                letterSpacing: 2,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {participants?.map((participant, index) => (
+                <span>
+                  {participant.user.user.username}
+                  {","}
+                </span>
+              ))}
+            </Typography>
+          ) : (
+            <Typography
+              variant="subtitle2"
+              noWrap
+              sx={{
+                letterSpacing: 2,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                fontStyle: "italic",
+                color: "#d5d2d2",
+              }}
+            >
+              {typing}
+            </Typography>
+          )}
         </Box>
         <Box className={classes.topbarIcons}>
           {/* <IconButton className={classes.topbarIcon}>
