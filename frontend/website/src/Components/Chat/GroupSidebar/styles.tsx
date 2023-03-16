@@ -37,6 +37,7 @@ export const useStyles = makeStyles((theme) => ({
     margin: 0,
   },
   groupList: {
+    position: "relative",
     "&::-webkit-scrollbar": {
       width: "10px",
       height: "40px",
