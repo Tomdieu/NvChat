@@ -103,6 +103,10 @@ class ChatGroup(models.Model):
 
     description = models.TextField(blank=True, null=True)
 
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    updated_on = models.DateTimeField(auto_now=True)
+
     @property
     def messages(self) -> list:
         return self.chat_messages.all()
