@@ -43,6 +43,9 @@ export const useStyles = makeStyles((theme) => ({
       backgroundColor: "#5376f0",
       color: "#fff",
     },
+    "& ::selection": {
+      backgroundColor: "transparent",
+    },
   },
   sidebarIcon: {
     marginRight: theme.spacing(1.5),
