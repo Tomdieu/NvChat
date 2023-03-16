@@ -1,18 +1,18 @@
+import { AccountCircle, Home } from "@mui/icons-material";
 import { Box, Button, Grid, Paper, TextField, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
+import PasswordInput from "Components/PasswordInput";
+import { useAuth } from "Context/AuthContext";
+import ApiService from "Utils/ApiService";
 import LOGO from "assets/logo.svg";
 import { Form, Formik } from "formik";
-
-const useStyles = makeStyles((theme) => ({
-  leftContainer: {
-    backgroundImage: `logo.svg`,
-  },
-}));
+import { UserCreateSchema } from "schema/UserCreateProfile";
+import { UserProfile } from "types/UserProfile";
 
 type Props = {};
 
 const Register = (props: Props) => {
-  const classes = useStyles();
+  const { showBar, setUserToken, setUserProfile } = useAuth();
   return (
     <Grid
       container
@@ -20,18 +20,41 @@ const Register = (props: Props) => {
       width={"100vw"}
       justifyContent={"center"}
       alignItems={"center"}
-      sx={{}}
+      sx={{ backgroundColor: "#218af2" }}
     >
       <Grid item width={"500px"} component={Paper}>
         <Formik
+          validationSchema={UserCreateSchema}
           initialValues={{
+            confirmPassword: "",
             username: "",
             phoneNumber: "",
             password: "",
-            confirmPassword: "",
           }}
-          onSubmit={(e) => {
+          onSubmit={(e: { username: any; password: any; phoneNumber: any }) => {
             console.log(e);
+            const newUSer: UserProfile = {
+              user: {
+                username: e.username,
+                password: e.password,
+              },
+              phone_number: e.phoneNumber,
+            };
+
+            ApiService.register(newUSer)
+              .then((res) => res.json())
+              .then((data) => {
+                if (data.data) {
+                  showBar(
+                    `Account Created Successfully For ${data.data.user.username}!`,
+                    <AccountCircle />,
+                    "success"
+                  );
+                  setUserToken(data.token);
+                  setUserProfile(data.data);
+                }
+              })
+              .catch((err) => console.log(err));
           }}
         >
           {({
@@ -53,6 +76,7 @@ const Register = (props: Props) => {
                 padding: 3,
               }}
               component={Form}
+              autoComplete=""
             >
               <Box
                 sx={{
@@ -69,39 +93,75 @@ const Register = (props: Props) => {
               <TextField
                 label={"username"}
                 required
+                name="username"
                 value={values.username}
                 onChange={handleChange("username")}
                 onBlur={handleBlur("username")}
+                error={Boolean(touched.username && errors.username)}
+                helperText={
+                  Boolean(touched.username) &&
+                  Boolean(errors.username) &&
+                  errors.username.toString()
+                }
               />
               <TextField
                 label={"Phone Number"}
                 required
+                name="phoneNumber"
                 value={values.phoneNumber}
                 onChange={handleChange("phoneNumber")}
                 onBlur={handleBlur("phoneNumber")}
+                error={Boolean(touched.phoneNumber && errors.phoneNumber)}
+                helperText={
+                  touched.phoneNumber &&
+                  errors.phoneNumber &&
+                  errors.phoneNumber.toString()
+                }
               />
-              <TextField
+              <PasswordInput
                 label={"password"}
                 required
+                name="password"
                 value={values.password}
                 onChange={handleChange("password")}
                 onBlur={handleBlur("password")}
+                aria-autocomplete="none"
+                error={Boolean(touched.password && errors.password)}
+                helperText={
+                  touched.password &&
+                  errors.password &&
+                  errors.password.toString()
+                }
               />
-              <TextField
+              <PasswordInput
                 label={"Confirm Password"}
                 required
+                name="confirmPassword"
                 value={values.confirmPassword}
                 onChange={handleChange("confirmPassword")}
                 onBlur={handleBlur("confirmPassword")}
+                error={Boolean(
+                  touched.confirmPassword && errors.confirmPassword
+                )}
+                helperText={
+                  touched.confirmPassword &&
+                  errors.confirmPassword &&
+                  errors.confirmPassword.toString()
+                }
               />
-              <Button type="submit" variant="contained">
+              <Button
+                disabled={Boolean(!isValid || !dirty)}
+                type="submit"
+                variant="contained"
+                size="large"
+              >
                 Register
               </Button>
-              <Typography textAlign={"center"} variant="caption">
+              <Typography textAlign={"center"}>
                 Already have an account ? <a href="#">Login</a>
               </Typography>
-              <Typography textAlign={"center"} variant="caption">
-                Copyright &copy; 2021 -2023
+              <Typography textAlign={"center"}>
+                Copyright &copy; 2021 - {new Date().getFullYear()}
               </Typography>
             </Box>
           )}
