@@ -46,8 +46,11 @@ type Props = {
 
 const GroupMessage = (props: Props) => {
   const { isMine = false, groupMessage } = props;
+
   const classes = useStyles({ isMine });
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(e.currentTarget);
   };
@@ -77,6 +80,7 @@ const GroupMessage = (props: Props) => {
   const open = Boolean(anchorEl);
   return (
     <Box
+      id={"message_" + groupMessage.id}
       className={classes.messageWrapper}
       justifyContent={isMine ? "flex-end" : "flex-start"}
     >
@@ -90,7 +94,9 @@ const GroupMessage = (props: Props) => {
             justifyContent: "space-between",
           }}
         >
-          <span style={{ fontWeight: "600", cursor: "pointer" }}>~ivantom</span>
+          <span style={{ fontWeight: "600", cursor: "pointer" }}>
+            ~ {groupMessage.sender.user.username}
+          </span>
           <IconButton
             id="message-menu"
             onClick={handleClick}
@@ -101,15 +107,15 @@ const GroupMessage = (props: Props) => {
             <MoreHoriz />
           </IconButton>
         </div>
-        {isText && (
-          <TextMessage text="from django.contrib.auth import get_user_model" />
+        {isText && <TextMessage text={groupMessage.message.text} />}
+        {isImage && (
+          <PhotoMessage caption={groupMessage.message.caption} image={Logo} />
         )}
-        {isImage && <PhotoMessage caption={"This is an image"} image={Logo} />}
         {isAudio && <AudioMessage audio={""} caption={""} />}
         {isVideo && (
           <VideoMessage
-            video={"/assets/video.mp4"}
-            caption={"This is a video"}
+            video={groupMessage.message.video}
+            caption={groupMessage.message.caption}
           />
         )}
         <div
@@ -144,57 +150,63 @@ const GroupMessage = (props: Props) => {
               <Typography>Reply</Typography>
             </Box>
           </MenuItem>
-          {isMine && (
-            <>
-              <MenuItem onClick={handleClose}>
-                <Box
-                  display="flex"
-                  alignItems={"center"}
-                  gap={5}
-                  sx={{
-                    "& > *": {
-                      color: "#f5c875",
-                    },
-                  }}
-                >
-                  <RemoveRedEye />
-                  <Typography>View By</Typography>
-                </Box>
-              </MenuItem>
 
-              <Divider />
-              <MenuItem onClick={handleClose}>
-                <Box
-                  display="flex"
-                  alignItems={"center"}
-                  gap={5}
-                  sx={{
-                    "& > *": {
-                      color: "#1c72f2",
-                    },
-                  }}
-                >
-                  <Edit />
-                  <Typography>Update</Typography>
-                </Box>
-              </MenuItem>
-              <MenuItem onClick={handleClose}>
-                <Box
-                  display="flex"
-                  alignItems={"center"}
-                  gap={5}
-                  sx={{
-                    "& > *": {
-                      color: "red",
-                    },
-                  }}
-                >
-                  <Delete />
-                  <Typography>Delete</Typography>
-                </Box>
-              </MenuItem>
-            </>
-          )}
+          <MenuItem
+            sx={{ display: !isMine ? "none" : "block" }}
+            onClick={handleClose}
+          >
+            <Box
+              display="flex"
+              alignItems={"center"}
+              gap={5}
+              sx={{
+                "& > *": {
+                  color: "#f5c875",
+                },
+              }}
+            >
+              <RemoveRedEye />
+              <Typography>View By</Typography>
+            </Box>
+          </MenuItem>
+
+          <Divider sx={{ display: !isMine ? "none" : "block" }} />
+          <MenuItem
+            sx={{ display: !isMine ? "none" : "block" }}
+            onClick={handleClose}
+          >
+            <Box
+              display="flex"
+              alignItems={"center"}
+              gap={5}
+              sx={{
+                "& > *": {
+                  color: "#1c72f2",
+                },
+              }}
+            >
+              <Edit />
+              <Typography>Update</Typography>
+            </Box>
+          </MenuItem>
+          <MenuItem
+            sx={{ display: !isMine ? "none" : "block" }}
+            onClick={handleClose}
+          >
+            <Box
+              display="flex"
+              alignItems={"center"}
+              gap={5}
+              sx={{
+                "& > *": {
+                  color: "red",
+                },
+              }}
+            >
+              <Delete />
+              <Typography>Delete</Typography>
+            </Box>
+          </MenuItem>
         </Menu>
       </Box>
     </Box>

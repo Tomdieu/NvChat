@@ -9,6 +9,7 @@ type Props = {
 const VideoMessage = (props: Props) => {
   const { video, caption = "" } = props;
   const videoRef = useRef<HTMLVideoElement>(null!);
+  // if(video.split(".")[])
   return (
     <div>
       <video ref={videoRef} id="video" width={"100%"} controls>
