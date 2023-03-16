@@ -101,7 +101,7 @@ class ChatGroup(models.Model):
     )
     image = models.ImageField(upload_to="group_image/", blank=True, null=True)
 
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True, default="")
 
     created_on = models.DateTimeField(auto_now_add=True)
 

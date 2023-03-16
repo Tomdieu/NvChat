@@ -112,7 +112,7 @@ class GroupMessageViewAdminInline(admin.TabularInline, nested.NestedTabularInlin
     extra = 0
 
 
-class GroupMessageAdminInline(admin.StackedInline, nested.NestedStackedInline):
+class GroupMessageAdminInline(admin.TabularInline, nested.NestedTabularInline):
     model = GroupMessage
     extra = 0
     raw_id_fields = ["sender", "message", "parent_message"]
@@ -125,7 +125,7 @@ class GroupMemberAdminInline(admin.TabularInline, nested.NestedTabularInline):
 
 
 class ChatGroupAdmin(nested.NestedModelAdmin):
-    list_display = ("chat_name","description", "created_by")
+    list_display = ("chat_name", "description", "created_by")
     inlines = [GroupMemberAdminInline, GroupMessageAdminInline]
 
 
