@@ -4,6 +4,7 @@ import React from "react";
 import { GroupSerializer } from "types/GroupSerializer";
 import moment from "moment";
 import LatestMessage from "./LatestMessage";
+import { useGroup } from "Context/GroupContext";
 
 const useStyles = makeStyles((theme) => ({
   groupItem: {
@@ -31,14 +32,20 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: "transparent",
     },
   },
-  groupIcon: {},
+  groupIcon: {
+    width: "60px",
+    height: "60px",
+    // lineHeight: 32,
+  },
   groupInfo: {
     flex: 1,
     paddingLeft: theme.spacing(1),
   },
   groupName: {
-    fontWeight: "lighter",
+    fontWeight: "bold",
     fontSize: "18px",
+    color: "#fff",
+    display: "block",
   },
   groupDateInfo: {
     color: "#fff",
@@ -56,6 +63,7 @@ type Props = {
 const Group = (props: Props) => {
   const { group, onClick } = props;
   const classes = useStyles();
+  const { groupId } = useGroup();
   const formattedDate = moment(group?.latest_message?.created_at).format(
     "DD/MM/YYYY"
   );
@@ -67,23 +75,32 @@ const Group = (props: Props) => {
     ? "Today"
     : formattedDate;
   return (
-    <Box className={classes.groupItem} onClick={onClick}>
+    <Box
+      className={classes.groupItem}
+      onClick={onClick}
+      bgcolor={groupId === group.id ? "#3286e7" : "#ccc"}
+    >
       <Avatar className={classes.groupIcon} src={group?.image} />
       <Box className={classes.groupInfo}>
-        <Typography variant="h6" className={classes.groupName}>
+        {/* <Typography variant="h6" className={classes.groupName}>
           {group?.chat_name}
-        </Typography>
+        </Typography> */}
+        <span className={classes.groupName}>{group?.chat_name}</span>
         <Typography variant="caption" className={classes.groupLatestMessage}>
           {group?.latest_message?.message.created_at ? (
-            <LatestMessage />
+            <LatestMessage message={group?.latest_message} />
           ) : (
             <>
               {" "}
-              <Typography
-                sx={{ lineHeight: "20px", color: "grey", fontStyle: "italic" }}
+              <span
+                style={{
+                  lineHeight: "20px",
+                  color: "#e3d9d9",
+                  fontStyle: "italic",
+                }}
               >
                 Select chat and start discussing
-              </Typography>
+              </span>
             </>
           )}
         </Typography>

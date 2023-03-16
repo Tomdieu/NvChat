@@ -1,4 +1,10 @@
-import { Box, IconButton, InputBase, TextField } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  InputBase,
+  InputBaseProps,
+  TextField,
+} from "@mui/material";
 import React from "react";
 import { useStyles } from "./styles";
 import { AttachFile, EmojiEmotions, Mic, Send } from "@mui/icons-material";
@@ -9,20 +15,29 @@ type Props = {
   onChange?: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
-  onEmogiClick?: (
+  onEmojiClick?: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => void;
   onSendClick?: () => void;
-};
+  onInput?: (event: React.FormEventHandler<HTMLDivElement>) => void;
+} & InputBaseProps;
 
 const MessageInput = (props: Props) => {
-  const { onFileClick, text, onChange, onEmogiClick, onSendClick } = props;
+  const {
+    onFileClick,
+    text,
+    onChange,
+    onInput,
+    onEmojiClick,
+    onSendClick,
+    ...other
+  } = props;
   const classes = useStyles();
   return (
     <Box className={classes.messageInput}>
       {/* <Box></Box> */}
       <Box className={classes.messageInputWrapper}>
-        <IconButton className={classes.iconButton}>
+        <IconButton className={classes.iconButton} onClick={onEmojiClick}>
           <EmojiEmotions
             className={classes.icon}
             sx={{ width: 32, height: 32 }}
@@ -36,6 +51,7 @@ const MessageInput = (props: Props) => {
             fullWidth
             value={text}
             onChange={onChange}
+            onInput={onInput}
             placeholder="Type a message"
             sx={(theme) => ({
               paddingLeft: theme.spacing(0.5),
@@ -43,6 +59,7 @@ const MessageInput = (props: Props) => {
               fontSize: 16,
               lineHeight: "32px",
             })}
+            {...other}
           />
         </Box>
         <Box className={classes.iconContainer}>

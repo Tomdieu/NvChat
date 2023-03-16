@@ -4,14 +4,18 @@ import { useStyles } from "./styles";
 
 import GroupMessage from "../Message/GroupMessage";
 import { GroupMessageSerializer } from "types/GroupMessageSerializer";
+import { useAuth } from "Context/AuthContext";
 
 type Props = {
   messages: GroupMessageSerializer[];
+  ref?: React.LegacyRef<HTMLDivElement>;
 };
 
 const MessagesList = (props: Props) => {
   const classes = useStyles();
-  const { messages } = props;
+  const { messages, ref } = props;
+
+  const { userProfile } = useAuth();
 
   const getSenderName = (message: GroupMessageSerializer): string => {
     return message.sender.user.username;
@@ -21,14 +25,11 @@ const MessagesList = (props: Props) => {
     <Box className={classes.messageList}>
       {messages?.map((message, index) => (
         <GroupMessage
-          isMine={Boolean(getSenderName(message) === "ivantom")}
+          key={index}
+          isMine={Boolean(getSenderName(message) === userProfile.user.username)}
           groupMessage={message}
         />
       ))}
-      {/* <GroupMessage isMine={true} />
-      <GroupMessage isMine={false} />
-      <GroupMessage isMine={true} />
-      <GroupMessage isMine={false} /> */}
     </Box>
   );
 };

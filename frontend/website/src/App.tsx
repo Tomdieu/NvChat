@@ -4,6 +4,7 @@ import { GroupContextProvider } from "Context/GroupContext";
 import Login from "pages/auth/Login/Login";
 import Register from "pages/auth/Register/Register";
 
+import Routes from "routes";
 type Props = {};
 
 const App = (props: Props) => {
@@ -13,8 +14,9 @@ const App = (props: Props) => {
       {/* <GroupContextProvider>
         <Group />
       </GroupContextProvider> */}
-      <Login />
+      {/* <Login /> */}
       {/* <Register /> */}
+      <Routes />
     </>
   );
 };

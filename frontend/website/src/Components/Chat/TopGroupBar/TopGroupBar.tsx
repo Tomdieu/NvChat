@@ -1,24 +1,28 @@
-import { Avatar, Box, IconButton, Typography } from "@mui/material";
+import { Avatar, Box, BoxProps, IconButton, Typography } from "@mui/material";
 
 import { useStyles } from "./styles";
 import { Call, MoreVert } from "@mui/icons-material";
 import { GroupMember } from "types/GroupMember";
 import { useAuth } from "Context/AuthContext";
 
+type Typing = {
+  sender: string;
+  message: string;
+};
+
 type Props = {
   name: string;
   participants?: GroupMember[];
-  typing?: string;
+  typing?: Typing;
   icon: string;
-};
+} & BoxProps;
 
 const TopGroupBar = (props: Props) => {
   const classes = useStyles();
-  const { name, participants, typing, icon } = props;
-  const { userProfile } = useAuth();
+  const { name, participants, typing, icon, ...other } = props;
   const isTyping = Boolean(typing);
   return (
-    <Box className={classes.topbar}>
+    <Box className={classes.topbar} {...other}>
       <Box className={classes.topbarWrapper}>
         <Avatar className={classes.topbarImg} src={icon} alt={name} />
         <Box className={classes.topbarCenter}>
@@ -36,7 +40,7 @@ const TopGroupBar = (props: Props) => {
               }}
             >
               {participants?.map((participant, index) => (
-                <span>
+                <span key={index}>
                   {participant.user.user.username}
                   {","}
                 </span>
@@ -54,7 +58,7 @@ const TopGroupBar = (props: Props) => {
                 color: "#d5d2d2",
               }}
             >
-              {typing}
+              {typing.message}
             </Typography>
           )}
         </Box>
