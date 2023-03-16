@@ -1,0 +1,44 @@
+.iconContainer {
+    position: "relative"
+}
+
+.iconContainer::selection {
+    background-color: transparent;
+}
+
+.hover {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    width: 300;
+    height: 300;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    background-color: #d0c8c887;
+    cursor: pointer;
+    z-index: 999;
+    flex-direction: column;
+}
+
+.hover span {
+    font-size: medium;
+    font-weight: 700;
+}
+
+.iconContainer:hover .hover {
+    display: flex;
+}
+
+
+.hover:active * {
+    color: "#fff";
+    transform: scale(.99);
+}
+
+.hover *::selection {
+    background-color: transparent;
+}
