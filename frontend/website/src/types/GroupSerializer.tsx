@@ -1,13 +1,17 @@
 import { GroupMember } from "./GroupMember";
 import { GroupMessage } from "./GroupMessage";
+import { GroupMessageSerializer } from "./GroupMessageSerializer";
 import { UserProfile } from "./UserProfile";
 
 export type GroupSerializer = {
   id: number;
-  members: GroupMember[];
+  group_members: GroupMember[];
   created_by: UserProfile;
-  latest_message: null | GroupMessage;
-  messages: GroupMessage[];
+  latest_message: null | GroupMessageSerializer;
+  messages: GroupMessageSerializer[];
   chat_name: string;
   image: string;
+  description: string;
+  created_on: string;
+  updated_on: string;
 };
