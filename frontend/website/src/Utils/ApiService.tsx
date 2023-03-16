@@ -207,4 +207,18 @@ export default class ApiService {
 
     return res;
   }
+
+  static async updateGroup(data: any, id: number, token: string) {
+    const url = this.endPoint + "chat/groups/" + id + "/";
+    const res = await fetch(url, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `token ${token}`,
+      },
+    });
+
+    return res;
+  }
 }
