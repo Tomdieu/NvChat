@@ -128,11 +128,12 @@ def create_message(
         return Message.objects.create(**newMessage)
     elif messageType == "group":
         chat_group = ChatGroup.objects.get(id=conversationId)
-        msgContent["message"] = msgContent
-        msgContent["chat"] = chat_group
-        msgContent["sender"] = sender
+        newMessage = {}
+        newMessage["message"] = msgContent
+        newMessage["chat"] = chat_group
+        newMessage["sender"] = sender
 
-        return GroupMessage.objects.create(**msgContent)
+        return GroupMessage.objects.create(**newMessage)
 
 
 # Single Chat Consumer
@@ -272,7 +273,7 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
     async def send_typing(self, event):
         message = event["message"]
         typing = event["typing"]
-        username = event["username"]
+        username = event["sender"]
         await self.send(
             text_data=json.dumps(
                 {
