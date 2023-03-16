@@ -10,6 +10,7 @@ import {
   Button,
   Menu,
   MenuItem,
+  CircularProgress,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useStyles } from "./styles";
@@ -23,16 +24,31 @@ import {
 import CreateGroupDialog from "../CreateGroupDialog";
 import Group from "../Group/Group";
 import { useGroup } from "Context/GroupContext";
+import ApiService from "Utils/ApiService";
 
 type Props = {};
 
 const GroupSidebar = (props: Props) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
-  const { groups, setGroups, setSelectedGroup } = useGroup();
+  const { groups, setGroups, setSelectedGroup, setGroupId } = useGroup();
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    // loads the groups
+    const token = localStorage.getItem("userToken");
+    if (token) {
+      ApiService.getGroups(token)
+        .then((res) => res.json())
+        .then((data) => {
+          setGroups(data.data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+        });
+    }
   }, []);
+
   const handleClose = () => {
     setOpen(false);
   };
@@ -69,7 +85,11 @@ const GroupSidebar = (props: Props) => {
           open={menuOpen}
           MenuListProps={{ "aria-labelledby": "chat-menu" }}
           onClose={handleCloseMenu}
-          anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
+          anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
         >
           <MenuItem onClick={handleCloseMenu}>
             <Box
@@ -142,13 +162,24 @@ const GroupSidebar = (props: Props) => {
             </IconButton>
           </Box>
           <Box className={classes.groupList}>
-            {groups?.map((group, index) => (
-              <Group
-                group={group}
-                key={index}
-                onClick={() => setSelectedGroup(group)}
-              />
-            ))}
+            {loading ? (
+              <center>
+                <CircularProgress sx={{ color: "#fff" }} />
+              </center>
+            ) : (
+              <>
+                {groups?.map((group, index) => (
+                  <Group
+                    group={group}
+                    key={index}
+                    onClick={() => {
+                      setSelectedGroup(group);
+                      setGroupId(group.id);
+                    }}
+                  />
+                ))}
+              </>
+            )}
           </Box>
         </Box>
       </Box>
