@@ -8,24 +8,29 @@ import {
   PeopleOutline,
 } from "@mui/icons-material";
 import { Avatar, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 type Props = {};
 
 const Sidebar = (props: Props) => {
   const classes = useStyles();
+  const navigate = useNavigate();
   return (
     <div className={classes.sidebarContainer}>
       <div className={classes.sidebarWrapper}>
         <ul className={classes.sidebarList}>
-          <li className={classes.sidebarListItem}>
+          <li className={classes.sidebarListItem} onClick={() => navigate("/")}>
             <RssFeed className={classes.sidebarIcon} />
             <span className={classes.sidebarListItemText}>Post</span>
           </li>
-          <li className={classes.sidebarListItem}>
+          <li className={classes.sidebarListItem} onClick={() => navigate("/")}>
             <Chat className={classes.sidebarIcon} />
             <span className={classes.sidebarListItemText}>Chats</span>
           </li>
-          <li className={classes.sidebarListItem}>
+          <li
+            className={classes.sidebarListItem}
+            onClick={() => navigate("/groups")}
+          >
             <Group className={classes.sidebarIcon} />
             <span className={classes.sidebarListItemText}>Groups</span>
           </li>
