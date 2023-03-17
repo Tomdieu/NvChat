@@ -6,6 +6,11 @@ router = DefaultRouter()
 
 router.register("groups", views.ChatGroupViewSet, basename="groups")
 router.register(
+    "updated-group-image",
+    views.UpdatedGroupImageViewSet,
+    basename="updated-group-image",
+)
+router.register(
     "add-group-member", views.AddMemberToGroupViewSet, basename="add-group-member"
 )
 router.register(
