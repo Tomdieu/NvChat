@@ -208,13 +208,26 @@ export default class ApiService {
     return res;
   }
 
-  static async updateGroup(data: any, id: number, token: string) {
+  static async updateGroup(data: object, id: number, token: string) {
     const url = this.endPoint + "chat/groups/" + id + "/";
     const res = await fetch(url, {
       method: "PATCH",
       body: JSON.stringify(data),
       headers: {
         "Content-Type": "application/json",
+        Authorization: `token ${token}`,
+      },
+    });
+
+    return res;
+  }
+
+  static async updateGroupImage(formData: FormData, id: number, token: string) {
+    const url = this.endPoint + "chat/updated-group-image/" + id + "/";
+    const res = await fetch(url, {
+      method: "PATCH",
+      body: formData,
+      headers: {
         Authorization: `token ${token}`,
       },
     });

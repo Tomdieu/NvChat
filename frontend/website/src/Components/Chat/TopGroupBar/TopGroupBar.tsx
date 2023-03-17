@@ -19,13 +19,13 @@ type Props = {
 
 const TopGroupBar = (props: Props) => {
   const classes = useStyles();
-  const { name, participants, typing, icon, ...other } = props;
+  const { name, participants, typing, icon, onClick, ...other } = props;
   const isTyping = Boolean(typing);
   return (
     <Box className={classes.topbar} {...other}>
       <Box className={classes.topbarWrapper}>
         <Avatar className={classes.topbarImg} src={icon} alt={name} />
-        <Box className={classes.topbarCenter}>
+        <Box className={classes.topbarCenter} onClick={onClick}>
           <Typography variant="h6" sx={{ fontSize: 16, fontWeight: "bold" }}>
             {name}
           </Typography>
@@ -34,13 +34,12 @@ const TopGroupBar = (props: Props) => {
               variant="subtitle2"
               noWrap
               sx={{
-                letterSpacing: 2,
                 overflow: "hidden",
                 textOverflow: "ellipsis",
               }}
             >
               {participants?.map((participant, index) => (
-                <span key={index}>
+                <span key={index} style={{ color: "#e5e5e5" }}>
                   {participant.user.user.username}
                   {","}
                 </span>

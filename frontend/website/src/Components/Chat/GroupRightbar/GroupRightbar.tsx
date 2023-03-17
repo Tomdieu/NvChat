@@ -2,17 +2,14 @@ import {
   Avatar,
   Badge,
   Box,
-  Button,
   Grid,
   IconButton,
   Paper,
-  TextField,
   Typography,
 } from "@mui/material";
 import { useGroup } from "Context/GroupContext";
 import { useStyles } from "./styles";
 import {
-  CameraAltOutlined,
   Close,
   GroupAddOutlined,
   LogoutRounded,
@@ -21,15 +18,15 @@ import {
 
 import "./style.css";
 
-import { BsDot } from "react-icons/bs";
 import { useAuth } from "Context/AuthContext";
 import GroupDescription from "./GroupDescription";
 import GroupHead from "./GroupHead";
+import GroupMemberList from "./GroupMemberList";
 
 type Props = {};
 
 const GroupRightbar = (props: Props) => {
-  const { isRightOpen, selectedGroup, setIsRightOpen } = useGroup();
+  const { isRightOpen, selectedGroup, setIsRightOpen, toggle } = useGroup();
   const classes = useStyles();
   const { userProfile } = useAuth();
 
@@ -38,15 +35,12 @@ const GroupRightbar = (props: Props) => {
       item
       md={3}
       sm={0}
-      sx={{ display: isRightOpen ? "none" : "block" }}
+      sx={{ display: isRightOpen ? "block" : "none" }}
       className={classes.rightbar}
     >
       <Box className={classes.rightbarWrapper}>
         <Box className={classes.rightbarTop}>
-          <IconButton
-            className={classes.closeBtn}
-            onClick={() => setIsRightOpen(false)}
-          >
+          <IconButton className={classes.closeBtn} onClick={toggle}>
             <Close sx={{ fontWeight: "bold" }} />
           </IconButton>
           <span className={classes.title}>Group Info</span>
@@ -80,73 +74,7 @@ const GroupRightbar = (props: Props) => {
               <Typography>Add Members</Typography>
             </Box>
           </Box>
-          <Box
-            sx={{ borderRadius: 0 }}
-            component={Paper}
-            className={classes.groupMemberContainer}
-            elevation={0}
-          >
-            <Box className={classes.groupMemberTopContainer}>
-              <Typography color="grey">
-                {selectedGroup?.group_members.length} member
-              </Typography>
-              <IconButton>
-                <SearchRounded />
-              </IconButton>
-            </Box>
-            <Box>
-              {selectedGroup?.group_members?.map((member, index) => (
-                <Box
-                  display={"flex"}
-                  alignItems={"center"}
-                  gap={2}
-                  justifyContent={"space-between"}
-                  sx={(theme) => ({
-                    p: 0.5,
-                    borderRadius: 1,
-                    cursor: "pointer",
-                    "&:hover": {
-                      backgroundColor: "#efecec",
-                    },
-                    "& ::selection": {
-                      backgroundColor: "transparent",
-                    },
-                  })}
-                >
-                  <Avatar
-                    src={member.user.profile_picture}
-                    alt={member.user.user.username}
-                  />
-                  <Box flex={1}>
-                    <Typography>
-                      {member.user.user.username === userProfile.user.username
-                        ? "you"
-                        : member.user.user.username}
-                    </Typography>
-                    <span style={{ color: "#ada4a4", fontSize: ".8em" }}>
-                      {member.user.bio || "hello i am using NvChat"}
-                    </span>
-                  </Box>
-                  <Box>
-                    {member.is_manager && (
-                      <Badge
-                        sx={(theme) => ({
-                          backgroundColor: "#c9e0fd",
-                          color: "#3886e5fa",
-                          borderRadius: 2,
-                          p: 0.5,
-                          fontSize: ".8em",
-                        })}
-                      >
-                        Admin
-                        {/* <span>Admin</span> */}
-                      </Badge>
-                    )}
-                  </Box>
-                </Box>
-              ))}
-            </Box>
-          </Box>
+          <GroupMemberList />
           <Box component={Paper} className={classes.groupInfoDangerContain}>
             <Box
               display={"flex"}

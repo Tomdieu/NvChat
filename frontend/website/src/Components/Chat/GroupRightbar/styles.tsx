@@ -4,7 +4,6 @@ export const useStyles = makeStyles((theme) => ({
   rightbar: {
     backgroundColor: "#e1dbdb",
     height: "100vh",
-    // flex: 3,
   },
   rightbarWrapper: {
     height: "100%",
@@ -37,12 +36,14 @@ export const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     alignItems: "center",
     paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
   },
   groupIcon: {
     width: 300,
     height: 300,
     borderRadius: "50%",
     objectFit: "cover",
+    border: "1px solid #ccc",
   },
   groupName: {
     fontWeight: "normal",

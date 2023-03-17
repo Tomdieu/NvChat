@@ -4,7 +4,7 @@ import TopGroupBar from "../TopGroupBar/TopGroupBar";
 import MessageInput from "../global/MessageInput/MessageInput";
 import MessagesList from "../global/MessagesList/MessagesList";
 import { useGroup } from "Context/GroupContext";
-import EmojiPicker, { Emoji } from "emoji-picker-react";
+import EmojiPicker from "emoji-picker-react";
 import { Close, ErrorRounded } from "@mui/icons-material";
 import { useAuth } from "Context/AuthContext";
 import ApiService from "Utils/ApiService";
@@ -210,18 +210,12 @@ const GroupChatBox = (props: Props) => {
   const handleKeyup = (
     e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    console.log("====================================");
-    console.log("up");
-    console.log("====================================");
     webSocket.send(JSON.stringify({ typing: false, message: `` }));
   };
-  console.log("====================================");
-  console.log({ isRightOpen });
-  console.log("====================================");
   return (
     <Grid
       item
-      md={isRightOpen ? 9 : 6}
+      md={isRightOpen ? 6 : 9}
       sm={8}
       sx={{
         position: "relative",
@@ -313,7 +307,6 @@ const EmptyPage = () => {
 const GroupChat = () => {
   const { selectedGroup } = useGroup();
 
-  // console.log(selectedGroup);
   if (selectedGroup) {
     return <GroupChatBox />;
   } else {

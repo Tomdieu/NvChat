@@ -9,7 +9,7 @@ export const useStyles = makeStyles((theme) => ({
     width: "100%",
   },
   topbarWrapper: {
-    padding: theme.spacing(1),
+    // padding: theme.spacing(1),
     display: "flex",
     width: "100%",
     alignItems: "center",

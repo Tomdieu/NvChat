@@ -15,7 +15,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#ccc",
     borderRadius: theme.shape.borderRadius,
     cursor: "pointer",
-    // borderBottom: "1px solid #ddd",
     marginBottom: theme.spacing(0.5),
     margin: theme.spacing(1),
     "&:hover": {
@@ -35,7 +34,10 @@ const useStyles = makeStyles((theme) => ({
   groupIcon: {
     width: "60px",
     height: "60px",
-    // lineHeight: 32,
+    borderRadius: "50%",
+    border: "1px solid #ccc",
+    objectFit: "contain",
+    backgroundColor: "#ffffff47",
   },
   groupInfo: {
     flex: 1,
@@ -80,7 +82,7 @@ const Group = (props: Props) => {
       onClick={onClick}
       bgcolor={groupId === group.id ? "#3286e7" : "#ccc"}
     >
-      <Avatar className={classes.groupIcon} src={group?.image} />
+      <img className={classes.groupIcon} src={group?.image} />
       <Box className={classes.groupInfo}>
         {/* <Typography variant="h6" className={classes.groupName}>
           {group?.chat_name}

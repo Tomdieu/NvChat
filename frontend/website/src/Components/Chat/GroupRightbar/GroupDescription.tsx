@@ -1,5 +1,5 @@
 import { Box, Button, Paper, Typography, TextField } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useStyles } from "./styles";
 import { useGroup } from "Context/GroupContext";
 import moment from "moment";
@@ -13,24 +13,24 @@ const GroupDescription = (props: Props) => {
   const { selectedGroup, groups, setGroups, setSelectedGroup, groupId } =
     useGroup();
   const { userToken, userProfile } = useAuth();
-  const createdOn = moment(
-    selectedGroup?.created_on || "2023-03-16T19:30:17.089994Z"
-  ).format("DD/MM/YYYY");
+  const createdOn = moment(selectedGroup?.created_on).format("DD/MM/YYYY");
 
-  const at = moment(
-    selectedGroup?.created_on || "2023-03-16T19:30:17.089994Z"
-  ).format("HH:MM a");
+  const at = moment(selectedGroup?.created_on).format("HH:MM a");
 
   const created_by =
-    selectedGroup?.created_by?.user?.username === userProfile.user.username
+    selectedGroup?.created_by?.user?.username === userProfile?.user.username
       ? "You"
       : selectedGroup?.created_by?.user?.username;
 
   const [formOpen, setFormOpen] = useState(false);
 
-  const [description, setDescription] = useState(selectedGroup?.description);
+  const [description, setDescription] = useState("");
 
   const previousDescription = selectedGroup?.description;
+
+  useEffect(() => {
+    setDescription(selectedGroup?.description);
+  }, []);
 
   const handleCreateOrUpdate = () => {
     if (description) {
@@ -40,13 +40,17 @@ const GroupDescription = (props: Props) => {
           .then((data) => {
             console.log(data);
 
-            const othersGroups = groups.filter((group) => group.id !== groupId);
+            if (data.id) {
+              const othersGroups = groups.filter(
+                (group) => group.id !== groupId
+              );
 
-            othersGroups.push(data);
+              othersGroups.push(data);
 
-            setSelectedGroup(data);
+              setSelectedGroup(data);
 
-            setGroups(othersGroups);
+              setGroups(othersGroups);
+            }
           })
           .catch((err) => console.log(err));
       }
