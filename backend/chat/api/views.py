@@ -18,12 +18,18 @@ from chat.models import (
     ChatGroup,
 )
 
+from rest_framework.parsers import (
+    MultiPartParser,
+    FormParser,
+)
+
 from account.models import UserProfile
 from account.api.serializers import UserProfileSerializer
 
 from .serializers import (
     ChatGroupSerializer,
     ChatGroupCreateSerializer,
+    ChatGroupImageSerializer,
     ChatGroupListSerializer,
     CreateConversationSerializer,
     ConversationSerializer,
@@ -60,13 +66,10 @@ class ChatGroupViewSet(
         return ChatGroup.objects.filter(members__user=self.request.user)
 
     def get_serializer_class(self):
-        if self.request.method.upper() in ["POST"]:
+        if self.request.method.upper() in ["POST", "PATCH", "PUT"]:
             return ChatGroupCreateSerializer
         else:
             return ChatGroupSerializer
-            # return ChatGroupSerializer
-
-    # queryset = ChatGroup.objects.all()
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -91,8 +94,32 @@ class ChatGroupViewSet(
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
 
-    def partial_update(self, request, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+        saveObject = serializer.save()
+
+        if getattr(instance, "_prefetched_objects_cache", None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(ChatGroupSerializer(saveObject).data)
+
+
+class UpdatedGroupImageViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    parser_classes = [MultiPartParser, FormParser]
+
+    serializer_class = ChatGroupImageSerializer
+
+    def get_queryset(self):
+        return ChatGroup.objects.filter(members__user=self.request.user)
 
 
 class AddMemberToGroupViewSet(CreateAPIView, GenericViewSet):
