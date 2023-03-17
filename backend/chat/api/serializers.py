@@ -274,6 +274,7 @@ class ChatGroupMemberCreateSerializer(serializers.ModelSerializer):
 
 class ChatGroupCreateSerializer(serializers.ModelSerializer):
     # participant = UserProfileSerializer(many=True)
+
     class Meta:
         model = ChatGroup
         fields = "__all__"
@@ -338,6 +339,12 @@ class GroupMessageCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroupMessage
         fields = "__all__"
+
+
+class ChatGroupImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChatGroup
+        fields = ("image",)
 
 
 class ChatGroupListSerializer(serializers.ModelSerializer):
