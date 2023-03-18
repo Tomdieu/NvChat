@@ -24,7 +24,7 @@ from .api.serializers import (
     GroupMessageListSerializer,
     MessageListSerializer,
     Message,
-    GroupMessage,
+    ChatGroupSerializer,
 )
 
 
@@ -93,7 +93,7 @@ def create_message(
         videoMessage.save()
         videoMessage.video.save(filename, files.File(open(url, "rb")), save=True)
         videoMessage.save()
-        # storage.delete()
+
         os.remove(url)
         msgContent = videoMessage
     elif resourceType == "FileMessage":
@@ -122,6 +122,7 @@ def create_message(
     if messageType == "conversation":
         conversation = Conversation.objects.get(id=conversationId)
         newMessage = {}
+        newMessage["parent_message"] = parent_message
         newMessage["conversation"] = conversation
         newMessage["message"] = msgContent
         newMessage["sender"] = sender
@@ -129,6 +130,7 @@ def create_message(
     elif messageType == "group":
         chat_group = ChatGroup.objects.get(id=conversationId)
         newMessage = {}
+        newMessage["parent_message"] = parent_message
         newMessage["message"] = msgContent
         newMessage["chat"] = chat_group
         newMessage["sender"] = sender

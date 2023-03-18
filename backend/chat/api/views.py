@@ -35,7 +35,7 @@ from .serializers import (
     ConversationSerializer,
     MessageSerializer,
     MessageCreateSerializer,
-    # GroupMessageSerializer,
+    GroupMessageSerializer,
     GroupMessageListSerializer,
     # GroupMessageCreateSerializer,
     GroupMemberCreateSerializer,
@@ -190,7 +190,13 @@ class JoinGroupViewSet(GenericViewSet, CreateModelMixin):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class GroupChatMessageViewSet(GenericViewSet, RetrieveModelMixin):
+class GroupChatMessageViewSet(
+    GenericViewSet,
+    ListModelMixin,
+    RetrieveModelMixin,
+    DestroyModelMixin,
+    CreateModelMixin,
+):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 

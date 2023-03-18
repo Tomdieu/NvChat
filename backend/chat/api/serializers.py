@@ -301,8 +301,8 @@ class GroupMessageViewSerializer(serializers.ModelSerializer):
 
 
 class GroupMessageListSerializer(serializers.ModelSerializer):
-    message = IMessagePolymorphicSerializer()
-    sender = UserProfileSerializer()
+    message = IMessagePolymorphicSerializer(read_only=True)
+    sender = UserProfileSerializer(read_only=True)
     # chat = ChatGroupSerializer()
     parent_message = serializers.SerializerMethodField()
 
