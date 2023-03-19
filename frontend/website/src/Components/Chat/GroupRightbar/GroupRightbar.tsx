@@ -7,7 +7,7 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import { useGroup } from "Context/GroupContext";
+import { useGroup } from "context/GroupContext";
 import { useStyles } from "./styles";
 import {
   Close,
@@ -18,7 +18,7 @@ import {
 
 import "./style.css";
 
-import { useAuth } from "Context/AuthContext";
+import { useAuth } from "context/AuthContext";
 import GroupDescription from "./GroupDescription";
 import GroupHead from "./GroupHead";
 import GroupMemberList from "./GroupMemberList";

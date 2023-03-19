@@ -1,10 +1,10 @@
 import { Box, Button, Paper, Typography, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useStyles } from "./styles";
-import { useGroup } from "Context/GroupContext";
+import { useGroup } from "context/GroupContext";
 import moment from "moment";
-import ApiService from "Utils/ApiService";
-import { useAuth } from "Context/AuthContext";
+import ApiService from "utils/ApiService";
+import { useAuth } from "context/AuthContext";
 
 type Props = {};
 
@@ -24,7 +24,7 @@ const GroupDescription = (props: Props) => {
 
   const [formOpen, setFormOpen] = useState(false);
 
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState(selectedGroup?.description);
 
   const previousDescription = selectedGroup?.description;
 

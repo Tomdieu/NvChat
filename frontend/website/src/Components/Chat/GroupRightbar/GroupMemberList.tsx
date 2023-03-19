@@ -7,10 +7,10 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import { useGroup } from "Context/GroupContext";
+import { useGroup } from "context/GroupContext";
 import React from "react";
 import { useStyles } from "./styles";
-import { useAuth } from "Context/AuthContext";
+import { useAuth } from "context/AuthContext";
 
 type Props = {};
 

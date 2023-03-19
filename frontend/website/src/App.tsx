@@ -1,6 +1,6 @@
 import Home from "pages/home/Home";
 import Group from "pages/chat/Group";
-import { GroupContextProvider } from "Context/GroupContext";
+import { GroupContextProvider } from "context/GroupContext";
 import Login from "pages/auth/Login/Login";
 import Register from "pages/auth/Register/Register";
 

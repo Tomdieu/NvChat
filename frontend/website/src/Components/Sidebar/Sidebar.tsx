@@ -23,7 +23,10 @@ const Sidebar = (props: Props) => {
             <RssFeed className={classes.sidebarIcon} />
             <span className={classes.sidebarListItemText}>Post</span>
           </li>
-          <li className={classes.sidebarListItem} onClick={() => navigate("/")}>
+          <li
+            className={classes.sidebarListItem}
+            onClick={() => navigate("/discussion")}
+          >
             <Chat className={classes.sidebarIcon} />
             <span className={classes.sidebarListItemText}>Chats</span>
           </li>

@@ -9,4 +9,5 @@ export type Conversation = {
   messages: Array<Message>;
   imageUrl: string;
   created_at: string;
+  online: boolean;
 };

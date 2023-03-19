@@ -9,4 +9,5 @@ export interface UserProfile {
   country?: "string";
   profile_picture?: "string";
   bio?: "string";
+  online?: boolean;
 }

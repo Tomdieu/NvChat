@@ -11,7 +11,7 @@ import { useState } from "react";
 import { Form, Formik } from "formik";
 import LOGO from "assets/logo.svg";
 import PasswordInput from "Components/PasswordInput";
-import { useAuth } from "Context/AuthContext";
+import { useAuth } from "context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 type Props = {};

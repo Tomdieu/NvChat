@@ -5,7 +5,10 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 
 import Group from "pages/chat/Group";
-import { GroupContextProvider } from "Context/GroupContext";
+import Discussion from "pages/chat/Discussion";
+
+import { GroupContextProvider } from "context/GroupContext";
+import { ChatProvider } from "context/ChatContext";
 
 type Props = {};
 
@@ -25,6 +28,14 @@ const index = (props: Props) => {
             <GroupContextProvider>
               <Group />
             </GroupContextProvider>
+          }
+        />
+        <Route
+          path="discussion"
+          element={
+            <ChatProvider>
+              <Discussion />
+            </ChatProvider>
           }
         />
       </Route>

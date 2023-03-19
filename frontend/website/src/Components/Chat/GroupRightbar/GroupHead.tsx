@@ -1,12 +1,12 @@
 import { Box, IconButton, Paper } from "@mui/material";
 import React, { useState } from "react";
 import { useStyles } from "./styles";
-import { useGroup } from "Context/GroupContext";
+import { useGroup } from "context/GroupContext";
 import { CameraAltOutlined, Cancel, Save, SaveAlt } from "@mui/icons-material";
 
 import { BsDot } from "react-icons/bs";
-import ApiService from "Utils/ApiService";
-import { useAuth } from "Context/AuthContext";
+import ApiService from "utils/ApiService";
+import { useAuth } from "context/AuthContext";
 
 type Props = {};
 
@@ -54,10 +54,6 @@ const GroupHead = (props: Props) => {
     ApiService.updateGroupImage(formData, selectedGroup.id, userToken)
       .then((res) => res.json())
       .then((data) => {
-        console.log("====================================");
-        console.log(data);
-        console.log("====================================");
-
         if (data.image) {
           const filteredGroup = groups.find(
             (group) => Number(group?.id) === groupId

@@ -5,7 +5,7 @@ import "./index.css";
 
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/styles";
-import { AuthContextProvider } from "Context/AuthContext";
+import { AuthContextProvider } from "context/AuthContext";
 
 import { BrowserRouter } from "react-router-dom";
 
