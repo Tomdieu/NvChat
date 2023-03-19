@@ -4,32 +4,50 @@ import { useStyles } from "./styles";
 
 import GroupMessage from "../Message/GroupMessage";
 import { GroupMessageSerializer } from "types/GroupMessageSerializer";
-import { useAuth } from "Context/AuthContext";
+import { useAuth } from "context/AuthContext";
+import { Message } from "types/Message";
+import DiscussionMessage from "../Message/DiscussionMessage";
 
 type Props = {
-  messages: GroupMessageSerializer[];
+  messages: GroupMessageSerializer[] | Message[];
   ref?: React.LegacyRef<HTMLDivElement>;
+  type: "DISCUSSION" | "GROUP";
 };
 
 const MessagesList = (props: Props) => {
   const classes = useStyles();
-  const { messages, ref } = props;
+  const { messages, ref, type } = props;
 
   const { userProfile } = useAuth();
 
-  const getSenderName = (message: GroupMessageSerializer): string => {
+  const getSenderName = (message: GroupMessageSerializer | Message): string => {
+    // console.log(message.sender.user);
+
     return message.sender.user.username;
   };
 
   return (
     <Box className={classes.messageList}>
-      {messages?.map((message, index) => (
-        <GroupMessage
-          key={index}
-          isMine={Boolean(getSenderName(message) === userProfile.user.username)}
-          groupMessage={message}
-        />
-      ))}
+      {type === "GROUP" &&
+        messages?.map((message, index) => (
+          <GroupMessage
+            key={index}
+            isMine={Boolean(
+              getSenderName(message) === userProfile.user.username
+            )}
+            groupMessage={message}
+          />
+        ))}
+      {type === "DISCUSSION" &&
+        messages?.map((message, index) => (
+          <DiscussionMessage
+            key={index}
+            isMine={Boolean(
+              getSenderName(message) === userProfile.user.username
+            )}
+            discussionMessage={message}
+          />
+        ))}
     </Box>
   );
 };

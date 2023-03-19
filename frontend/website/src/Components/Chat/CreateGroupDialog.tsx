@@ -18,7 +18,7 @@ import {
   EmojiEmotions,
   Save,
 } from "@mui/icons-material";
-import ApiService from "Utils/ApiService";
+import ApiService from "utils/ApiService";
 
 type Props = {
   open: boolean;

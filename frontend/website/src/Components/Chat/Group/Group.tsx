@@ -4,7 +4,7 @@ import React from "react";
 import { GroupSerializer } from "types/GroupSerializer";
 import moment from "moment";
 import LatestMessage from "./LatestMessage";
-import { useGroup } from "Context/GroupContext";
+import { useGroup } from "context/GroupContext";
 
 const useStyles = makeStyles((theme) => ({
   groupItem: {

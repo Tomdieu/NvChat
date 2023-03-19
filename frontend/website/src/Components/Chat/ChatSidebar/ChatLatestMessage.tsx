@@ -1,32 +1,30 @@
-import { span } from "@mui/material";
 import { useAuth } from "context/AuthContext";
-import React from "react";
-import { GroupMessageSerializer } from "types/GroupMessageSerializer";
+import { Message } from "types/Message";
 
 type Props = {
-  message: GroupMessageSerializer;
+  message: Message;
 };
 
-const LatestMessage = (props: Props) => {
+const ChatLatestMessage = (props: Props) => {
   const { message } = props;
   const { userProfile } = useAuth();
-  if (message.message.resourcetype === "TextMessage") {
+  if (message?.message.resourcetype === "TextMessage") {
     return (
       <span
         style={{
           color: "lightgrey",
-          fontSize: "1.3em",
+          textOverflow: "ellipsis",
+          whiteSpace: "unset",
+          overflow: "hidden",
         }}
       >
-        {userProfile.user.username === message.sender.user.username ? (
-          <span>{`You : ${message.message.text}`}</span>
-        ) : (
-          <span>{`${message.sender.user.username} : ${message.message.text}`}</span>
-        )}
+        {userProfile.user.username === message.sender.user.username
+          ? `You : ${message.message.text.slice(0, 30)}...`
+          : `${message.sender.user.username} : ${message.message.text}`}
       </span>
     );
   }
-  if (message.message.resourcetype === "ImageMessage") {
+  if (message?.message.resourcetype === "ImageMessage") {
     return (
       <span
         style={{
@@ -40,7 +38,7 @@ const LatestMessage = (props: Props) => {
     );
   }
 
-  if (message.message.resourcetype === "VideoMessage") {
+  if (message?.message.resourcetype === "VideoMessage") {
     return (
       <span
         style={{
@@ -53,7 +51,7 @@ const LatestMessage = (props: Props) => {
       </span>
     );
   }
-  if (message.message.resourcetype === "FileMessage") {
+  if (message?.message.resourcetype === "FileMessage") {
     return (
       <span
         style={{
@@ -68,4 +66,4 @@ const LatestMessage = (props: Props) => {
   }
 };
 
-export default LatestMessage;
+export default ChatLatestMessage;

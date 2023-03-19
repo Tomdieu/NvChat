@@ -26,7 +26,9 @@ import PhotoMessage from "./PhotoMessage";
 import VideoMessage from "./VideoMessage";
 import { GroupMessageSerializer } from "types/GroupMessageSerializer";
 import AudioMessage from "./AudioMessage";
+import { Message } from "types/Message";
 import moment from "moment";
+import FileMessage from "./FileMessage";
 
 export const useStyles = makeStyles((theme) => ({
   messageWrapper: {
@@ -41,11 +43,11 @@ export const useStyles = makeStyles((theme) => ({
 
 type Props = {
   isMine: Boolean;
-  groupMessage?: GroupMessageSerializer;
+  discussionMessage?: Message;
 };
 
-const GroupMessage = (props: Props) => {
-  const { isMine = false, groupMessage } = props;
+const DiscussionMessage = (props: Props) => {
+  const { isMine = false, discussionMessage } = props;
 
   const classes = useStyles({ isMine });
 
@@ -62,25 +64,27 @@ const GroupMessage = (props: Props) => {
     return filename.split(".")[1];
   };
 
-  const isText = Boolean(groupMessage?.message.resourcetype === "TextMessage");
+  const isText = Boolean(
+    discussionMessage?.message.resourcetype === "TextMessage"
+  );
   const isAudio =
-    Boolean(groupMessage?.message.resourcetype === "FileMessage") &&
-    Boolean(getExt(groupMessage?.message.file) === "mp3");
+    Boolean(discussionMessage?.message.resourcetype === "FileMessage") &&
+    Boolean(getExt(discussionMessage?.message.file) === "mp3");
   const isImage = Boolean(
-    groupMessage?.message.resourcetype === "ImageMessage"
+    discussionMessage?.message.resourcetype === "ImageMessage"
   );
 
   const isVideo = Boolean(
-    groupMessage?.message.resourcetype === "VideoMessage"
+    discussionMessage?.message.resourcetype === "VideoMessage"
   );
   const isPdf =
-    Boolean(groupMessage?.message.resourcetype === "FileMessage") &&
-    Boolean(getExt(groupMessage?.message.file) === "pdf");
+    Boolean(discussionMessage?.message.resourcetype === "FileMessage") &&
+    Boolean(getExt(discussionMessage?.message.file) === "pdf");
 
   const open = Boolean(anchorEl);
   return (
     <Box
-      id={"message_" + groupMessage.id}
+      id={"message_" + discussionMessage.id}
       className={classes.messageWrapper}
       justifyContent={isMine ? "flex-end" : "flex-start"}
     >
@@ -95,7 +99,7 @@ const GroupMessage = (props: Props) => {
           }}
         >
           <span style={{ fontWeight: "600", cursor: "pointer" }}>
-            ~ {groupMessage.sender.user.username}
+            ~ {discussionMessage.sender.user.username}
           </span>
           <IconButton
             id="message-menu"
@@ -107,18 +111,29 @@ const GroupMessage = (props: Props) => {
             <MoreHoriz />
           </IconButton>
         </div>
-        {isText && <TextMessage text={groupMessage.message.text} />}
+        {isText && <TextMessage text={discussionMessage.message.text} />}
         {isImage && (
           <PhotoMessage
-            caption={groupMessage.message.caption}
-            image={groupMessage.message.image}
+            caption={discussionMessage.message.caption}
+            image={discussionMessage.message.image}
           />
         )}
-        {isAudio && <AudioMessage audio={""} caption={""} />}
+        {isAudio && (
+          <AudioMessage
+            audio={discussionMessage.file}
+            caption={discussionMessage.caption}
+          />
+        )}
         {isVideo && (
           <VideoMessage
-            video={groupMessage.message.video}
-            caption={groupMessage.message.caption}
+            video={discussionMessage.message.video}
+            caption={discussionMessage.message.caption}
+          />
+        )}
+        {isPdf && (
+          <FileMessage
+            caption={discussionMessage.message.caption}
+            file={discussionMessage.message.file}
           />
         )}
         <div
@@ -128,7 +143,7 @@ const GroupMessage = (props: Props) => {
             alignItems: "center",
           }}
         >
-          <span>{moment(groupMessage.timestamp).format("HH:MM A")}</span>
+          <span>{moment(discussionMessage.timestamp).format("HH:MM a")}</span>
         </div>
         <Menu
           id="message-menu"
@@ -216,4 +231,4 @@ const GroupMessage = (props: Props) => {
   );
 };
 
-export default GroupMessage;
+export default DiscussionMessage;

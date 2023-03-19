@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import TextMessage from "./TextMessage";
+import ReactPlayer from "react-player";
+import { Box } from "@mui/material";
 
 type Props = {
   video: string;
@@ -8,18 +10,11 @@ type Props = {
 
 const VideoMessage = (props: Props) => {
   const { video, caption = "" } = props;
-  const videoRef = useRef<HTMLVideoElement>(null!);
-  // if(video.split(".")[])
   return (
-    <div>
-      <video ref={videoRef} id="video" width={"100%"} controls>
-        <source src={video} type="video/mp4" />
-        <source src={video} type="video/webm" />
-        <source src={video} type="video/ogg" />
-        Your browser doesnot support Video tag
-      </video>
+    <Box>
+      <ReactPlayer url={video} controls width={"100%"} />
       <TextMessage text={caption} />
-    </div>
+    </Box>
   );
 };
 

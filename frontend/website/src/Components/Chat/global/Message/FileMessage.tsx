@@ -1,9 +1,22 @@
-import React from "react";
+import { Box } from "@mui/material";
 
-type Props = {};
+import { Document, Page } from "react-pdf";
+
+type Props = {
+  file: string;
+  caption: string;
+};
 
 const FileMessage = (props: Props) => {
-  return <div>FileMessage</div>;
+  const { file, caption } = props;
+  return (
+    <Box sx={{ width: "100%" }}>
+      <Document file={file}>
+        <Page pageNumber={1} />
+      </Document>
+      <span>{caption}</span>
+    </Box>
+  );
 };
 
 export default FileMessage;

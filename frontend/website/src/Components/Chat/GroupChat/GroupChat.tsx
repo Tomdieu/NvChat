@@ -3,11 +3,11 @@ import React, { useEffect, useRef, useState } from "react";
 import TopGroupBar from "../TopGroupBar/TopGroupBar";
 import MessageInput from "../global/MessageInput/MessageInput";
 import MessagesList from "../global/MessagesList/MessagesList";
-import { useGroup } from "Context/GroupContext";
+import { useGroup } from "context/GroupContext";
 import EmojiPicker from "emoji-picker-react";
 import { Close, ErrorRounded } from "@mui/icons-material";
-import { useAuth } from "Context/AuthContext";
-import ApiService from "Utils/ApiService";
+import { useAuth } from "context/AuthContext";
+import ApiService from "utils/ApiService";
 import { TextMessage } from "types/AbstractMessage";
 import { GroupMessageSerializer } from "types/GroupMessageSerializer";
 
@@ -46,6 +46,9 @@ const GroupChatBox = (props: Props) => {
     };
     webSocket.onmessage = (message) => {
       const messageData = JSON.parse(message.data);
+      console.log("====================================");
+      console.log(messageData);
+      console.log("====================================");
       if (messageData.typing === true) {
         if (getUsername() !== messageData.sender) {
           setTyping({
@@ -57,11 +60,9 @@ const GroupChatBox = (props: Props) => {
         if (getUsername() !== messageData.sender) {
           setTyping(null);
         }
+      } else if (messageData.updated && messageData.typing === undefined) {
+        console.log(messageData);
       } else if (messageData.typing === undefined) {
-        console.log("====================================");
-        console.log("Case 3");
-        console.log("====================================");
-
         const groupMessage: GroupMessageSerializer = messageData.message;
         addNewMessage(groupMessage);
       }
@@ -80,7 +81,7 @@ const GroupChatBox = (props: Props) => {
 
   const addNewMessage = (message: GroupMessageSerializer) => {
     const filteredGroupChat = groups.find(
-      (group) => Number(group.id) === Number(groupId)
+      (group) => Number(group?.id) === Number(groupId)
     );
     // settings the new message as latest message and adding it the messages of the group
     filteredGroupChat.latest_message = message;
@@ -98,7 +99,7 @@ const GroupChatBox = (props: Props) => {
     // updating the group list
 
     const otherGroups = groups.filter(
-      (group) => Number(group.id) !== Number(groupId)
+      (group) => Number(group?.id) !== Number(groupId)
     );
 
     otherGroups.push(filteredGroupChat);
@@ -232,7 +233,7 @@ const GroupChatBox = (props: Props) => {
         typing={typing}
         onClick={toggle}
       />
-      <MessagesList messages={selectedGroup.messages} />
+      <MessagesList messages={selectedGroup.messages} type="GROUP" />
       <MessageInput
         text={message}
         onChange={handleChange}
@@ -248,7 +249,7 @@ const GroupChatBox = (props: Props) => {
         ref={fileInputRef}
         onChange={handleFileChange}
       />
-      {emojiOpen && (
+      {/* {emojiOpen && (
         <Box sx={{ position: "absolute", bottom: "10%", left: "5%" }}>
           <Box position={"relative"}>
             <EmojiPicker
@@ -266,7 +267,7 @@ const GroupChatBox = (props: Props) => {
             </IconButton>
           </Box>
         </Box>
-      )}
+      )} */}
     </Grid>
   );
 };
@@ -278,7 +279,7 @@ const EmptyPage = () => {
   return (
     <Grid
       item
-      md={isRightOpen ? 9 : 6}
+      md={isRightOpen ? 6 : 9}
       sm={8}
       sx={{
         position: "relative",
