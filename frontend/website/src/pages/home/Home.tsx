@@ -6,7 +6,7 @@ import { Box, Grid } from "@mui/material";
 import { useStyles } from "./styles";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "Context/AuthContext";
+import { useAuth } from "context/AuthContext";
 
 type Props = {};
 

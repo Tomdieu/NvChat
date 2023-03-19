@@ -39,6 +39,17 @@ export default class ApiService {
     return res;
   }
 
+  static async getDiscussions(token: string) {
+    const url = this.endPoint + "chat/conversation/";
+    const res = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `token ${token}`,
+      },
+    });
+    return res;
+  }
+
   static async getDiscussion(token: string, id?: number) {
     const part = id ? `chat/conversation/${id}` : `chat/conversation/`;
     const url = this.endPoint + part;
@@ -226,6 +237,26 @@ export default class ApiService {
     const url = this.endPoint + "chat/updated-group-image/" + id + "/";
     const res = await fetch(url, {
       method: "PATCH",
+      body: formData,
+      headers: {
+        Authorization: `token ${token}`,
+      },
+    });
+
+    return res;
+  }
+
+  static async deleteGroupMessage(messageId: number, token: string) {}
+
+  static async sendDiscussionMessage(
+    formData: FormData,
+    discusionId: number,
+    token: string
+  ) {
+    const url =
+      this.endPoint + "chat/send-discussion-message/" + discusionId + "/";
+    const res = await fetch(url, {
+      method: "POST",
       body: formData,
       headers: {
         Authorization: `token ${token}`,
