@@ -1,6 +1,6 @@
 import { Alert, AlertColor, SnackbarCloseReason } from "@mui/material";
 import SnackBar from "Components/SnackBar";
-import ApiService from "Utils/ApiService";
+import ApiService from "utils/ApiService";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { UserProfile } from "types/UserProfile";
 

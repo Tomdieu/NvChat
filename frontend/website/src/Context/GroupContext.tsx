@@ -1,4 +1,4 @@
-import ApiService from "Utils/ApiService";
+import ApiService from "utils/ApiService";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { GroupSerializer } from "types/GroupSerializer";
 

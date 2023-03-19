@@ -23,8 +23,8 @@ import {
 } from "@mui/icons-material";
 import CreateGroupDialog from "../CreateGroupDialog";
 import Group from "../Group/Group";
-import { useGroup } from "Context/GroupContext";
-import ApiService from "Utils/ApiService";
+import { useGroup } from "context/GroupContext";
+import ApiService from "utils/ApiService";
 
 type Props = {};
 

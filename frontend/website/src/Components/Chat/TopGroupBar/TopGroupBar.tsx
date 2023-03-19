@@ -3,7 +3,7 @@ import { Avatar, Box, BoxProps, IconButton, Typography } from "@mui/material";
 import { useStyles } from "./styles";
 import { Call, MoreVert } from "@mui/icons-material";
 import { GroupMember } from "types/GroupMember";
-import { useAuth } from "Context/AuthContext";
+import { useAuth } from "context/AuthContext";
 
 type Typing = {
   sender: string;
