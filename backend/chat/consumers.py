@@ -160,8 +160,6 @@ class ConversationConsumer(AsyncWebsocketConsumer):
         file_name = text_data_json.get("filename")
         typing = text_data_json.get("typing")
 
-        print(text_data_json)
-
         if typing:
             if typing == True:
                 await self.channel_layer.group_send(
@@ -185,11 +183,15 @@ class ConversationConsumer(AsyncWebsocketConsumer):
                     },
                 )
         else:
-            instance = await self.save_message(message, fileName=file_name)
-            serializer = MessageListSerializer(instance)
+            # instance = await self.save_message(message, fileName=file_name)
+            # serializer = MessageListSerializer(instance)
+            # await self.channel_layer.group_send(
+            #     self.room_group_name,
+            #     {"type": "send_message", "message": serializer.data},
+            # )
             await self.channel_layer.group_send(
                 self.room_group_name,
-                {"type": "send_message", "message": serializer.data},
+                {"type": "send_message", "message": message},
             )
 
     async def send_typing(self, event):
@@ -267,9 +269,14 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
         if typing == None:
             instance = await self.save_chat_message(message, fileName=file_name)
             serializer = GroupMessageListSerializer(instance)
+            # await self.channel_layer.group_send(
+            #     self.room_group_name,
+            #     {"type": "send_message", "message": serializer.data},
+            # )
+
             await self.channel_layer.group_send(
                 self.room_group_name,
-                {"type": "send_message", "message": serializer.data},
+                {"type": "send_message", "message": message},
             )
 
     async def send_typing(self, event):
@@ -288,7 +295,6 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
 
     async def send_message(self, event):
         message = event["message"]
-        # Send message to WebSocket
         await self.send(text_data=json.dumps({"message": message}))
 
     @sync_to_async
