@@ -210,7 +210,6 @@ class ConversationConsumer(AsyncWebsocketConsumer):
 
     async def send_message(self, event):
         message = event["message"]
-        # Send message to WebSocket
         await self.send(text_data=json.dumps({"message": message}))
 
     @sync_to_async
@@ -267,11 +266,11 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
                 },
             )
         if typing == None:
-            instance = await self.save_chat_message(message, fileName=file_name)
-            serializer = GroupMessageListSerializer(instance)
-            # await self.channel_layer.group_send(
-            #     self.room_group_name,
-            #     {"type": "send_message", "message": serializer.data},
+            # instance = await self.save_chat_message(message, fileName=file_name)
+            # serializer = GroupMessageListSerializer(instance)
+            # # await self.channel_layer.group_send(
+            # #     self.room_group_name,
+            # #     {"type": "send_message", "message": serializer.data},
             # )
 
             await self.channel_layer.group_send(

@@ -158,10 +158,10 @@ class GroupInvitationMessageAdmin(admin.ModelAdmin):
 admin.site.register(GroupInvitationMessage, GroupInvitationMessageAdmin)
 
 
-# class GroupMemberAdmin(admin.ModelAdmin):
-#     list_display = ["user", "group", "joined_on"]
+class GroupMemberAdmin(admin.ModelAdmin):
+    list_display = ["user", "group", "joined_on"]
 
-#     raw_id_fields = ["user", "group"]
+    raw_id_fields = ["user", "group"]
 
 
-# admin.site.register(GroupMember, GroupMemberAdmin)
+admin.site.register(GroupMember, GroupMemberAdmin)

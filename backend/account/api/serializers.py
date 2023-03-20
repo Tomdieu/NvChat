@@ -13,6 +13,7 @@ class AuthenticationSerializer(serializers.Serializer):
     username = serializers.CharField(required=True, max_length=255)
     password = serializers.CharField(required=True, max_length=255)
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -26,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = UserProfile
