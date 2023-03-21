@@ -197,9 +197,17 @@ class SearchFriendView(ListAPIView):
 
     def get_queryset(self):
         parameter = self.request.query_params.get("q", "")
+        friends = self.request.query_params.get("friends", False)
 
         if parameter:
-            queryset = UserProfile.objects.filter(user__username__icontains=parameter)
+            if friends:
+                queryset = self.request.user.profile.friend_list.friends.filter(
+                    user__username__icontains=parameter
+                )
+            else:
+                queryset = UserProfile.objects.filter(
+                    user__username__icontains=parameter
+                )
             return queryset
         else:
             return UserProfile.objects.all()

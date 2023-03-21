@@ -98,10 +98,12 @@ class ChatGroupSerializer(serializers.ModelSerializer):
     def get_latest_message(self, obj: ChatGroup):
         if obj.messages.last() == None:
             return None
-        return GroupMessageSerializer(obj.messages.last()).data
+        return GroupMessageSerializer(obj.messages.last(), context=self.context).data
 
     def get_messages(self, obj: ChatGroup):
-        return GroupMessageSerializer(obj.messages.all(), many=True).data
+        return GroupMessageSerializer(
+            obj.messages.all(), many=True, context=self.context
+        ).data
 
 
 class GroupInvitationMessageSerializer(serializers.ModelSerializer):
@@ -216,6 +218,7 @@ class ConversationSerializer(serializers.ModelSerializer):
     latest_message = serializers.SerializerMethodField()
     messages = serializers.SerializerMethodField()
     imageUrl = serializers.SerializerMethodField()
+    online = serializers.SerializerMethodField()
 
     class Meta:
         model = Conversation
@@ -239,19 +242,21 @@ class ConversationSerializer(serializers.ModelSerializer):
 
     def get_imageUrl(self, obj: Conversation):
         user = self.get_user(obj)
-        # print(user.profile_picture.url)
-        # print(dir(self.context["request"]))
         if user.profile_picture:
             return UserProfileImageSerializer(user, context=self.context).data.get(
                 "profile_picture"
             )
         return None
 
+    def get_online(self, obj: Conversation):
+        user = self.get_user(obj)
+        return user.online
+
 
 class MessageSerializer(serializers.ModelSerializer):
     message = IMessagePolymorphicSerializer(many=False)
-    sender = UserProfileSerializer()
-    conversation = ConversationSerializer()
+    sender = UserProfileSerializer(read_only=True)
+    conversation = ConversationSerializer(read_only=True)
 
     class Meta:
         model = Message
@@ -267,6 +272,8 @@ class MessageCreateSerializer(serializers.ModelSerializer):
 
 
 class ChatGroupMemberCreateSerializer(serializers.ModelSerializer):
+    user = UserProfileSerializer(read_only=True)
+
     class Meta:
         model = GroupMember
         fields = "__all__"
@@ -282,8 +289,8 @@ class ChatGroupCreateSerializer(serializers.ModelSerializer):
 
 
 class GroupMessageSerializer(serializers.ModelSerializer):
-    message = IMessagePolymorphicSerializer()
-    sender = UserProfileSerializer()
+    message = IMessagePolymorphicSerializer(read_only=True)
+    sender = UserProfileSerializer(read_only=True)
 
     # message =
     class Meta:
@@ -365,6 +372,8 @@ class ChatGroupListSerializer(serializers.ModelSerializer):
 
 
 class GroupMemberSerializer(serializers.ModelSerializer):
+    user = UserProfileSerializer(read_only=True)
+
     class Meta:
         model = GroupMember
         fields = "__all__"

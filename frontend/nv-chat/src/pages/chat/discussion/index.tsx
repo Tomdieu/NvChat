@@ -73,17 +73,17 @@ const index = (props: Props) => {
 
   // console.log({ chat });
 
-  useEffect(() => {
-    if (!chat.name) {
-      return loadData();
-    }
-    setTimeout(() => {
-      bottomOfChat.current.scrollIntoView({
-        behavior: "smoot",
-        block: "start",
-      });
-    }, 100);
-  }, [chat]);
+  // useEffect(() => {
+  //   if (!chat.name) {
+  //     return loadData();
+  //   }
+  //   setTimeout(() => {
+  //     bottomOfChat.current.scrollIntoView({
+  //       behavior: "smoot",
+  //       block: "start",
+  //     });
+  //   }, 100);
+  // }, [chat]);
 
   const fileInputRef = useRef(null);
   const imageInputRef = useRef(null);

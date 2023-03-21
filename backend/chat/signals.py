@@ -1,6 +1,8 @@
 # from django.dispatch import receiver
 # from django.db.models.signals import post_save
 
+# from chat.api.serializers import ChatGroupSerializer
+
 # from .models import ChatGroup
 
 
@@ -8,6 +10,8 @@
 # def send_chat_update(sender, instance, created, **kwargs):
 #     from channels.layers import get_channel_layer
 #     import asyncio
+
+#     print(kwargs)
 
 #     if not created:
 #         channel_layer = get_channel_layer()
@@ -17,8 +21,8 @@
 #             channel_layer.group_send(
 #                 f"group_chat_{instance.id}",
 #                 {
-#                     "type": "send_updated_group",
-#                     "message": instance,
+#                     "type": "send_group_updates",
+#                     "group": ChatGroupSerializer(instance).data,
 #                 },
 #             )
 #         )

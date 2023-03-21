@@ -296,6 +296,17 @@ class GroupChatConsumer(AsyncWebsocketConsumer):
         message = event["message"]
         await self.send(text_data=json.dumps({"message": message}))
 
+    # async def send_group_updates(self, event):
+    #     message = event["group"]
+
+    #     await self.send(
+    #         text_data=json.dumps({"group": message, "type": "group_updated"})
+    #     )
+
+    @sync_to_async
+    def getSerializer(self, groupInstance):
+        return ChatGroupSerializer(groupInstance)
+
     @sync_to_async
     def save_chat_message(self, message, parent_message=None, fileName=None):
         return create_message(

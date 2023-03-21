@@ -130,6 +130,7 @@ class ChatGroup(models.Model):
             _member = member.get(user=user)
             print(_member)
             _member.is_active = False
+            _member.is_manager = False
             _member.save()
 
     def set_member_as_admin(self, user: UserProfile):
@@ -138,6 +139,9 @@ class ChatGroup(models.Model):
             _member = member.get(user=user)
             _member.is_manager = True
             _member.save()
+
+    class Meta:
+        ordering = ("-updated_on",)
 
 
 class GroupMember(models.Model):

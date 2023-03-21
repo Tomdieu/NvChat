@@ -10,6 +10,7 @@ import { useAuth } from "context/AuthContext";
 import ApiService from "utils/ApiService";
 import { TextMessage } from "types/AbstractMessage";
 import { GroupMessageSerializer } from "types/GroupMessageSerializer";
+import { useNavigate } from "react-router-dom";
 
 type Props = {};
 
@@ -36,7 +37,8 @@ const GroupChatBox = (props: Props) => {
 
   useEffect(() => {
     const ws = new WebSocket(
-      ApiService.wsEndPoint + `ws/group_chat/${groupId}/?token=${userToken}`
+      ApiService.wsEndPoint +
+        `ws/group_chat/${selectedGroup.id}/?token=${userToken}`
     );
     setSocket(ws);
     return () => {
@@ -56,12 +58,6 @@ const GroupChatBox = (props: Props) => {
       socket.onmessage = (message) => {
         const messageData = JSON.parse(message.data);
         console.log(messageData);
-
-        // if (messageData.type === "group_updated") {
-        //   console.log("Updated ", { messageData });
-
-        //   // setSelectedGroup(messageData.group);
-        // }
         if (messageData.typing === true) {
           if (getUsername() !== messageData.sender) {
             setTyping({
@@ -76,10 +72,7 @@ const GroupChatBox = (props: Props) => {
         } else if (messageData.updated && messageData.typing === undefined) {
           console.log(messageData);
         } else if (messageData.typing === undefined) {
-          // const groupMessage: GroupMessageSerializer = messageData.message;
-          if (messageData.messages) {
-            addNewMessage(messageData.message);
-          }
+          addNewMessage(messageData.message);
         }
       };
 
@@ -315,6 +308,13 @@ const EmptyPage = () => {
 
 const GroupChat = () => {
   const { selectedGroup } = useGroup();
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem("userToken");
+    if (!token) {
+      navigate("/auth/login");
+    }
+  }, []);
 
   if (selectedGroup) {
     return <GroupChatBox />;

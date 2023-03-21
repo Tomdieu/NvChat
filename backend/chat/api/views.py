@@ -8,7 +8,6 @@ from rest_framework.mixins import (
 
 from rest_framework.generics import CreateAPIView
 
-from django.contrib.auth import authenticate, login
 
 from chat.models import (
     GroupMember,
@@ -23,25 +22,22 @@ from rest_framework.parsers import (
     FormParser,
 )
 
-from account.models import UserProfile
-from account.api.serializers import UserProfileSerializer
+from rest_framework.views import APIView
+
 
 from .serializers import (
     ChatGroupSerializer,
     ChatGroupCreateSerializer,
     ChatGroupImageSerializer,
-    ChatGroupListSerializer,
     CreateConversationSerializer,
     ConversationSerializer,
     MessageSerializer,
     MessageCreateSerializer,
-    GroupMessageSerializer,
     GroupMessageListSerializer,
-    # GroupMessageCreateSerializer,
     GroupMemberCreateSerializer,
     GroupMemberSerializer,
     GMSerializer,
-    # AuthenticationSerializer,
+    IMessagePolymorphicSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -63,7 +59,9 @@ class ChatGroupViewSet(
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_queryset(self):
-        return ChatGroup.objects.filter(members__user=self.request.user)
+        queryset = ChatGroup.objects.filter(members__user=self.request.user)
+
+        return queryset
 
     def get_serializer_class(self):
         if self.request.method.upper() in ["POST", "PATCH", "PUT"]:
@@ -169,7 +167,7 @@ class removeMemberFromGroupViewSet(CreateAPIView, GenericViewSet):
         chatGroup.remove_member(user)
 
         return Response(
-            {"message": "member from group", "success": True},
+            {"message": "member remove from group", "success": True},
             status=status.HTTP_201_CREATED,
         )
 
@@ -254,3 +252,73 @@ class MessageViewSet(
             return MessageCreateSerializer
 
     queryset = Message.objects.all()
+
+
+# Discussion Message Creation
+
+
+class DisussionMessageApiView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    def post(self, request, *args, **kwargs):
+        conversation = Conversation.objects.get(id=kwargs["conversation_id"])
+
+        serializer = IMessagePolymorphicSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+
+        newMessage = {}
+        newMessage["message"] = instance
+        newMessage["conversation"] = conversation
+        newMessage["sender"] = request.user.profile
+        newMessage["parent_message"] = None
+
+        msg = Message.objects.create(**newMessage)
+
+        msg_serializer = MessageSerializer(msg, context={"request": request})
+
+        return Response(
+            {
+                "data": msg_serializer.data,
+            }
+        )
+
+
+class GroupMessageApiView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    def post(self, request, *args, **kwargs):
+        chat = ChatGroup.objects.get(id=kwargs["chat_group_id"])
+
+        serializer = IMessagePolymorphicSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+
+        newMessage = {}
+        newMessage["message"] = instance
+        newMessage["chat"] = chat
+        newMessage["sender"] = request.user.profile
+        newMessage["parent_message"] = None
+
+        msg = GroupMessage.objects.create(**newMessage)
+
+        msg_serializer = GroupMessageListSerializer(msg, context={"request": request})
+
+        return Response(
+            {
+                "data": msg_serializer.data,
+            }
+        )
+
+
+class GroupMemberViewSet(
+    UpdateModelMixin, GenericViewSet, RetrieveModelMixin, DestroyModelMixin
+):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    serializer_class = GroupMemberSerializer
+
+    queryset = GroupMember.objects.all()

@@ -13,7 +13,7 @@ export default defineConfig({
     alias: {
       "@chat": path.resolve(__dirname, "./src"),
       "@Components": path.resolve(__dirname, "./src/Components"),
-      "@Context": path.resolve(__dirname, "./src/Context"),
+      "@context": path.resolve(__dirname, "./src/context"),
       "@pages": path.resolve(__dirname, "./src/pages"),
       "@Utils": path.resolve(__dirname, "./src/Utils"),
       "@assets": path.resolve(__dirname, "./src/assets"),

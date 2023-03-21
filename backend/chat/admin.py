@@ -125,7 +125,7 @@ class GroupMemberAdminInline(admin.TabularInline, nested.NestedTabularInline):
 
 
 class ChatGroupAdmin(nested.NestedModelAdmin):
-    list_display = ("chat_name", "description", "created_by")
+    list_display = ("chat_name", "description", "created_by", "updated_on")
     inlines = [GroupMemberAdminInline, GroupMessageAdminInline]
 
 
