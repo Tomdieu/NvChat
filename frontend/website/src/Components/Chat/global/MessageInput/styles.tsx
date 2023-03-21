@@ -8,6 +8,7 @@ export const useStyles = makeStyles((theme) => ({
     padding: 0,
     display: "flex",
     alignItems: "center",
+    flexDirection: "column",
   },
   messageInputWrapper: {
     display: "flex",

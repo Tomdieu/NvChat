@@ -4,14 +4,26 @@ import {
   InputBase,
   InputBaseProps,
   TextField,
+  Typography,
 } from "@mui/material";
 import React from "react";
 import { useStyles } from "./styles";
-import { AttachFile, EmojiEmotions, Mic, Send } from "@mui/icons-material";
+import {
+  AttachFile,
+  Close,
+  EmojiEmotions,
+  Mic,
+  Send,
+} from "@mui/icons-material";
+import { GroupMessageSerializer } from "types/GroupMessageSerializer";
+import { Message } from "types/Message";
+import GroupMessage from "../Message/GroupMessage";
+import GroupMessageReply from "../Message/GroupMessageReply";
 
 type Props = {
   text: string;
-  onFileClick: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
+  msgToReply?: GroupMessageSerializer | Message;
+  onFileClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onChange?: (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
@@ -19,7 +31,8 @@ type Props = {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => void;
   onSendClick?: () => void;
-  onInput?: (event: React.FormEventHandler<HTMLDivElement>) => void;
+  onInput?: (event: React.FormEvent<HTMLDivElement>) => void;
+  onCancleReplyMsg?: () => void;
 } & InputBaseProps;
 
 const MessageInput = (props: Props) => {
@@ -30,12 +43,48 @@ const MessageInput = (props: Props) => {
     onInput,
     onEmojiClick,
     onSendClick,
+    msgToReply,
+    onCancleReplyMsg,
     ...other
   } = props;
+  console.log("====================================");
+  console.log({ msgToReply });
+  console.log("====================================");
   const classes = useStyles();
   return (
     <Box className={classes.messageInput}>
-      {/* <Box></Box> */}
+      {msgToReply && (
+        <Box
+          flex={1}
+          width={"100%"}
+          sx={{ m: 0, p: 0, borderBottom: "2px solid #269bdf" }}
+        >
+          <Box
+            display={"flex"}
+            alignItems={"center"}
+            justifyContent={"space-between"}
+            sx={{
+              bgcolor: "#f5f5f5",
+              pt: 1,
+              pb: 1,
+              pl: 1,
+
+              borderLeft: "5px solid #2a63df",
+              borderRadius: "2px",
+            }}
+          >
+            <Box>
+              <Typography>
+                Message To Reply With Id : {msgToReply.id}
+              </Typography>
+              <GroupMessageReply message={msgToReply} />
+            </Box>
+            <IconButton onClick={onCancleReplyMsg}>
+              <Close />
+            </IconButton>
+          </Box>
+        </Box>
+      )}
       <Box className={classes.messageInputWrapper}>
         <IconButton className={classes.iconButton} onClick={onEmojiClick}>
           <EmojiEmotions

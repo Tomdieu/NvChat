@@ -12,11 +12,12 @@ type Props = {
   messages: GroupMessageSerializer[] | Message[];
   ref?: React.LegacyRef<HTMLDivElement>;
   type: "DISCUSSION" | "GROUP";
+  onMsgClick?: (message: GroupMessageSerializer | Message) => void;
 };
 
 const MessagesList = (props: Props) => {
   const classes = useStyles();
-  const { messages, ref, type } = props;
+  const { messages, ref, type, onMsgClick } = props;
 
   const { userProfile } = useAuth();
 
@@ -31,6 +32,9 @@ const MessagesList = (props: Props) => {
       {type === "GROUP" &&
         messages?.map((message, index) => (
           <GroupMessage
+            onClick={(e, groupMsg) => {
+              onMsgClick(groupMsg);
+            }}
             key={index}
             isMine={Boolean(
               getSenderName(message) === userProfile.user.username
@@ -42,6 +46,7 @@ const MessagesList = (props: Props) => {
         messages?.map((message, index) => (
           <DiscussionMessage
             key={index}
+            onClick={(e, discMsg) => onMsgClick(discMsg)}
             isMine={Boolean(
               getSenderName(message) === userProfile.user.username
             )}

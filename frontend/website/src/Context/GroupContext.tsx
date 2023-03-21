@@ -41,6 +41,8 @@ export const GroupContextProvider = (props: Props) => {
     if (selectedGroup) {
       // setIsRightOpen(false);
       localStorage.setItem("selectedGroup", JSON.stringify(selectedGroup));
+
+      setGroupId(selectedGroup.id);
     }
   }, [groupId, selectedGroup]);
 

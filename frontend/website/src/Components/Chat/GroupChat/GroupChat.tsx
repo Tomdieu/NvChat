@@ -138,9 +138,7 @@ const GroupChatBox = (props: Props) => {
     }
   };
 
-  const handleFileClick = (
-    event: React.MouseEvent<HTMLAnchorElement, MouseEvent>
-  ) => {
+  const handleFileClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     fileInputRef.current.click();
   };
 
@@ -234,7 +232,11 @@ const GroupChatBox = (props: Props) => {
         typing={typing}
         onClick={toggle}
       />
-      <MessagesList messages={selectedGroup.messages} type="GROUP" />
+      <MessagesList
+        messages={selectedGroup.messages}
+        type="GROUP"
+        onMsgClick={(message) => setReplyMessage(message)}
+      />
       <MessageInput
         text={message}
         onChange={handleChange}
@@ -243,6 +245,8 @@ const GroupChatBox = (props: Props) => {
         onEmojiClick={handleEmogiClick}
         onKeyDown={handleKeydown}
         onBlur={handleKeyup}
+        msgToReply={replyMessage}
+        onCancleReplyMsg={() => setReplyMessage(null)}
       />
       <input
         style={{ display: "none" }}
