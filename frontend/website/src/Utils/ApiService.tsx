@@ -2,7 +2,11 @@ import { UserProfile } from "types/UserProfile";
 
 export default class ApiService {
   static endPoint = "http://localhost:8000/api/";
+  // static endPoint = "http://10.42.0.186:8000/api/";
+
   static wsEndPoint = "ws://localhost:8000/";
+  // static wsEndPoint = "ws://10.42.0.186:8000/";
+
   static async login(username: string, password: string) {
     const url = this.endPoint + "account/login/";
     const res = await fetch(url, {
@@ -152,8 +156,15 @@ export default class ApiService {
     });
     return res;
   }
-  static async searchUser(query: string, token: string) {
-    const url = this.endPoint + `friends/search?q=${query}`;
+  static async searchUser(query: string, token: string, friends?: boolean) {
+    let url: string;
+    if (friends) {
+      url = this.endPoint + `friends/search?q=${query}&friends=true`;
+    } else {
+      url = this.endPoint + `friends/search?q=${query}`;
+    }
+    console.log({ url });
+
     const res = await fetch(url, {
       headers: {
         "Content-Type": "application/json",
@@ -233,6 +244,20 @@ export default class ApiService {
     return res;
   }
 
+  static async updateGroupMember(data: object, id: number, token: string) {
+    const url = this.endPoint + "chat/group-member/" + id + "/";
+    const res = await fetch(url, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `token ${token}`,
+      },
+    });
+
+    return res;
+  }
+
   static async updateGroupImage(formData: FormData, id: number, token: string) {
     const url = this.endPoint + "chat/updated-group-image/" + id + "/";
     const res = await fetch(url, {
@@ -255,6 +280,23 @@ export default class ApiService {
   ) {
     const url =
       this.endPoint + "chat/send-discussion-message/" + discusionId + "/";
+    const res = await fetch(url, {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: `token ${token}`,
+      },
+    });
+
+    return res;
+  }
+
+  static async sendGroupMessage(
+    formData: FormData,
+    groupId: number,
+    token: string
+  ) {
+    const url = this.endPoint + "chat/send-group-message/" + groupId + "/";
     const res = await fetch(url, {
       method: "POST",
       body: formData,

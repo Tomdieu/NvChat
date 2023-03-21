@@ -9,6 +9,8 @@ import { useAuth } from "context/AuthContext";
 import { TextMessage } from "types/AbstractMessage";
 import { Message } from "types/Message";
 
+import Picker from "emoji-picker-react";
+
 type Props = {};
 
 const ActiveDiscussion = () => {
@@ -21,6 +23,9 @@ const ActiveDiscussion = () => {
     setSelectedDiscussion,
     setIsRightOpen,
   } = useChat();
+
+  const [socket, setSocket] = useState<WebSocket>(null);
+
   const [respondMessage, setRespondMessage] = useState(null);
   const { userToken } = useAuth();
 
@@ -33,45 +38,41 @@ const ActiveDiscussion = () => {
   ) => {
     setMessage(e.target.value);
   };
-
-  const wsRef = useRef<WebSocket>(null);
-
   useEffect(() => {
-    wsRef.current = new WebSocket(
+    const ws = new WebSocket(
       ApiService.wsEndPoint + `ws/discussion_chat/${chatId}/?token=${userToken}`
     );
-    wsRef.current.onopen = (e) => {
-      console.log("Connection established");
-    };
-    wsRef.current.onclose = (e) => {
-      console.log("Connection Close");
-    };
-    wsRef.current.onmessage = (e: MessageEvent<any>) => {
-      console.log("Message Recieved ", e);
-
-      const newMessage = JSON.parse(e.data);
-
-      addNewMessage(newMessage.message);
+    setSocket(ws);
+    return () => {
+      ws.close();
     };
   }, []);
 
-  const addNewMessage = (newMessage: Message) => {
-    console.log(newMessage);
+  useEffect(() => {
+    if (socket) {
+      socket.onopen = (e) => {
+        console.log("Connection established");
+      };
+      socket.onclose = (e) => {
+        console.log("Connection Close");
+      };
+      socket.onmessage = (e: MessageEvent<any>) => {
+        console.log("Message Recieved ");
 
+        const newMessage = JSON.parse(e.data);
+        if (newMessage.message && newMessage.message.id) {
+          addNewMessage(newMessage.message);
+        }
+      };
+    }
+  }, [socket]);
+
+  const addNewMessage = (newMessage: Message) => {
     const filterChats = discussions.find((chat) => chat.id === chatId);
     console.log(filterChats);
 
     filterChats.latest_message = newMessage;
     filterChats.messages.push(newMessage);
-
-    const actualMessages = selectedDiscussion.messages;
-    actualMessages.push(newMessage);
-
-    setSelectedDiscussion({
-      ...selectedDiscussion,
-      latest_message: newMessage,
-      messages: actualMessages,
-    });
 
     const otherChats = discussions.filter((chat) => chat.id !== chatId);
     otherChats.push(filterChats);
@@ -122,10 +123,12 @@ const ActiveDiscussion = () => {
         formData.append("resourcetype", "FileMessage");
       }
 
+      setMessage("");
       ApiService.sendDiscussionMessage(formData, chatId, userToken)
         .then((res) => res.json())
         .then((data) => {
-          wsRef.current.send(JSON.stringify({ message: data.data }));
+          socket.send(JSON.stringify({ message: data.data }));
+          // wsRef.current.send(JSON.stringify({ message: data.data }));
         })
         .catch((err) => console.log(err));
     }
@@ -136,11 +139,13 @@ const ActiveDiscussion = () => {
       const formData = new FormData();
       formData.append("text", message);
       formData.append("resourcetype", "TextMessage");
+      setMessage("");
 
       ApiService.sendDiscussionMessage(formData, chatId, userToken)
         .then((res) => res.json())
         .then((data) => {
-          wsRef.current.send(JSON.stringify({ message: data.data }));
+          socket.send(JSON.stringify({ message: data.data }));
+          // wsRef.current.send(JSON.stringify({ message: data.data }));
         })
         .catch((err) => console.log(err));
     }

@@ -32,52 +32,64 @@ const GroupChatBox = (props: Props) => {
     useGroup();
   const { userToken, userProfile, showBar } = useAuth();
 
+  const [socket, setSocket] = useState<WebSocket>(null);
+
+  useEffect(() => {
+    const ws = new WebSocket(
+      ApiService.wsEndPoint + `ws/group_chat/${groupId}/?token=${userToken}`
+    );
+    setSocket(ws);
+    return () => {
+      ws.close();
+    };
+  }, []);
+
   const getUsername = () => {
     return userProfile.user.username;
   };
 
-  let webSocket = new WebSocket(
-    ApiService.wsEndPoint + `ws/group_chat/${groupId}/?token=${userToken}`
-  );
-
   useEffect(() => {
-    webSocket.onopen = (e) => {
-      console.log("WebSocket Established", { e });
-    };
-    webSocket.onmessage = (message) => {
-      const messageData = JSON.parse(message.data);
-      console.log("====================================");
-      console.log(messageData);
-      console.log("====================================");
-      if (messageData.typing === true) {
-        if (getUsername() !== messageData.sender) {
-          setTyping({
-            message: messageData.message,
-            sender: messageData.sender,
-          });
-        }
-      } else if (messageData.typing === false) {
-        if (getUsername() !== messageData.sender) {
-          setTyping(null);
-        }
-      } else if (messageData.updated && messageData.typing === undefined) {
+    if (socket) {
+      socket.onopen = (e) => {
+        console.log("WebSocket Established", { e });
+      };
+      socket.onmessage = (message) => {
+        const messageData = JSON.parse(message.data);
         console.log(messageData);
-      } else if (messageData.typing === undefined) {
-        const groupMessage: GroupMessageSerializer = messageData.message;
-        addNewMessage(groupMessage);
-      }
-    };
 
-    webSocket.onclose = () => {
-      console.log("WebSocket Client Disconnected");
-      showBar("Websocket Disconnected", <ErrorRounded />, "error");
-    };
-    webSocket.onerror = (e) => {
-      webSocket = new WebSocket(
-        ApiService.wsEndPoint + `ws/group_chat/${groupId}/?token=${userToken}`
-      );
-    };
-  }, []);
+        // if (messageData.type === "group_updated") {
+        //   console.log("Updated ", { messageData });
+
+        //   // setSelectedGroup(messageData.group);
+        // }
+        if (messageData.typing === true) {
+          if (getUsername() !== messageData.sender) {
+            setTyping({
+              message: messageData.message,
+              sender: messageData.sender,
+            });
+          }
+        } else if (messageData.typing === false) {
+          if (getUsername() !== messageData.sender) {
+            setTyping(null);
+          }
+        } else if (messageData.updated && messageData.typing === undefined) {
+          console.log(messageData);
+        } else if (messageData.typing === undefined) {
+          // const groupMessage: GroupMessageSerializer = messageData.message;
+          if (messageData.messages) {
+            addNewMessage(messageData.message);
+          }
+        }
+      };
+
+      socket.onclose = () => {
+        console.log("WebSocket Client Disconnected");
+        showBar("Websocket Disconnected", <ErrorRounded />, "error");
+      };
+      socket.onerror = (e) => {};
+    }
+  }, [socket]);
 
   const addNewMessage = (message: GroupMessageSerializer) => {
     const filteredGroupChat = groups.find(
@@ -90,11 +102,11 @@ const GroupChatBox = (props: Props) => {
     const actualMessages = selectedGroup.messages;
     actualMessages.push(message);
 
-    setSelectedGroup({
-      ...selectedGroup,
-      latest_message: message,
-      messages: actualMessages,
-    });
+    // setSelectedGroup({
+    //   ...selectedGroup,
+    //   latest_message: message,
+    //   messages: actualMessages,
+    // });
 
     // updating the group list
 
@@ -115,12 +127,20 @@ const GroupChatBox = (props: Props) => {
 
   const handleSend = () => {
     if (message) {
-      const textMessage: TextMessage = {
-        text: message,
-        resourcetype: "TextMessage",
-      };
-
-      webSocket.send(JSON.stringify({ message: textMessage }));
+      // const textMessage: TextMessage = {
+      //   text: message,
+      //   resourcetype: "TextMessage",
+      // };
+      const formData = new FormData();
+      formData.append("text", message);
+      formData.append("resourcetype", "TextMessage");
+      ApiService.sendGroupMessage(formData, groupId, userToken)
+        .then((res) => res.json())
+        .then((data) => {
+          socket.send(JSON.stringify({ message: data.data }));
+        })
+        .catch((err) => console.log(err));
+      // webSocket.send(JSON.stringify({ message: textMessage }));
       setMessage("");
     }
   };
@@ -140,59 +160,47 @@ const GroupChatBox = (props: Props) => {
       let file = files[i];
       const fileName = file.name.toLowerCase();
 
-      const fileReader = new FileReader();
+      const isImage =
+        fileName.endsWith(".jpg") ||
+        fileName.endsWith(".jpeg") ||
+        fileName.endsWith(".png") ||
+        fileName.endsWith(".gif");
+      const isVideo =
+        fileName.endsWith(".mp4") ||
+        fileName.endsWith(".mov") ||
+        fileName.endsWith(".avi") ||
+        fileName.endsWith(".mkv") ||
+        fileName.endsWith(".wmv");
 
-      fileReader.onload = (ev: ProgressEvent<FileReader>) => {
-        const dataUrl = fileReader.result;
-        console.log(dataUrl);
+      const formData = new FormData();
 
-        const isImage =
-          fileName.endsWith(".jpg") ||
-          fileName.endsWith(".jpeg") ||
-          fileName.endsWith(".png") ||
-          fileName.endsWith(".gif");
-        const isVideo =
-          fileName.endsWith(".mp4") ||
-          fileName.endsWith(".mov") ||
-          fileName.endsWith(".avi") ||
-          fileName.endsWith(".wmv");
+      if (isImage) {
+        formData.append("caption", message);
+        formData.append("image", file);
+        formData.append("resourcetype", "ImageMessage");
+      }
 
-        if (isVideo) {
-          const videoMessage = {
-            video: fileReader.result,
-            caption: message || null,
-            resourcetype: "VideoMessage",
-          };
-          // console.log(videoMessage);
-          webSocket.send(
-            JSON.stringify({ message: videoMessage, filename: fileName })
-          );
-        }
-        if (isImage) {
-          const imageMessage = {
-            image: fileReader.result,
-            caption: message || null,
-            resourcetype: "ImageMessage",
-          };
-          // console.log(imageMessage);
-          webSocket.send(
-            JSON.stringify({ message: imageMessage, filename: fileName })
-          );
-        }
+      if (isVideo) {
+        formData.append("caption", message);
+        formData.append("video", file);
 
-        if (!isImage && !isVideo) {
-          const fileMessage = {
-            file: fileReader.result,
-            caption: message || null,
-            resourcetype: "FileMessage",
-          };
-          webSocket.send(
-            JSON.stringify({ message: fileMessage, filename: fileName })
-          );
-        }
-      };
+        formData.append("resourcetype", "VideoMessage");
+      }
 
-      fileReader.readAsDataURL(file);
+      if (!isImage && !isVideo) {
+        formData.append("caption", message);
+        formData.append("file", file);
+
+        formData.append("resourcetype", "FileMessage");
+      }
+      setMessage("");
+
+      ApiService.sendGroupMessage(formData, groupId, userToken)
+        .then((res) => res.json())
+        .then((data) => {
+          socket.send(JSON.stringify({ message: data.data }));
+        })
+        .catch((err) => console.log(err));
     }
   };
 
@@ -204,14 +212,14 @@ const GroupChatBox = (props: Props) => {
   const handleKeydown = (
     e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
-    webSocket.send(
+    socket.send(
       JSON.stringify({ typing: true, message: `${getUsername()} is typing` })
     );
   };
   const handleKeyup = (
     e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    webSocket.send(JSON.stringify({ typing: false, message: `` }));
+    socket.send(JSON.stringify({ typing: false, message: `` }));
   };
   return (
     <Grid

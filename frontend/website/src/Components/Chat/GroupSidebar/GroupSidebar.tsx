@@ -25,6 +25,7 @@ import CreateGroupDialog from "../CreateGroupDialog";
 import Group from "../Group/Group";
 import { useGroup } from "context/GroupContext";
 import ApiService from "utils/ApiService";
+import { GroupSerializer } from "types/GroupSerializer";
 
 type Props = {};
 
@@ -32,6 +33,7 @@ const GroupSidebar = (props: Props) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const { groups, setGroups, setSelectedGroup, setGroupId } = useGroup();
+  const [groupToDisplay, setGroupToDisplay] = useState<GroupSerializer[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const token = localStorage.getItem("userToken");
@@ -48,6 +50,48 @@ const GroupSidebar = (props: Props) => {
         });
     }
   }, []);
+
+  const getLastestMessage = (group: GroupSerializer) => {
+    return (
+      (group.latest_message &&
+        new Date(group.latest_message.message.created_at)) ||
+      new Date("10/10/2000")
+    );
+  };
+
+  // useEffect(() => {
+  //   /**
+  //    * Here is will sort all the groups with respect to the last message
+  //    * and for that i wll use the insertion sort algorithm
+  //    *
+  //    */
+
+  //   let _groups = groups.map((g) => g);
+
+  //   for (let i = 1; i < _groups.length; i++) {
+  //     let _group = _groups[i];
+
+  //     // let j = i - 1;
+  //     // while (
+  //     //   getLastestMessage(_group) < getLastestMessage(_groups[j]) &&
+  //     //   j >= 0
+  //     // ) {
+  //     //   _groups[j + 1] = _groups[j];
+  //     //   console.log("====================================");
+  //     //   console.log(
+  //     //     getLastestMessage(_groups[i]),
+  //     //     getLastestMessage(_groups[j])
+  //     //   );
+  //     //   console.log("====================================");
+  //     //   j -= 1;
+  //     // }
+  //     // _groups[j + 1] = _group;
+  //   }
+
+  //   console.log("====================================");
+  //   console.log({ _groups });
+  //   console.log("====================================");
+  // }, [groups]);
 
   const handleClose = () => {
     setOpen(false);

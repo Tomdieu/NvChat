@@ -3,8 +3,8 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { GroupSerializer } from "types/GroupSerializer";
 
 type groupContextType = {
-  groups: GroupSerializer[] | [];
-  setGroups: React.Dispatch<React.SetStateAction<[] | GroupSerializer[]>>;
+  groups: GroupSerializer[];
+  setGroups: React.Dispatch<React.SetStateAction<GroupSerializer[]>>;
   selectedGroup: GroupSerializer;
   setSelectedGroup: React.Dispatch<React.SetStateAction<GroupSerializer>>;
   isRightOpen: boolean;
@@ -25,10 +25,8 @@ type Props = {
 
 export const GroupContextProvider = (props: Props) => {
   const { children } = props;
-  const [groups, setGroups] = useState<GroupSerializer[] | []>([]);
-  const [selectedGroup, setSelectedGroup] = useState<GroupSerializer | null>(
-    null
-  );
+  const [groups, setGroups] = useState<GroupSerializer[]>([]);
+  const [selectedGroup, setSelectedGroup] = useState<GroupSerializer>(null);
   const [isRightOpen, setIsRightOpen] = useState(false);
   const [groupId, setGroupId] = useState<number | null>(null);
 
@@ -38,15 +36,16 @@ export const GroupContextProvider = (props: Props) => {
 
   useEffect(() => {
     if (groupId) {
-      sessionStorage.setItem("groupId", groupId.toString());
+      localStorage.setItem("groupId", groupId.toString());
     }
     if (selectedGroup) {
-      sessionStorage.setItem("selectedGroup", JSON.stringify(selectedGroup));
+      // setIsRightOpen(false);
+      localStorage.setItem("selectedGroup", JSON.stringify(selectedGroup));
     }
   }, [groupId, selectedGroup]);
 
   useEffect(() => {
-    const _groupId = sessionStorage.getItem("groupId");
+    const _groupId = localStorage.getItem("groupId");
     if (_groupId) {
       setGroupId(Number(_groupId));
     }
@@ -54,8 +53,8 @@ export const GroupContextProvider = (props: Props) => {
     if (_groups) {
       setGroups(JSON.parse(_groups));
     }
-    const _selectedGroup = sessionStorage.getItem("selectedGroup");
-    if (_selectedGroup) {
+    const _selectedGroup = localStorage.getItem("selectedGroup");
+    if (_selectedGroup && _groups) {
       const x: GroupSerializer = JSON.parse(_selectedGroup);
       setSelectedGroup(x);
     }

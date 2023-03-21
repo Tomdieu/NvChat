@@ -38,12 +38,9 @@ const TopGroupBar = (props: Props) => {
                 textOverflow: "ellipsis",
               }}
             >
-              {participants?.map((participant, index) => (
-                <span key={index} style={{ color: "#e5e5e5" }}>
-                  {participant.user.user.username}
-                  {","}
-                </span>
-              ))}
+              {participants
+                ?.map((participant, index) => participant.user.user.username)
+                .join(", ")}
             </Typography>
           ) : (
             <Typography

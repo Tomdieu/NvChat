@@ -22,6 +22,7 @@ import { useAuth } from "context/AuthContext";
 import GroupDescription from "./GroupDescription";
 import GroupHead from "./GroupHead";
 import GroupMemberList from "./GroupMemberList";
+import GroupAddMember from "./GroupAddMember";
 
 type Props = {};
 
@@ -48,32 +49,7 @@ const GroupRightbar = (props: Props) => {
         <Box className={classes.rightbarBottom}>
           <GroupHead />
           <GroupDescription />
-          <Box
-            className={classes.groupMemberContainer}
-            component={Paper}
-            sx={{
-              "&:hover": {
-                backgroundColor: "#c3dbf9",
-              },
-            }}
-          >
-            <Box
-              display="flex"
-              gap={2}
-              sx={{
-                cursor: "pointer",
-                "& ::selection": {
-                  backgroundColor: "transparent",
-                },
-                "& > *": {
-                  color: "#5199f0",
-                },
-              }}
-            >
-              <GroupAddOutlined />
-              <Typography>Add Members</Typography>
-            </Box>
-          </Box>
+          <GroupAddMember />
           <GroupMemberList />
           <Box component={Paper} className={classes.groupInfoDangerContain}>
             <Box

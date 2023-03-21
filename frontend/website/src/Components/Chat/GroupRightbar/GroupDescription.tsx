@@ -30,7 +30,7 @@ const GroupDescription = (props: Props) => {
 
   useEffect(() => {
     setDescription(selectedGroup?.description);
-  }, []);
+  }, [selectedGroup]);
 
   const handleCreateOrUpdate = () => {
     if (description) {
@@ -102,6 +102,7 @@ const GroupDescription = (props: Props) => {
                 ? "Updated group description"
                 : "Add a group description"}
             </Typography>
+
             <Box
               sx={{
                 borderLeft: "3px solid #3886e5fa",
@@ -118,7 +119,7 @@ const GroupDescription = (props: Props) => {
                   wordWrap: "break-word",
                 }}
               >
-                {selectedGroup?.description}
+                {selectedGroup?.description || "No description"}
               </p>
             </Box>
           </>

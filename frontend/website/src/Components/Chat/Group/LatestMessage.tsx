@@ -1,28 +1,29 @@
-import { span } from "@mui/material";
 import { useAuth } from "context/AuthContext";
 import React from "react";
 import { GroupMessageSerializer } from "types/GroupMessageSerializer";
 
 type Props = {
   message: GroupMessageSerializer;
+  style: React.CSSProperties;
 };
 
 const LatestMessage = (props: Props) => {
-  const { message } = props;
+  const { message, style } = props;
   const { userProfile } = useAuth();
   if (message.message.resourcetype === "TextMessage") {
     return (
       <span
         style={{
-          color: "lightgrey",
-          fontSize: "1.3em",
+          ...{
+            color: "#2859e2",
+            fontSize: "1.3em",
+          },
+          ...style,
         }}
       >
-        {userProfile.user.username === message.sender.user.username ? (
-          <span>{`You : ${message.message.text}`}</span>
-        ) : (
-          <span>{`${message.sender.user.username} : ${message.message.text}`}</span>
-        )}
+        {userProfile.user.username === message.sender.user.username
+          ? `You : ${message.message.text}`
+          : `${message.sender.user.username} : ${message.message.text}`}
       </span>
     );
   }
@@ -30,7 +31,11 @@ const LatestMessage = (props: Props) => {
     return (
       <span
         style={{
-          color: "lightgrey",
+          ...{
+            color: "#2859e2",
+            fontSize: "1.3em",
+          },
+          ...style,
         }}
       >
         {userProfile.user.username === message.sender.user.username
@@ -44,7 +49,11 @@ const LatestMessage = (props: Props) => {
     return (
       <span
         style={{
-          color: "lightgrey",
+          ...{
+            color: "#2859e2",
+            fontSize: "1.3em",
+          },
+          ...style,
         }}
       >
         {userProfile.user.username === message.sender.user.username
@@ -57,7 +66,11 @@ const LatestMessage = (props: Props) => {
     return (
       <span
         style={{
-          color: "lightgrey",
+          ...{
+            color: "#2859e2",
+            fontSize: "1.3em",
+          },
+          ...style,
         }}
       >
         {userProfile.user.username === message.sender.user.username

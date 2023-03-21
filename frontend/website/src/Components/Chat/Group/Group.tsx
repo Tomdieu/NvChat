@@ -1,6 +1,5 @@
-import { Avatar, Box, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import React from "react";
 import { GroupSerializer } from "types/GroupSerializer";
 import moment from "moment";
 import LatestMessage from "./LatestMessage";
@@ -84,13 +83,15 @@ const Group = (props: Props) => {
     >
       <img className={classes.groupIcon} src={group?.image} />
       <Box className={classes.groupInfo}>
-        {/* <Typography variant="h6" className={classes.groupName}>
-          {group?.chat_name}
-        </Typography> */}
         <span className={classes.groupName}>{group?.chat_name}</span>
         <Typography variant="caption" className={classes.groupLatestMessage}>
           {group?.latest_message?.message.created_at ? (
-            <LatestMessage message={group?.latest_message} />
+            <LatestMessage
+              message={group?.latest_message}
+              style={{
+                color: groupId === group.id ? "#fff" : "#597ee3",
+              }}
+            />
           ) : (
             <>
               {" "}

@@ -37,6 +37,7 @@ export const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2),
+    position: "relative",
   },
   groupIcon: {
     width: 300,

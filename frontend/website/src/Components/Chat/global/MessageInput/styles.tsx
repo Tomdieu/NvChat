@@ -23,6 +23,7 @@ export const useStyles = makeStyles((theme) => ({
     backgroundColor: "#ddd",
     borderRadius: theme.shape.borderRadius,
     borderBottom: "2px solid #38f0b0",
+    fontFamily: "Fira Code",
     "&:focus-within": {
       borderBottom: "2px solid #227aec",
     },

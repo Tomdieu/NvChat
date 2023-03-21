@@ -1,21 +1,21 @@
 export interface IMessage {
-  id?: null|number;
+  id?: null | number;
   // polymorphic_ctype: number;
   resourcetype: "TextMessage" | "ImageMessage" | "VideoMessage" | "FileMessage";
-  created_at?: Date;
-  updated_at?: Date;
+  created_at?: string;
+  updated_at?: string;
   // type: "text" | "image" | "video"|"file"
 }
 
 export interface TextMessage extends IMessage {
   // type: "text";
-  resourcetype:"TextMessage";
+  resourcetype: "TextMessage";
   text: string;
 }
 
 export interface ImageMessage extends IMessage {
   // type: "image";
-  resourcetype:"ImageMessage";
+  resourcetype: "ImageMessage";
 
   image: string;
   caption?: string;
@@ -23,14 +23,14 @@ export interface ImageMessage extends IMessage {
 
 export interface VideoMessage extends IMessage {
   // type: "video";
-  resourcetype:"VideoMessage";
+  resourcetype: "VideoMessage";
   video: string;
   caption?: string;
 }
 
 export interface FileMessage extends IMessage {
   // type: "file";
-  resourcetype:"FileMessage";
+  resourcetype: "FileMessage";
 
   file: string;
   caption?: string;
