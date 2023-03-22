@@ -32,7 +32,14 @@ type Props = {};
 const GroupSidebar = (props: Props) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
-  const { groups, setGroups, setSelectedGroup, setGroupId } = useGroup();
+  const {
+    groups,
+    setGroups,
+    selectedGroup,
+    groupId,
+    setSelectedGroup,
+    setGroupId,
+  } = useGroup();
   const [groupToDisplay, setGroupToDisplay] = useState<GroupSerializer[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -43,6 +50,18 @@ const GroupSidebar = (props: Props) => {
         .then((data) => {
           setGroups(data.data);
           setLoading(false);
+          if (selectedGroup) {
+            const _groups: GroupSerializer[] = data.data;
+            const _selectedGroup = _groups.find(
+              (group) => group.id === selectedGroup.id
+            );
+            if (_selectedGroup) {
+              setSelectedGroup(_selectedGroup);
+            } else {
+              localStorage.removeItem("selectedGroup");
+              setSelectedGroup(null);
+            }
+          }
         })
         .catch((err) => {
           console.log(err);
@@ -55,43 +74,20 @@ const GroupSidebar = (props: Props) => {
     return (
       (group.latest_message &&
         new Date(group.latest_message.message.created_at)) ||
-      new Date("10/10/2000")
+      new Date(group.created_on)
     );
   };
 
-  // useEffect(() => {
-  //   /**
-  //    * Here is will sort all the groups with respect to the last message
-  //    * and for that i wll use the insertion sort algorithm
-  //    *
-  //    */
+  useEffect(() => {
+    setGroupToDisplay(
+      groups.sort((a, b) => {
+        var keyA = getLastestMessage(a);
+        var keyB = getLastestMessage(b);
 
-  //   let _groups = groups.map((g) => g);
-
-  //   for (let i = 1; i < _groups.length; i++) {
-  //     let _group = _groups[i];
-
-  //     // let j = i - 1;
-  //     // while (
-  //     //   getLastestMessage(_group) < getLastestMessage(_groups[j]) &&
-  //     //   j >= 0
-  //     // ) {
-  //     //   _groups[j + 1] = _groups[j];
-  //     //   console.log("====================================");
-  //     //   console.log(
-  //     //     getLastestMessage(_groups[i]),
-  //     //     getLastestMessage(_groups[j])
-  //     //   );
-  //     //   console.log("====================================");
-  //     //   j -= 1;
-  //     // }
-  //     // _groups[j + 1] = _group;
-  //   }
-
-  //   console.log("====================================");
-  //   console.log({ _groups });
-  //   console.log("====================================");
-  // }, [groups]);
+        return keyB.getTime() - keyA.getTime();
+      })
+    );
+  }, [groups, selectedGroup, groupId]);
 
   const handleClose = () => {
     setOpen(false);
@@ -212,7 +208,7 @@ const GroupSidebar = (props: Props) => {
               </center>
             ) : (
               <>
-                {groups?.map((group, index) => (
+                {groupToDisplay?.map((group, index) => (
                   <Group
                     group={group}
                     key={index}
