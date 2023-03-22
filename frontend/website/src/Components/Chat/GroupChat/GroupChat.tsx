@@ -88,9 +88,6 @@ const GroupChatBox = (props: Props) => {
   }, [socket]);
 
   const addNewMessage = (message: GroupMessageSerializer) => {
-    console.log("====================================");
-    console.log("Adding Message : ");
-    console.log("====================================");
     const filteredGroupChat = groups.find((group) => group.id === groupId);
 
     filteredGroupChat.latest_message = message;
@@ -104,9 +101,6 @@ const GroupChatBox = (props: Props) => {
     otherGroups.push(filteredGroupChat);
 
     setGroups(otherGroups);
-    console.log("====================================");
-    console.log("End");
-    console.log("====================================");
   };
 
   const handleChange = (
