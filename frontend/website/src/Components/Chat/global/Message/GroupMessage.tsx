@@ -10,10 +10,9 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import {
-  Check,
+  ArrowDropDown,
   Delete,
   Edit,
-  MoreHoriz,
   RemoveRedEye,
   ReplySharp,
 } from "@mui/icons-material";
@@ -27,6 +26,7 @@ import VideoMessage from "./VideoMessage";
 import { GroupMessageSerializer } from "types/GroupMessageSerializer";
 import AudioMessage from "./AudioMessage";
 import moment from "moment";
+import ParentMessage from "./ParentMessage";
 
 export const useStyles = makeStyles((theme) => ({
   messageWrapper: {
@@ -42,10 +42,14 @@ export const useStyles = makeStyles((theme) => ({
 type Props = {
   isMine: Boolean;
   groupMessage?: GroupMessageSerializer;
+  onClick?: (
+    e: React.MouseEvent<HTMLLIElement>,
+    message: GroupMessageSerializer
+  ) => void;
 };
 
 const GroupMessage = (props: Props) => {
-  const { isMine = false, groupMessage } = props;
+  const { isMine = false, groupMessage, onClick } = props;
 
   const classes = useStyles({ isMine });
 
@@ -85,7 +89,16 @@ const GroupMessage = (props: Props) => {
       justifyContent={isMine ? "flex-end" : "flex-start"}
     >
       <Avatar sx={{ display: isMine ? "none" : "auto" }} />
-      <Box component={Paper} sx={{ p: 0.5, maxWidth: "50%" }}>
+      <Box
+        component={Paper}
+        sx={{
+          p: 0.5,
+          maxWidth: "50%",
+          display: "flex",
+          flexDirection: "column",
+          minWidth: 150,
+        }}
+      >
         <div
           style={{
             borderBottom: "1px solid #ccc",
@@ -94,8 +107,13 @@ const GroupMessage = (props: Props) => {
             justifyContent: "space-between",
           }}
         >
-          <span style={{ fontWeight: "600", cursor: "pointer" }}>
-            ~ {groupMessage.sender.user.username}
+          <span
+            style={{
+              fontWeight: "600",
+              cursor: "pointer",
+            }}
+          >
+            {isMine ? " " : <>~ {groupMessage.sender.user.username}</>}
           </span>
           <IconButton
             id="message-menu"
@@ -104,9 +122,17 @@ const GroupMessage = (props: Props) => {
             aria-haspopup={"true"}
             aria-expanded={open ? "true" : undefined}
           >
-            <MoreHoriz />
+            {/* <MoreHoriz /> */}
+            <ArrowDropDown />
+            {/* <VerifiedUserRounded /> */}
           </IconButton>
         </div>
+        {groupMessage.parent_message && (
+          <ParentMessage
+            message={groupMessage.parent_message}
+            isMine={isMine}
+          />
+        )}
         {isText && <TextMessage text={groupMessage.message.text} />}
         {isImage && (
           <PhotoMessage
@@ -128,7 +154,9 @@ const GroupMessage = (props: Props) => {
             alignItems: "center",
           }}
         >
-          <span>{moment(groupMessage.timestamp).format("HH:MM A")}</span>
+          <span>
+            {moment(groupMessage.message.created_at).format("HH:MM A")}
+          </span>
         </div>
         <Menu
           id="message-menu"
@@ -137,7 +165,12 @@ const GroupMessage = (props: Props) => {
           MenuListProps={{ "aria-labelledby": "message-menu" }}
           onClose={handleClose}
         >
-          <MenuItem onClick={handleClose}>
+          <MenuItem
+            onClick={(e) => {
+              onClick(e, groupMessage);
+              handleClose();
+            }}
+          >
             <Box
               display="flex"
               // justifyContent={"flex-end"}
