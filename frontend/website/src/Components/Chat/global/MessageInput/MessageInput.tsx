@@ -47,9 +47,6 @@ const MessageInput = (props: Props) => {
     onCancleReplyMsg,
     ...other
   } = props;
-  console.log("====================================");
-  console.log({ msgToReply });
-  console.log("====================================");
   const classes = useStyles();
   return (
     <Box className={classes.messageInput}>
@@ -64,19 +61,18 @@ const MessageInput = (props: Props) => {
             alignItems={"center"}
             justifyContent={"space-between"}
             sx={{
-              bgcolor: "#f5f5f5",
+              bgcolor: "#ffff",
               pt: 1,
               pb: 1,
               pl: 1,
-
               borderLeft: "5px solid #2a63df",
               borderRadius: "2px",
             }}
           >
-            <Box>
-              <Typography>
+            <Box flex={1}>
+              {/* <Typography>
                 Message To Reply With Id : {msgToReply.id}
-              </Typography>
+              </Typography> */}
               <GroupMessageReply message={msgToReply} />
             </Box>
             <IconButton onClick={onCancleReplyMsg}>
