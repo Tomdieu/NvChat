@@ -81,11 +81,17 @@ class ChatGroupViewSet(
         serializer = self.get_serializer_class()(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.validated_data["created_by"] = self.request.user.profile
-        instance = serializer.save()
-        instance.participant.add(self.request.user.profile)
+        instance: ChatGroup = serializer.save()
+        instance.members.add(self.request.user.profile)
+        instance.set_member_as_admin(self.request.user.profile)
 
         return Response(
-            {"data": ChatGroupSerializer(instance=instance).data},
+            {
+                "data": ChatGroupSerializer(
+                    instance=ChatGroup.objects.get(id=instance.id),
+                    context={"request": request},
+                ).data
+            },
             status=status.HTTP_201_CREATED,
         )
 
@@ -264,6 +270,9 @@ class DisussionMessageApiView(APIView):
     def post(self, request, *args, **kwargs):
         conversation = Conversation.objects.get(id=kwargs["conversation_id"])
 
+        request_data = request.data
+        parent_message_id = request_data.get("parent_message_id", None)
+
         serializer = IMessagePolymorphicSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
@@ -273,6 +282,10 @@ class DisussionMessageApiView(APIView):
         newMessage["conversation"] = conversation
         newMessage["sender"] = request.user.profile
         newMessage["parent_message"] = None
+
+        parent_message = Message.objects.filter(id=parent_message_id)
+        if parent_message.exists():
+            newMessage["parent_message"] = parent_message.first()
 
         msg = Message.objects.create(**newMessage)
 
@@ -292,7 +305,10 @@ class GroupMessageApiView(APIView):
     def post(self, request, *args, **kwargs):
         chat = ChatGroup.objects.get(id=kwargs["chat_group_id"])
 
-        serializer = IMessagePolymorphicSerializer(data=request.data)
+        request_data = request.data
+        parent_message_id = request_data.get("parent_message_id", None)
+
+        serializer = IMessagePolymorphicSerializer(data=request_data)
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
 
@@ -301,6 +317,10 @@ class GroupMessageApiView(APIView):
         newMessage["chat"] = chat
         newMessage["sender"] = request.user.profile
         newMessage["parent_message"] = None
+
+        parent_message = GroupMessage.objects.filter(id=parent_message_id)
+        if parent_message.exists():
+            newMessage["parent_message"] = parent_message.first()
 
         msg = GroupMessage.objects.create(**newMessage)
 
