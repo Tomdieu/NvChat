@@ -34,8 +34,13 @@ const Discussion = (props: Props) => {
           {disc.title}
         </span>
         {disc.latest_message ? (
-          <Typography>
-            <ChatLatestMessage message={disc.latest_message} />
+          <Typography noWrap maxWidth={"100%"} textOverflow={"ellipsis"}>
+            <ChatLatestMessage
+              message={disc.latest_message}
+              style={{
+                color: chatId === disc.id ? "#fff" : "#597ee3",
+              }}
+            />
           </Typography>
         ) : (
           <span
@@ -49,7 +54,13 @@ const Discussion = (props: Props) => {
       </Box>
       {disc.latest_message && (
         <Box>
-          <span>{moment(disc.latest_message.timestamp).format("HH:MM a")}</span>
+          <span
+            style={{
+              color: chatId === disc.id ? "#fff" : "#597ee3",
+            }}
+          >
+            {moment(disc.latest_message.timestamp).format("HH:MM a")}
+          </span>
         </Box>
       )}
     </Box>
