@@ -6,7 +6,6 @@ import {
   MenuItem,
   InputBase,
   ButtonGroup,
-  Divider,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useStyles } from "./styles";
@@ -17,9 +16,6 @@ import {
   Close,
   MoreVert,
   Save,
-  SaveAlt,
-  Update,
-  UpdateRounded,
 } from "@mui/icons-material";
 
 import { BsDot } from "react-icons/bs";
