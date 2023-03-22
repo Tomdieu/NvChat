@@ -39,6 +39,7 @@ const ActiveDiscussion = () => {
     setMessage(e.target.value);
   };
   useEffect(() => {
+    setMessage("");
     const ws = new WebSocket(
       ApiService.wsEndPoint + `ws/discussion_chat/${chatId}/?token=${userToken}`
     );
@@ -46,7 +47,7 @@ const ActiveDiscussion = () => {
     return () => {
       ws.close();
     };
-  }, []);
+  }, [chatId]);
 
   useEffect(() => {
     if (socket) {
