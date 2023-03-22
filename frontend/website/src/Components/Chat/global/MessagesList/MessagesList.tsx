@@ -19,7 +19,22 @@ const MessagesList = (props: Props) => {
   const classes = useStyles();
   const { messages, ref, type, onMsgClick } = props;
 
+  const [_messages, setMessages] = useState<
+    GroupMessageSerializer[] | Message[]
+  >([]);
+
   const { userProfile } = useAuth();
+
+  // useEffect(() => {
+  //   // const uniqueMsg = messages.reduce((acc, current) => {
+  //   //   if (!acc[current.id]) {
+  //   //     acc[current.id] = current;
+  //   //   }
+  //   //   return acc;
+  //   // }, {});
+  //   // setMessages(Object.values(uniqueMsg))
+
+  // }, [messages]);
 
   const getSenderName = (message: GroupMessageSerializer | Message): string => {
     // console.log(message.sender.user);
