@@ -11,8 +11,11 @@ import ApiService from "utils/ApiService";
 import { TextMessage } from "types/AbstractMessage";
 import { GroupMessageSerializer } from "types/GroupMessageSerializer";
 import { useNavigate } from "react-router-dom";
+import { Message } from "types/Message";
 
-type Props = {};
+type Props = {
+  groupId: number;
+};
 
 type Typing = {
   sender: string;
@@ -20,31 +23,33 @@ type Typing = {
 };
 
 const GroupChatBox = (props: Props) => {
+  const { groupId } = props;
   const [message, setMessage] = useState<string | null>("");
-  const [replyMessage, setReplyMessage] = useState(null);
+  const [replyMessage, setReplyMessage] = useState<
+    GroupMessageSerializer | Message
+  >(null);
   const [typing, setTyping] = useState<Typing | null>(null);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>();
 
-  const msgRef = useRef<HTMLDivElement>(null);
+  // const msgRef = useRef<HTMLDivElement>(null);
   const { isRightOpen, toggle } = useGroup();
 
-  const { selectedGroup, groupId, setGroups, groups, setSelectedGroup } =
-    useGroup();
+  const { selectedGroup, setGroups, groups, setSelectedGroup } = useGroup();
   const { userToken, userProfile, showBar } = useAuth();
 
   const [socket, setSocket] = useState<WebSocket>(null);
 
   useEffect(() => {
+    setMessage("");
     const ws = new WebSocket(
-      ApiService.wsEndPoint +
-        `ws/group_chat/${selectedGroup.id}/?token=${userToken}`
+      ApiService.wsEndPoint + `ws/group_chat/${groupId}/?token=${userToken}`
     );
     setSocket(ws);
     return () => {
       ws.close();
     };
-  }, []);
+  }, [groupId]);
 
   const getUsername = () => {
     return userProfile.user.username;
@@ -53,11 +58,10 @@ const GroupChatBox = (props: Props) => {
   useEffect(() => {
     if (socket) {
       socket.onopen = (e) => {
-        console.log("WebSocket Established", { e });
+        console.log("WebSocket Established");
       };
       socket.onmessage = (message) => {
         const messageData = JSON.parse(message.data);
-        console.log(messageData);
         if (messageData.typing === true) {
           if (getUsername() !== messageData.sender) {
             setTyping({
@@ -70,46 +74,39 @@ const GroupChatBox = (props: Props) => {
             setTyping(null);
           }
         } else if (messageData.updated && messageData.typing === undefined) {
-          console.log(messageData);
+          // console.log(messageData);
         } else if (messageData.typing === undefined) {
           addNewMessage(messageData.message);
         }
       };
 
       socket.onclose = () => {
-        console.log("WebSocket Client Disconnected");
+        console.log("Connection Close");
         showBar("Websocket Disconnected", <ErrorRounded />, "error");
       };
-      socket.onerror = (e) => {};
     }
   }, [socket]);
 
   const addNewMessage = (message: GroupMessageSerializer) => {
-    const filteredGroupChat = groups.find(
-      (group) => Number(group?.id) === Number(groupId)
-    );
-    // settings the new message as latest message and adding it the messages of the group
+    console.log("====================================");
+    console.log("Adding Message : ");
+    console.log("====================================");
+    const filteredGroupChat = groups.find((group) => group.id === groupId);
+
     filteredGroupChat.latest_message = message;
     filteredGroupChat.messages.push(message);
 
     const actualMessages = selectedGroup.messages;
     actualMessages.push(message);
 
-    // setSelectedGroup({
-    //   ...selectedGroup,
-    //   latest_message: message,
-    //   messages: actualMessages,
-    // });
-
-    // updating the group list
-
-    const otherGroups = groups.filter(
-      (group) => Number(group?.id) !== Number(groupId)
-    );
+    const otherGroups = groups.filter((group) => group.id !== groupId);
 
     otherGroups.push(filteredGroupChat);
 
     setGroups(otherGroups);
+    console.log("====================================");
+    console.log("End");
+    console.log("====================================");
   };
 
   const handleChange = (
@@ -127,6 +124,9 @@ const GroupChatBox = (props: Props) => {
       const formData = new FormData();
       formData.append("text", message);
       formData.append("resourcetype", "TextMessage");
+      if (replyMessage) {
+        formData.append("parent_message_id", replyMessage.id.toString());
+      }
       ApiService.sendGroupMessage(formData, groupId, userToken)
         .then((res) => res.json())
         .then((data) => {
@@ -184,6 +184,9 @@ const GroupChatBox = (props: Props) => {
 
         formData.append("resourcetype", "FileMessage");
       }
+      if (replyMessage) {
+        formData.append("parent_message_id", replyMessage.id.toString());
+      }
       setMessage("");
 
       ApiService.sendGroupMessage(formData, groupId, userToken)
@@ -212,6 +215,9 @@ const GroupChatBox = (props: Props) => {
   ) => {
     socket.send(JSON.stringify({ typing: false, message: `` }));
   };
+  const getUniqueMessages = (data: any[], key: any) => {
+    return [...new Map(data.map((x) => [key(x), x])).values()];
+  };
   return (
     <Grid
       item
@@ -233,7 +239,7 @@ const GroupChatBox = (props: Props) => {
         onClick={toggle}
       />
       <MessagesList
-        messages={selectedGroup.messages}
+        messages={getUniqueMessages(selectedGroup.messages, (msg) => msg.id)}
         type="GROUP"
         onMsgClick={(message) => setReplyMessage(message)}
       />
@@ -321,7 +327,7 @@ const GroupChat = () => {
   }, []);
 
   if (selectedGroup) {
-    return <GroupChatBox />;
+    return <GroupChatBox groupId={selectedGroup.id} />;
   } else {
     return <EmptyPage />;
   }
