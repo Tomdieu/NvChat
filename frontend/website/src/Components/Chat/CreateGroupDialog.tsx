@@ -19,6 +19,8 @@ import {
   Save,
 } from "@mui/icons-material";
 import ApiService from "utils/ApiService";
+import { useAuth } from "context/AuthContext";
+import { useGroup } from "context/GroupContext";
 
 type Props = {
   open: boolean;
@@ -29,10 +31,15 @@ type Props = {
 const CreateGroupDialog = (props: Props) => {
   const { open, onClose } = props;
   const [name, setName] = useState("");
+  const [groupImage, setGroupImage] = useState<File>(null);
 
   const [loading, setLoading] = useState(false);
 
-  const iconRef = useRef();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const iconRef = useRef<HTMLImageElement>(null);
+
+  const { userToken } = useAuth();
+  const { setGroups } = useGroup();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -43,12 +50,21 @@ const CreateGroupDialog = (props: Props) => {
   const handleGroupCreate = () => {
     setLoading(true);
 
-    ApiService.createGroup(JSON.stringify({ chat_name: name }), "")
+    const formData = new FormData();
+
+    formData.append("chat_name", name);
+    if (groupImage) {
+      formData.append("image", groupImage);
+    }
+
+    ApiService.createGroup(formData, userToken)
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
         if (data.detail) {
           alert(data.detail);
+        } else {
+          setGroups((groups) => [...groups, data.data]);
         }
       })
       .catch((err) => {
@@ -57,8 +73,19 @@ const CreateGroupDialog = (props: Props) => {
       })
       .finally(() => {
         setLoading(false);
+        onClose();
       });
-    // onClose();
+  };
+
+  const handleSelectedFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files[0];
+    setGroupImage(file);
+    const fileReader = new FileReader();
+    fileReader.onload = (e) => {
+      const dataUrl = fileReader.result;
+      iconRef.current.src = dataUrl.toString();
+    };
+    fileReader.readAsDataURL(file);
   };
 
   return (
@@ -76,8 +103,18 @@ const CreateGroupDialog = (props: Props) => {
           Chat Group
         </Typography>
         <Box display={"flex"} alignItems={"center"} gap={1}>
-          <Box sx={{ cursor: "pointer", position: "relative" }}>
-            <Avatar ref={iconRef} />
+          <Box
+            sx={{ cursor: "pointer", position: "relative" }}
+            onClick={() => fileRef.current.click()}
+          >
+            <img
+              ref={iconRef}
+              src="src\assets\group-image.png"
+              alt=""
+              width={50}
+              height={50}
+              style={{ borderRadius: "50%", border: "1px solid grey" }}
+            />
           </Box>
           <InputBase
             // label="Group Name"
@@ -144,7 +181,8 @@ const CreateGroupDialog = (props: Props) => {
           style={{ display: "none" }}
           type="file"
           accept="image/*"
-          ref={iconRef}
+          ref={fileRef}
+          onChange={handleSelectedFile}
         />
       </Box>
     </Dialog>
