@@ -41,6 +41,8 @@ const useStyles = makeStyles((theme) => ({
   groupInfo: {
     flex: 1,
     paddingLeft: theme.spacing(1),
+    display: "flex",
+    flexDirection: "column",
   },
   groupName: {
     fontWeight: "bold",
@@ -84,7 +86,13 @@ const Group = (props: Props) => {
       <img className={classes.groupIcon} src={group?.image} />
       <Box className={classes.groupInfo}>
         <span className={classes.groupName}>{group?.chat_name}</span>
-        <Typography variant="caption" className={classes.groupLatestMessage}>
+        <Typography
+          variant="caption"
+          className={classes.groupLatestMessage}
+          noWrap
+          maxWidth={"50%"}
+          textOverflow={"ellipsis"}
+        >
           {group?.latest_message?.message.created_at ? (
             <LatestMessage
               message={group?.latest_message}
@@ -109,7 +117,13 @@ const Group = (props: Props) => {
         </Typography>
       </Box>
       <Box className={classes.groupDateInfo}>
-        {group?.latest_message?.message.created_at && displayDate}
+        <span
+          style={{
+            color: groupId === group.id ? "#fff" : "#597ee3",
+          }}
+        >
+          {group?.latest_message?.message.created_at && displayDate}
+        </span>
       </Box>
     </Box>
   );
