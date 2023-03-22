@@ -280,7 +280,7 @@ class ChatGroupMemberCreateSerializer(serializers.ModelSerializer):
 
 
 class ChatGroupCreateSerializer(serializers.ModelSerializer):
-    # participant = UserProfileSerializer(many=True)
+    # members = UserProfileSerializer(many=True, read_only=True)
 
     class Meta:
         model = ChatGroup
@@ -291,11 +291,18 @@ class ChatGroupCreateSerializer(serializers.ModelSerializer):
 class GroupMessageSerializer(serializers.ModelSerializer):
     message = IMessagePolymorphicSerializer(read_only=True)
     sender = UserProfileSerializer(read_only=True)
+    parent_message = serializers.SerializerMethodField()
 
     # message =
     class Meta:
         model = GroupMessage
         fields = "__all__"
+
+    def get_parent_message(self, obj: GroupMessage):
+        if obj.parent_message is None:
+            return None
+        serializer = self.__class__(obj.parent_message, context=self.context)
+        return serializer.data
 
 
 class GroupMessageViewSerializer(serializers.ModelSerializer):
@@ -325,7 +332,7 @@ class GroupMessageListSerializer(serializers.ModelSerializer):
     def get_parent_message(self, obj: GroupMessage):
         if obj.parent_message is None:
             return None
-        serializer = self.__class__(obj.parent_message)
+        serializer = self.__class__(obj.parent_message, context=self.context)
         return serializer.data
         # return GroupMessageSerializer(obj.parent_message).data
 
