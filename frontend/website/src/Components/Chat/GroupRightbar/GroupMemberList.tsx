@@ -23,7 +23,7 @@ type Props = {};
 
 const GroupMemberList = (props: Props) => {
   const classes = useStyles();
-  const { selectedGroup, setGroups, groups, setSelectedGroup } = useGroup();
+  const { selectedGroup, setGroups, setSelectedGroup } = useGroup();
   const { userProfile } = useAuth();
   const [members, setMembers] = useState<GroupMember[]>([]);
   const [name, setName] = useState<string>("");
@@ -50,7 +50,7 @@ const GroupMemberList = (props: Props) => {
   useEffect(() => {
     if (name) {
       setMembers(
-        selectedGroup?.group_members.filter((m) =>
+        selectedGroup?.group_members?.filter((m) =>
           m.user.user.username.includes(name)
         )
       );
