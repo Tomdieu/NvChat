@@ -35,10 +35,10 @@ const GroupAddMember = (props: Props) => {
   const { selectedGroup, setSelectedGroup, groups, setGroups } = useGroup();
 
   const isGroupMember = (profile: UserProfile) => {
-    const groupMembers = selectedGroup.group_members.map(
+    const groupMembers = selectedGroup?.group_members?.map(
       (member) => member.user
     );
-    const member = groupMembers.find((member) => member.id === profile.id);
+    const member = groupMembers?.find((member) => member.id === profile.id);
     if (member) {
       return true;
     }
