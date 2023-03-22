@@ -99,7 +99,12 @@ class ChatGroup(models.Model):
     members = models.ManyToManyField(
         UserProfile, through="GroupMember", blank=True, related_name="group_members"
     )
-    image = models.ImageField(upload_to="group_image/", blank=True, null=True)
+    image = models.ImageField(
+        upload_to="group_image/",
+        blank=True,
+        null=True,
+        default="group_image/group-image.png",
+    )
 
     description = models.TextField(blank=True, null=True, default="")
 
@@ -117,11 +122,9 @@ class ChatGroup(models.Model):
     def add_member(self, user: UserProfile):
         member = self.group_members.filter(user=user)
         if not member.exists():
-            if not member in self.group_members.all():
-                member = GroupMember.objects.create(
-                    user=user, group=self, is_active=True
-                )
-                self.group_members.add(member)
+            # if not member in self.group_members.all():
+            member = GroupMember.objects.create(user=user, group=self, is_active=True)
+            self.group_members.add(member)
 
     def remove_member(self, user: UserProfile):
         member = self.group_members.filter(user=user)
@@ -138,6 +141,7 @@ class ChatGroup(models.Model):
         if member.exists():
             _member = member.get(user=user)
             _member.is_manager = True
+            _member.is_active = True
             _member.save()
 
     class Meta:
@@ -231,14 +235,15 @@ class Conversation(models.Model):
 
     def clean_fields(self, exclude=None) -> None:
         super().clean_fields(exclude)
-        if len(self.participants.all()) > 2:
-            raise ValidationError(
-                {
-                    "participants": _(
-                        "Sorry this single chat conversation can only accept 2 people"
-                    )
-                }
-            )
+        if self.id:
+            if len(self.participants.all()) > 2:
+                raise ValidationError(
+                    {
+                        "participants": _(
+                            "Sorry this single chat conversation can only accept 2 people"
+                        )
+                    }
+                )
 
 
 class Message(models.Model):
