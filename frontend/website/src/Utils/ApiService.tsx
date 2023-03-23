@@ -174,13 +174,13 @@ export default class ApiService {
     return res;
   }
 
-  static async createGroup(groupData: any, token: string) {
+  static async createGroup(groupData: FormData, token: string) {
     const url = this.endPoint + "chat/groups/";
     const res = await fetch(url, {
-      body: JSON.stringify(groupData),
+      body: groupData,
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        // "Content-Type": "application/json",
         Authorization: `token ${token}`,
       },
     });
