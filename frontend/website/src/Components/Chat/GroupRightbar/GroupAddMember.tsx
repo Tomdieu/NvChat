@@ -256,4 +256,4 @@ const GroupAddMember = (props: Props) => {
   );
 };
 
-export default GroupAddMember;
+export default React.memo(GroupAddMember);

@@ -227,4 +227,4 @@ const GroupSidebar = (props: Props) => {
   );
 };
 
-export default GroupSidebar;
+export default React.memo(GroupSidebar);

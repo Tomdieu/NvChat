@@ -132,4 +132,4 @@ const ChatSidebar = (props: Props) => {
   );
 };
 
-export default ChatSidebar;
+export default React.memo(ChatSidebar);

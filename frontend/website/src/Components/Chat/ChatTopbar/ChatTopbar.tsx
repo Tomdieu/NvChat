@@ -1,9 +1,8 @@
 import { Avatar, Box, BoxProps, IconButton, Typography } from "@mui/material";
 
 import { useStyles } from "./styles";
-import { Call, MoreVert } from "@mui/icons-material";
-import { GroupMember } from "types/GroupMember";
-import { useAuth } from "context/AuthContext";
+import { MoreVert } from "@mui/icons-material";
+import React, { useMemo } from "react";
 
 type Typing = {
   sender: string;
@@ -19,7 +18,7 @@ type Props = {
 const ChatTopbar = (props: Props) => {
   const classes = useStyles();
   const { name, typing, icon, onClick, ...other } = props;
-  const isTyping = Boolean(typing);
+  const isTyping = useMemo(() => Boolean(typing), [typing]);
   return (
     <Box className={classes.topbar} {...other}>
       <Box className={classes.topbarWrapper}>
@@ -57,4 +56,4 @@ const ChatTopbar = (props: Props) => {
   );
 };
 
-export default ChatTopbar;
+export default React.memo(ChatTopbar);

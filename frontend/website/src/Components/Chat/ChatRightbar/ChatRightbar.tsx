@@ -13,4 +13,4 @@ const ChatRightbar = (props: Props) => {
   );
 };
 
-export default ChatRightbar;
+export default React.memo(ChatRightbar);

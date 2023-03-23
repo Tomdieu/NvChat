@@ -72,4 +72,4 @@ const MessagesList = (props: Props) => {
   );
 };
 
-export default MessagesList;
+export default React.memo(MessagesList);

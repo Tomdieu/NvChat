@@ -4,6 +4,7 @@ import { GroupSerializer } from "types/GroupSerializer";
 import moment from "moment";
 import LatestMessage from "./LatestMessage";
 import { useGroup } from "context/GroupContext";
+import React from "react";
 
 const useStyles = makeStyles((theme) => ({
   groupItem: {
@@ -130,4 +131,4 @@ const Group = (props: Props) => {
   );
 };
 
-export default Group;
+export default React.memo(Group);

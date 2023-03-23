@@ -1,5 +1,6 @@
 import { Typography } from "@mui/material";
 import { useAuth } from "context/AuthContext";
+import React from "react";
 import { Message } from "types/Message";
 
 type Props = {
@@ -80,4 +81,4 @@ const ChatLatestMessage = (props: Props) => {
   }
 };
 
-export default ChatLatestMessage;
+export default React.memo(ChatLatestMessage);

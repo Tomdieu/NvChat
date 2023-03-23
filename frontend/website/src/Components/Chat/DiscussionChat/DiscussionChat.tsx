@@ -227,4 +227,4 @@ const DiscussionChat = (props: Props) => {
   return <NoActiveChat />;
 };
 
-export default DiscussionChat;
+export default React.memo(DiscussionChat);

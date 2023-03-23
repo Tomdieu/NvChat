@@ -26,7 +26,9 @@ type Props = {
 export const GroupContextProvider = (props: Props) => {
   const { children } = props;
   const [groups, setGroups] = useState<GroupSerializer[]>([]);
-  const [selectedGroup, setSelectedGroup] = useState<GroupSerializer>(null);
+  const [selectedGroup, setSelectedGroup] = useState<GroupSerializer | null>(
+    null
+  );
   const [isRightOpen, setIsRightOpen] = useState(false);
   const [groupId, setGroupId] = useState<number | null>(null);
 

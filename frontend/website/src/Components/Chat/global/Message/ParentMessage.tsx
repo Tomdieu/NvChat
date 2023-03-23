@@ -99,4 +99,4 @@ const ParentMessage = (props: Props) => {
   );
 };
 
-export default ParentMessage;
+export default React.memo(ParentMessage);

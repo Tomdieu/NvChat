@@ -256,4 +256,4 @@ const GroupMessage = (props: Props) => {
   );
 };
 
-export default GroupMessage;
+export default React.memo(GroupMessage);

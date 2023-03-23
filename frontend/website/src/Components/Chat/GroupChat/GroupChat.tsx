@@ -1,5 +1,5 @@
 import { Box, Grid, IconButton, Typography } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
 import TopGroupBar from "../TopGroupBar/TopGroupBar";
 import MessageInput from "../global/MessageInput/MessageInput";
 import MessagesList from "../global/MessagesList/MessagesList";
@@ -40,7 +40,7 @@ const GroupChatBox = (props: Props) => {
 
   const [socket, setSocket] = useState<WebSocket>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setMessage("");
     const ws = new WebSocket(
       ApiService.wsEndPoint + `ws/group_chat/${groupId}/?token=${userToken}`
@@ -51,26 +51,26 @@ const GroupChatBox = (props: Props) => {
     };
   }, [groupId]);
 
-  const getUsername = () => {
+  const username = React.useMemo(() => {
     return userProfile.user.username;
-  };
+  }, []);
 
-  useEffect(() => {
+  React.useLayoutEffect(() => {
     if (socket) {
       socket.onopen = (e) => {
-        console.log("WebSocket Established");
+        // console.log("WebSocket Established");
       };
       socket.onmessage = (message) => {
         const messageData = JSON.parse(message.data);
         if (messageData.typing === true) {
-          if (getUsername() !== messageData.sender) {
+          if (username !== messageData.sender) {
             setTyping({
               message: messageData.message,
               sender: messageData.sender,
             });
           }
         } else if (messageData.typing === false) {
-          if (getUsername() !== messageData.sender) {
+          if (username !== messageData.sender) {
             setTyping(null);
           }
         } else if (messageData.updated && messageData.typing === undefined) {
@@ -79,29 +79,27 @@ const GroupChatBox = (props: Props) => {
           addNewMessage(messageData.message);
         }
       };
-
-      socket.onclose = () => {
-        console.log("Connection Close");
-        showBar("Websocket Disconnected", <ErrorRounded />, "error");
-      };
     }
   }, [socket]);
 
-  const addNewMessage = (message: GroupMessageSerializer) => {
-    const filteredGroupChat = groups.find((group) => group.id === groupId);
+  const addNewMessage = React.useCallback(
+    (message: GroupMessageSerializer) => {
+      const filteredGroupChat = groups.find((group) => group.id === groupId);
 
-    filteredGroupChat.latest_message = message;
-    filteredGroupChat.messages.push(message);
+      filteredGroupChat.latest_message = message;
+      filteredGroupChat.messages.push(message);
 
-    const actualMessages = selectedGroup.messages;
-    actualMessages.push(message);
+      const actualMessages = selectedGroup.messages;
+      actualMessages.push(message);
 
-    const otherGroups = groups.filter((group) => group.id !== groupId);
+      const otherGroups = groups.filter((group) => group.id !== groupId);
 
-    otherGroups.push(filteredGroupChat);
+      otherGroups.push(filteredGroupChat);
 
-    setGroups(otherGroups);
-  };
+      setGroups(otherGroups);
+    },
+    [selectedGroup]
+  );
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -111,10 +109,6 @@ const GroupChatBox = (props: Props) => {
 
   const handleSend = () => {
     if (message) {
-      // const textMessage: TextMessage = {
-      //   text: message,
-      //   resourcetype: "TextMessage",
-      // };
       const formData = new FormData();
       formData.append("text", message);
       formData.append("resourcetype", "TextMessage");
@@ -204,7 +198,7 @@ const GroupChatBox = (props: Props) => {
     e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     socket.send(
-      JSON.stringify({ typing: true, message: `${getUsername()} is typing` })
+      JSON.stringify({ typing: true, message: `${username} is typing` })
     );
   };
   const handleKeyup = (
@@ -236,7 +230,10 @@ const GroupChatBox = (props: Props) => {
         onClick={toggle}
       />
       <MessagesList
-        messages={getUniqueMessages(selectedGroup.messages, (msg) => msg.id)}
+        messages={getUniqueMessages(
+          selectedGroup.messages,
+          (msg: GroupMessageSerializer) => msg.id
+        )}
         type="GROUP"
         onMsgClick={(message) => setReplyMessage(message)}
       />
@@ -330,4 +327,4 @@ const GroupChat = () => {
   }
 };
 
-export default GroupChat;
+export default React.memo(GroupChat);

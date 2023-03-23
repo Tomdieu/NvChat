@@ -73,4 +73,4 @@ const Discussion = (props: Props) => {
   );
 };
 
-export default Discussion;
+export default React.memo(Discussion);

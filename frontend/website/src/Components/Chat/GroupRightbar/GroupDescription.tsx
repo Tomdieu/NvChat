@@ -133,4 +133,4 @@ const GroupDescription = (props: Props) => {
   );
 };
 
-export default GroupDescription;
+export default React.memo(GroupDescription);

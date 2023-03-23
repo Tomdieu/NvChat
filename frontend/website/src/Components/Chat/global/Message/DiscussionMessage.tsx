@@ -243,4 +243,4 @@ const DiscussionMessage = (props: Props) => {
   );
 };
 
-export default DiscussionMessage;
+export default React.memo(DiscussionMessage);
