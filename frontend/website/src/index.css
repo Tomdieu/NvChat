@@ -60,10 +60,6 @@ h1 {
   background-color: rgb(184, 182, 182),
 }
 
-/* ::selection {
-  background-color: transparent;
-} */
-
 
 * {
   transition: all .3s ease;

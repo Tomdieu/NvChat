@@ -15,7 +15,7 @@ const ParentMessage = (props: Props) => {
   return (
     <Box
       sx={{
-        borderRadius: 3,
+        borderRadius: 2,
         borderLeft: "3px solid #1f72ef",
         opacity: ".8",
         backgroundColor: "#d8d5d5",

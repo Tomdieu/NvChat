@@ -124,6 +124,7 @@ const GroupChatBox = (props: Props) => {
       ApiService.sendGroupMessage(formData, groupId, userToken)
         .then((res) => res.json())
         .then((data) => {
+          setReplyMessage(null);
           socket.send(JSON.stringify({ message: data.data }));
         })
         .catch((err) => console.log(err));
@@ -186,6 +187,8 @@ const GroupChatBox = (props: Props) => {
       ApiService.sendGroupMessage(formData, groupId, userToken)
         .then((res) => res.json())
         .then((data) => {
+          setReplyMessage(null);
+
           socket.send(JSON.stringify({ message: data.data }));
         })
         .catch((err) => console.log(err));

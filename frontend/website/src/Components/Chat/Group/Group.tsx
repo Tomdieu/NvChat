@@ -43,6 +43,7 @@ const useStyles = makeStyles((theme) => ({
     paddingLeft: theme.spacing(1),
     display: "flex",
     flexDirection: "column",
+    overflowX: "hidden",
   },
   groupName: {
     fontWeight: "bold",
@@ -90,7 +91,7 @@ const Group = (props: Props) => {
           variant="caption"
           className={classes.groupLatestMessage}
           noWrap
-          maxWidth={"50%"}
+          maxWidth={"95%"}
           textOverflow={"ellipsis"}
         >
           {group?.latest_message?.message.created_at ? (

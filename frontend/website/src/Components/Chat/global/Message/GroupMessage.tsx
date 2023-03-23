@@ -68,8 +68,8 @@ const GroupMessage = (props: Props) => {
 
   const isText = Boolean(groupMessage?.message.resourcetype === "TextMessage");
   const isAudio =
-    Boolean(groupMessage?.message.resourcetype === "FileMessage") &&
-    Boolean(getExt(groupMessage?.message.file) === "mp3");
+    groupMessage?.message.resourcetype === "FileMessage" &&
+    getExt(groupMessage?.message.file) === "mp3";
   const isImage = Boolean(
     groupMessage?.message.resourcetype === "ImageMessage"
   );
@@ -78,8 +78,8 @@ const GroupMessage = (props: Props) => {
     groupMessage?.message.resourcetype === "VideoMessage"
   );
   const isPdf =
-    Boolean(groupMessage?.message.resourcetype === "FileMessage") &&
-    Boolean(getExt(groupMessage?.message.file) === "pdf");
+    groupMessage?.message.resourcetype === "FileMessage" &&
+    getExt(groupMessage?.message.file) === "pdf";
 
   const open = Boolean(anchorEl);
   return (
@@ -133,15 +133,22 @@ const GroupMessage = (props: Props) => {
             isMine={isMine}
           />
         )}
-        {isText && <TextMessage text={groupMessage.message.text} />}
-        {isImage && (
+        {isText && groupMessage?.message.resourcetype === "TextMessage" && (
+          <TextMessage text={groupMessage.message.text} />
+        )}
+        {isImage && groupMessage?.message.resourcetype === "ImageMessage" && (
           <PhotoMessage
             caption={groupMessage.message.caption}
             image={groupMessage.message.image}
           />
         )}
-        {isAudio && <AudioMessage audio={""} caption={""} />}
-        {isVideo && (
+        {isAudio && groupMessage?.message.resourcetype === "FileMessage" && (
+          <AudioMessage
+            audio={groupMessage.message.file}
+            caption={groupMessage.message.caption}
+          />
+        )}
+        {isVideo && groupMessage?.message.resourcetype === "VideoMessage" && (
           <VideoMessage
             video={groupMessage.message.video}
             caption={groupMessage.message.caption}

@@ -25,16 +25,22 @@ const Discussion = (props: Props) => {
         />
         {disc.online && <span className={classes.online}></span>}
       </Box>
-      <Box display={"flex"} flexDirection={"column"} flex={1}>
+      <Box
+        display={"flex"}
+        flexDirection={"column"}
+        flex={1}
+        overflow={"hidden"}
+      >
         <span
           className={
             chatId ? classes.discussionNameSelected : classes.discussionName
           }
+          style={{ display: "block" }}
         >
           {disc.title}
         </span>
         {disc.latest_message ? (
-          <Typography noWrap maxWidth={"100%"} textOverflow={"ellipsis"}>
+          <Typography variant="caption">
             <ChatLatestMessage
               message={disc.latest_message}
               style={{

@@ -44,10 +44,11 @@ export const useStyles = makeStyles((theme) => ({
 type Props = {
   isMine: Boolean;
   discussionMessage?: Message;
+  onClick?: (e: React.MouseEvent<HTMLLIElement>, message: Message) => void;
 };
 
 const DiscussionMessage = (props: Props) => {
-  const { isMine = false, discussionMessage } = props;
+  const { isMine = false, discussionMessage, onClick } = props;
 
   const classes = useStyles({ isMine });
 
@@ -68,8 +69,8 @@ const DiscussionMessage = (props: Props) => {
     discussionMessage?.message.resourcetype === "TextMessage"
   );
   const isAudio =
-    Boolean(discussionMessage?.message.resourcetype === "FileMessage") &&
-    Boolean(getExt(discussionMessage?.message.file) === "mp3");
+    discussionMessage?.message.resourcetype === "FileMessage" &&
+    getExt(discussionMessage?.message.file) === "mp3";
   const isImage = Boolean(
     discussionMessage?.message.resourcetype === "ImageMessage"
   );
@@ -78,8 +79,8 @@ const DiscussionMessage = (props: Props) => {
     discussionMessage?.message.resourcetype === "VideoMessage"
   );
   const isPdf =
-    Boolean(discussionMessage?.message.resourcetype === "FileMessage") &&
-    Boolean(getExt(discussionMessage?.message.file) === "pdf");
+    discussionMessage?.message.resourcetype === "FileMessage" &&
+    getExt(discussionMessage?.message.file) === "pdf";
 
   const open = Boolean(anchorEl);
   return (
@@ -111,26 +112,32 @@ const DiscussionMessage = (props: Props) => {
             <MoreHoriz />
           </IconButton>
         </div>
-        {isText && <TextMessage text={discussionMessage.message.text} />}
-        {isImage && (
-          <PhotoMessage
-            caption={discussionMessage.message.caption}
-            image={discussionMessage.message.image}
-          />
-        )}
-        {isAudio && (
-          <AudioMessage
-            audio={discussionMessage.file}
-            caption={discussionMessage.caption}
-          />
-        )}
-        {isVideo && (
-          <VideoMessage
-            video={discussionMessage.message.video}
-            caption={discussionMessage.message.caption}
-          />
-        )}
-        {isPdf && (
+        {isText &&
+          discussionMessage?.message.resourcetype === "TextMessage" && (
+            <TextMessage text={discussionMessage.message.text} />
+          )}
+        {isImage &&
+          discussionMessage?.message.resourcetype === "ImageMessage" && (
+            <PhotoMessage
+              caption={discussionMessage.message.caption}
+              image={discussionMessage.message.image}
+            />
+          )}
+        {isAudio &&
+          discussionMessage?.message.resourcetype === "FileMessage" && (
+            <AudioMessage
+              audio={discussionMessage.message.file}
+              caption={discussionMessage.message.caption}
+            />
+          )}
+        {isVideo &&
+          discussionMessage?.message.resourcetype === "VideoMessage" && (
+            <VideoMessage
+              video={discussionMessage.message.video}
+              caption={discussionMessage.message.caption}
+            />
+          )}
+        {isPdf && discussionMessage?.message.resourcetype === "FileMessage" && (
           <FileMessage
             caption={discussionMessage.message.caption}
             file={discussionMessage.message.file}
@@ -152,7 +159,12 @@ const DiscussionMessage = (props: Props) => {
           MenuListProps={{ "aria-labelledby": "message-menu" }}
           onClose={handleClose}
         >
-          <MenuItem onClick={handleClose}>
+          <MenuItem
+            onClick={(e) => {
+              onClick(e, discussionMessage);
+              handleClose();
+            }}
+          >
             <Box
               display="flex"
               // justifyContent={"flex-end"}

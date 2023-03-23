@@ -13,12 +13,6 @@ const ChatLatestMessage = (props: Props) => {
   if (message?.message.resourcetype === "TextMessage") {
     return (
       <span
-        // style={{
-        //   color: "#2859e2",
-        //   textOverflow: "ellipsis",
-        //   maxWidth: "50px",
-        //   flex: 1,
-        // }}
         style={{
           ...{
             color: "#2859e2",
