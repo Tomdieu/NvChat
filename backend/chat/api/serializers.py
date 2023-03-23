@@ -280,12 +280,20 @@ class ChatGroupMemberCreateSerializer(serializers.ModelSerializer):
 
 
 class ChatGroupCreateSerializer(serializers.ModelSerializer):
-    # members = UserProfileSerializer(many=True, read_only=True)
+    message = IMessagePolymorphicSerializer(read_only=True)
+    sender = UserProfileSerializer(read_only=True)
+    parent_message = serializers.SerializerMethodField()
 
     class Meta:
         model = ChatGroup
         fields = "__all__"
         extra_kwargs = {"created_by": {"read_only": True}}
+
+    def get_parent_message(self, obj: GroupMessage):
+        if obj.parent_message is None:
+            return None
+        serializer = self.__class__(obj.parent_message, context=self.context)
+        return serializer.data
 
 
 class GroupMessageSerializer(serializers.ModelSerializer):

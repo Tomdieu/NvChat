@@ -111,7 +111,9 @@ class ChatGroupViewSet(
             # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
 
-        return Response(ChatGroupSerializer(saveObject).data)
+        return Response(
+            ChatGroupSerializer(saveObject, context={"request": request}).data
+        )
 
 
 class UpdatedGroupImageViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
