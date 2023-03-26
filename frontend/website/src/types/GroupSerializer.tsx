@@ -4,6 +4,7 @@ import { GroupMessageSerializer } from "./GroupMessageSerializer";
 import { UserProfile } from "./UserProfile";
 
 export type GroupSerializer = {
+  members?: string;
   id: number;
   group_members: GroupMember[];
   created_by: UserProfile;
