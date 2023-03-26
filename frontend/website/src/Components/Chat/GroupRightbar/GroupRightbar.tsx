@@ -56,7 +56,6 @@ const GroupRightbar = (props: Props) => {
               display={"flex"}
               alignItems={"center"}
               gap={2}
-              // justifyContent={"space-between"}
               sx={(theme) => ({
                 lineHeight: "40px",
                 height: "42px",
