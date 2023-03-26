@@ -24,6 +24,8 @@ from django.db import transaction
 
 from django.db.models import Q
 
+from django.contrib.sites.shortcuts import get_current_site
+
 
 class ImessageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -212,23 +214,38 @@ class UserProfileImageSerializer(serializers.ModelSerializer):
         fields = ["profile_picture"]
 
 
+class ChatGroupDetailSerializer(serializers.ModelSerializer):
+    # created_by = UserProfileSerializer(read_only=True)
+
+    class Meta:
+        model = ChatGroup
+        fields = "__all__"
+        # fields = ["chat_name", "image"]
+
+
 class ConversationSerializer(serializers.ModelSerializer):
     participants = UserProfileSerializer(many=True)
     title = serializers.SerializerMethodField()
+    user = serializers.SerializerMethodField()
     latest_message = serializers.SerializerMethodField()
     messages = serializers.SerializerMethodField()
     imageUrl = serializers.SerializerMethodField()
+    groups_in_common = serializers.SerializerMethodField()
     online = serializers.SerializerMethodField()
 
     class Meta:
         model = Conversation
         fields = "__all__"
 
-    def get_user(self, obj: Conversation) -> UserProfile:
+    def _get_user(self, obj: Conversation) -> UserProfile:
         return obj.participants.get(~Q(user=self.context["request"].user))
 
+    def get_user(self, obj: Conversation):
+        other_user = self._get_user(obj)
+        return UserProfileSerializer(other_user, context=self.context).data
+
     def get_title(self, obj: Conversation):
-        return self.get_user(obj).user.get_username()
+        return self._get_user(obj).user.get_username()
 
     def get_latest_message(self, obj: Conversation):
         if obj.messages.last():
@@ -241,7 +258,7 @@ class ConversationSerializer(serializers.ModelSerializer):
         ).data
 
     def get_imageUrl(self, obj: Conversation):
-        user = self.get_user(obj)
+        user = self._get_user(obj)
         if user.profile_picture:
             return UserProfileImageSerializer(user, context=self.context).data.get(
                 "profile_picture"
@@ -249,8 +266,38 @@ class ConversationSerializer(serializers.ModelSerializer):
         return None
 
     def get_online(self, obj: Conversation):
-        user = self.get_user(obj)
+        user = self._get_user(obj)
         return user.online
+
+    def get_groups_in_common(self, obj: Conversation):
+        import json
+
+        other_user = self._get_user(obj)
+        me = self.context["request"].user.profile
+        groups_in_common = ChatGroup.objects.filter(members__user__id=me.id).filter(
+            members__user__id=other_user.id
+        )
+        # print(groups_in_common)
+        groups = []
+        request = self.context.get("request")
+        current_site = get_current_site(request)
+        server_address = f"{request.scheme}://{current_site.domain}"
+        for group in groups_in_common:
+            imageUrl = ""
+            if group.image:
+                imageUrl = server_address + group.image.url
+            names = []
+            for member in group.members.all():
+                names.append(member.user.username)
+            groups.append(
+                {
+                    "chat_name": group.chat_name,
+                    "image": imageUrl,
+                    "members": ",".join(names),
+                }
+            )
+
+        return groups
 
 
 class MessageSerializer(serializers.ModelSerializer):
