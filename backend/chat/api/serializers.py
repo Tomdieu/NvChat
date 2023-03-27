@@ -458,3 +458,14 @@ class GMSerializer(serializers.Serializer):
             raise serializers.ValidationError({"group": "this group doesn't exits"})
 
         return _group.first()
+
+class DiscussionCreateSerializer(serializers.Serializer):
+
+    with_user = serializers.IntegerField()
+
+    def validate_with_user(self,with_user_id):
+        _user = UserProfile.objects.filter(id=with_user_id)
+        if not _user.exists():
+            raise serializers.ValidationError({"with_user": "this user doesn't exits"})
+
+        return _user.first()

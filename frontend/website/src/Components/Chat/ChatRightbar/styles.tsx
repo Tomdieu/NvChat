@@ -4,6 +4,7 @@ export const useStyles = makeStyles((theme) => ({
   rightbar: {
     height: "100vh",
     backgroundColor: "#e1dbdb",
+    width: "100%",
   },
   rightbarWrapper: {
     height: "100%",
@@ -22,6 +23,11 @@ export const useStyles = makeStyles((theme) => ({
   },
   rightbarBottom: {
     overflow: "auto",
+    width: "100%",
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    height: "100%",
   },
   image: {
     width: 300,

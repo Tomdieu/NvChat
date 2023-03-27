@@ -70,10 +70,11 @@ const ActiveDiscussion = () => {
 
   const addNewMessage = (newMessage: Message) => {
     const filterChats = discussions.find((chat) => chat.id === chatId);
-    console.log(filterChats);
 
     filterChats.latest_message = newMessage;
     filterChats.messages.push(newMessage);
+
+    // setSelectedDiscussion(filterChats);
 
     const otherChats = discussions.filter((chat) => chat.id !== chatId);
     otherChats.push(filterChats);

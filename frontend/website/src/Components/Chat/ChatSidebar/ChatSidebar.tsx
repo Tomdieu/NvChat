@@ -7,7 +7,7 @@ import {
   IconButton,
   InputBase,
 } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import { useStyles } from "./styles";
 import { Message, MoreVert, Search } from "@mui/icons-material";
 import { useChat } from "context/ChatContext";
@@ -16,6 +16,7 @@ import ChatLatestMessage from "./ChatLatestMessage";
 import moment from "moment";
 import Discussion from "./Discussion";
 import ApiService from "utils/ApiService";
+import CreateDiscussion from "./CreateDiscussion";
 
 type Props = {};
 
@@ -38,7 +39,13 @@ const ChatSidebar = (props: Props) => {
 
   const [loading, setLoading] = React.useState<boolean>();
 
-  useEffect(() => {
+  const [open, setOpen] = React.useState(false);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  useLayoutEffect(() => {
     const token = localStorage.getItem("userToken");
     if (token) {
       setLoading(true);
@@ -80,6 +87,7 @@ const ChatSidebar = (props: Props) => {
             <MoreVert />
           </IconButton>
         </Box>
+        <CreateDiscussion open={open} onClose={handleClose} />
         <Box className={classes.sidebarBottom}>
           <Box className={classes.searchWrapper}>
             <Search className={classes.icon} />
@@ -102,7 +110,7 @@ const ChatSidebar = (props: Props) => {
           </Box>
           <Box flex={10} position={"relative"} overflow={"auto"}>
             <Box className={classes.fab}>
-              <IconButton>
+              <IconButton onClick={() => setOpen(true)}>
                 <Message />
               </IconButton>
             </Box>

@@ -23,7 +23,7 @@ const ChatRightbar = (props: Props) => {
       className={classes.rightbar}
       item
       md={isRightOpen ? 3 : 0}
-      display={isRightOpen ? "flex" : "none"}
+      display={isRightOpen ? "block" : "none"}
     >
       <Box className={classes.rightbarWrapper}>
         <Box className={classes.rightbarTop}>
@@ -40,7 +40,7 @@ const ChatRightbar = (props: Props) => {
             justifyContent={"center"}
             flexDirection={"column"}
             p={5}
-            sx={{ borderRadius: 0 }}
+            sx={{ borderRadius: 0, with: "100%" }}
           >
             <img src={selectedDiscussion.imageUrl} className={classes.image} />
             <span className={classes.title}>{selectedDiscussion.title}</span>
@@ -99,6 +99,7 @@ const ChatRightbar = (props: Props) => {
               {selectedDiscussion?.groups_in_common?.map((group) => (
                 <Box
                   display={"flex"}
+                  alignItems={"center"}
                   gap={2}
                   p={0.5}
                   sx={{
@@ -110,7 +111,15 @@ const ChatRightbar = (props: Props) => {
                   <Avatar src={group.image} alt={group.chat_name} />
                   <Box flex={1} display={"flex"} flexDirection={"column"}>
                     <Typography variant="h6">{group.chat_name}</Typography>
-                    <Typography color={"GrayText"}>{group.members}</Typography>
+                    <Typography
+                      color={"GrayText"}
+                      noWrap
+                      textOverflow={"ellipsis"}
+                      maxWidth={"100%"}
+                      variant="caption"
+                    >
+                      {group.members}
+                    </Typography>
                   </Box>
                 </Box>
               ))}

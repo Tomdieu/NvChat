@@ -49,13 +49,14 @@ const Discussion = (props: Props) => {
             />
           </Typography>
         ) : (
-          <span
+          <Typography
+            variant="caption"
             className={
               chatId ? classes.discLatestMsgSelected : classes.discLatestMsg
             }
           >
             select discussion an start chating
-          </span>
+          </Typography>
         )}
       </Box>
       {disc.latest_message && (

@@ -38,6 +38,7 @@ from .serializers import (
     GroupMemberSerializer,
     GMSerializer,
     IMessagePolymorphicSerializer,
+    DiscussionCreateSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -344,3 +345,26 @@ class GroupMemberViewSet(
     serializer_class = GroupMemberSerializer
 
     queryset = GroupMember.objects.all()
+
+
+class CreateDiscussionView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    def post(self, request, *args, **kwargs):
+        serializer = DiscussionCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.validated_data["with_user"]
+
+        print(user, request.user.profile)
+
+        disc = Conversation.objects.create()
+        disc.participants.add(user)
+        disc.participants.add(request.user.profile)
+
+        serializer = ConversationSerializer(
+            Conversation.objects.get(id=disc.id), context={"request": request}
+        )
+
+        return Response(serializer.data)

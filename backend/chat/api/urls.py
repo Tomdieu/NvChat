@@ -35,6 +35,7 @@ urlpatterns = [
         "send-group-message/<int:chat_group_id>/",
         views.GroupMessageApiView.as_view(),
     ),
+    path("create-conversation/", views.CreateDiscussionView.as_view()),
 ]
 
 urlpatterns += router.urls
