@@ -1,0 +1,26 @@
+// vite.config.js
+import { defineConfig } from "file:///C:/Users/pc/Desktop/Code/projects/Chatapp/frontend/website/node_modules/vite/dist/node/index.js";
+import react from "file:///C:/Users/pc/Desktop/Code/projects/Chatapp/frontend/website/node_modules/@vitejs/plugin-react/dist/index.mjs";
+import path from "path";
+import tsconfigPaths from "file:///C:/Users/pc/Desktop/Code/projects/Chatapp/frontend/website/node_modules/vite-tsconfig-paths/dist/index.mjs";
+import commonjs from "file:///C:/Users/pc/Desktop/Code/projects/Chatapp/frontend/website/node_modules/@rollup/plugin-commonjs/dist/es/index.js";
+import nodeResolve from "file:///C:/Users/pc/Desktop/Code/projects/Chatapp/frontend/website/node_modules/@rollup/plugin-node-resolve/dist/es/index.js";
+var __vite_injected_original_dirname = "C:\\Users\\pc\\Desktop\\Code\\projects\\Chatapp\\frontend\\website";
+var vite_config_default = defineConfig({
+  plugins: [react(), tsconfigPaths(), commonjs(), nodeResolve()],
+  resolve: {
+    alias: {
+      "@chat": path.resolve(__vite_injected_original_dirname, "./src"),
+      "@Components": path.resolve(__vite_injected_original_dirname, "./src/Components"),
+      "@context": path.resolve(__vite_injected_original_dirname, "./src/context"),
+      "@pages": path.resolve(__vite_injected_original_dirname, "./src/pages"),
+      "@Utils": path.resolve(__vite_injected_original_dirname, "./src/Utils"),
+      "@assets": path.resolve(__vite_injected_original_dirname, "./src/assets")
+    },
+    extensions: [".js", ".jsx", ".ts", ".tsx"]
+  }
+});
+export {
+  vite_config_default as default
+};
+//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsidml0ZS5jb25maWcuanMiXSwKICAic291cmNlc0NvbnRlbnQiOiBbImNvbnN0IF9fdml0ZV9pbmplY3RlZF9vcmlnaW5hbF9kaXJuYW1lID0gXCJDOlxcXFxVc2Vyc1xcXFxwY1xcXFxEZXNrdG9wXFxcXENvZGVcXFxccHJvamVjdHNcXFxcQ2hhdGFwcFxcXFxmcm9udGVuZFxcXFx3ZWJzaXRlXCI7Y29uc3QgX192aXRlX2luamVjdGVkX29yaWdpbmFsX2ZpbGVuYW1lID0gXCJDOlxcXFxVc2Vyc1xcXFxwY1xcXFxEZXNrdG9wXFxcXENvZGVcXFxccHJvamVjdHNcXFxcQ2hhdGFwcFxcXFxmcm9udGVuZFxcXFx3ZWJzaXRlXFxcXHZpdGUuY29uZmlnLmpzXCI7Y29uc3QgX192aXRlX2luamVjdGVkX29yaWdpbmFsX2ltcG9ydF9tZXRhX3VybCA9IFwiZmlsZTovLy9DOi9Vc2Vycy9wYy9EZXNrdG9wL0NvZGUvcHJvamVjdHMvQ2hhdGFwcC9mcm9udGVuZC93ZWJzaXRlL3ZpdGUuY29uZmlnLmpzXCI7aW1wb3J0IHsgZGVmaW5lQ29uZmlnIH0gZnJvbSBcInZpdGVcIjtcbmltcG9ydCByZWFjdCBmcm9tIFwiQHZpdGVqcy9wbHVnaW4tcmVhY3RcIjtcbmltcG9ydCBwYXRoIGZyb20gXCJwYXRoXCI7XG4vLyBpbXBvcnQgcmVhY3RSZWZyZXNoIGZyb20gJ0B2aXRlanMvcGx1Z2luLXJlYWN0LXJlZnJlc2gnO1xuaW1wb3J0IHRzY29uZmlnUGF0aHMgZnJvbSBcInZpdGUtdHNjb25maWctcGF0aHNcIjtcbmltcG9ydCBjb21tb25qcyBmcm9tIFwiQHJvbGx1cC9wbHVnaW4tY29tbW9uanNcIjtcbmltcG9ydCBub2RlUmVzb2x2ZSBmcm9tIFwiQHJvbGx1cC9wbHVnaW4tbm9kZS1yZXNvbHZlXCI7XG5cbi8vIGh0dHBzOi8vdml0ZWpzLmRldi9jb25maWcvXG5leHBvcnQgZGVmYXVsdCBkZWZpbmVDb25maWcoe1xuICBwbHVnaW5zOiBbcmVhY3QoKSwgdHNjb25maWdQYXRocygpLCBjb21tb25qcygpLCBub2RlUmVzb2x2ZSgpXSxcbiAgcmVzb2x2ZToge1xuICAgIGFsaWFzOiB7XG4gICAgICBcIkBjaGF0XCI6IHBhdGgucmVzb2x2ZShfX2Rpcm5hbWUsIFwiLi9zcmNcIiksXG4gICAgICBcIkBDb21wb25lbnRzXCI6IHBhdGgucmVzb2x2ZShfX2Rpcm5hbWUsIFwiLi9zcmMvQ29tcG9uZW50c1wiKSxcbiAgICAgIFwiQGNvbnRleHRcIjogcGF0aC5yZXNvbHZlKF9fZGlybmFtZSwgXCIuL3NyYy9jb250ZXh0XCIpLFxuICAgICAgXCJAcGFnZXNcIjogcGF0aC5yZXNvbHZlKF9fZGlybmFtZSwgXCIuL3NyYy9wYWdlc1wiKSxcbiAgICAgIFwiQFV0aWxzXCI6IHBhdGgucmVzb2x2ZShfX2Rpcm5hbWUsIFwiLi9zcmMvVXRpbHNcIiksXG4gICAgICBcIkBhc3NldHNcIjogcGF0aC5yZXNvbHZlKF9fZGlybmFtZSwgXCIuL3NyYy9hc3NldHNcIiksXG4gICAgfSxcbiAgICBleHRlbnNpb25zOiBbXCIuanNcIiwgXCIuanN4XCIsIFwiLnRzXCIsIFwiLnRzeFwiXSxcbiAgfSxcbn0pO1xuIl0sCiAgIm1hcHBpbmdzIjogIjtBQUFrWCxTQUFTLG9CQUFvQjtBQUMvWSxPQUFPLFdBQVc7QUFDbEIsT0FBTyxVQUFVO0FBRWpCLE9BQU8sbUJBQW1CO0FBQzFCLE9BQU8sY0FBYztBQUNyQixPQUFPLGlCQUFpQjtBQU54QixJQUFNLG1DQUFtQztBQVN6QyxJQUFPLHNCQUFRLGFBQWE7QUFBQSxFQUMxQixTQUFTLENBQUMsTUFBTSxHQUFHLGNBQWMsR0FBRyxTQUFTLEdBQUcsWUFBWSxDQUFDO0FBQUEsRUFDN0QsU0FBUztBQUFBLElBQ1AsT0FBTztBQUFBLE1BQ0wsU0FBUyxLQUFLLFFBQVEsa0NBQVcsT0FBTztBQUFBLE1BQ3hDLGVBQWUsS0FBSyxRQUFRLGtDQUFXLGtCQUFrQjtBQUFBLE1BQ3pELFlBQVksS0FBSyxRQUFRLGtDQUFXLGVBQWU7QUFBQSxNQUNuRCxVQUFVLEtBQUssUUFBUSxrQ0FBVyxhQUFhO0FBQUEsTUFDL0MsVUFBVSxLQUFLLFFBQVEsa0NBQVcsYUFBYTtBQUFBLE1BQy9DLFdBQVcsS0FBSyxRQUFRLGtDQUFXLGNBQWM7QUFBQSxJQUNuRDtBQUFBLElBQ0EsWUFBWSxDQUFDLE9BQU8sUUFBUSxPQUFPLE1BQU07QUFBQSxFQUMzQztBQUNGLENBQUM7IiwKICAibmFtZXMiOiBbXQp9Cg==
