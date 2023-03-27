@@ -163,7 +163,6 @@ export default class ApiService {
     } else {
       url = this.endPoint + `friends/search?q=${query}`;
     }
-    console.log({ url });
 
     const res = await fetch(url, {
       headers: {
@@ -302,6 +301,20 @@ export default class ApiService {
       body: formData,
       headers: {
         Authorization: `token ${token}`,
+      },
+    });
+
+    return res;
+  }
+
+  static async createConversationWith(data: object, token: string) {
+    const url = this.endPoint + "chat/create-conversation/";
+    const res = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        Authorization: `token ${token}`,
+        "Content-Type": "application/json",
       },
     });
 
