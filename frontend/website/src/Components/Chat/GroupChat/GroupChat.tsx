@@ -35,8 +35,8 @@ const GroupChatBox = (props: Props) => {
   // const msgRef = useRef<HTMLDivElement>(null);
   const { isRightOpen, toggle } = useGroup();
 
-  const { selectedGroup, setGroups, groups, setSelectedGroup } = useGroup();
-  const { userToken, userProfile, showBar } = useAuth();
+  const { selectedGroup, setGroups, groups } = useGroup();
+  const { userToken, userProfile } = useAuth();
 
   const [socket, setSocket] = useState<WebSocket>(null);
 
