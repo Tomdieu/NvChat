@@ -254,14 +254,14 @@ const GroupChatBox = (props: Props) => {
         ref={fileInputRef}
         onChange={handleFileChange}
       />
-      {/* {emojiOpen && (
+      {emojiOpen && (
         <Box sx={{ position: "absolute", bottom: "10%", left: "5%" }}>
           <Box position={"relative"}>
             <EmojiPicker
-              // theme="dark"
               emojiStyle="native"
-              onEmojiClick={(emogi, event) => {
-                console.log(emoji, event);
+              onEmojiClick={(emojiObject, event) => {
+                console.log(emojiObject.emoji);
+                setMessage(message + emojiObject.emoji);
               }}
             />
             <IconButton
@@ -272,7 +272,7 @@ const GroupChatBox = (props: Props) => {
             </IconButton>
           </Box>
         </Box>
-      )} */}
+      )}
     </Grid>
   );
 };

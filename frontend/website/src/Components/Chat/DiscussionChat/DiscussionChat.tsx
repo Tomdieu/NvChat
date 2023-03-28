@@ -1,4 +1,4 @@
-import { Grid, Typography } from "@mui/material";
+import { Box, Grid, IconButton, Typography } from "@mui/material";
 import { useChat } from "context/ChatContext";
 import React, { useRef, useEffect, useState } from "react";
 import MessageInput from "../global/MessageInput/MessageInput";
@@ -9,8 +9,9 @@ import { useAuth } from "context/AuthContext";
 import { TextMessage } from "types/AbstractMessage";
 import { Message } from "types/Message";
 
-import Picker from "emoji-picker-react";
+import EmojiPicker from "emoji-picker-react";
 import { GroupMessageSerializer } from "types/GroupMessageSerializer";
+import { Close } from "@mui/icons-material";
 
 type Props = {};
 
@@ -21,7 +22,6 @@ const ActiveDiscussion = () => {
     discussions,
     setDiscussions,
     selectedDiscussion,
-    setSelectedDiscussion,
     setIsRightOpen,
   } = useChat();
 
@@ -29,9 +29,10 @@ const ActiveDiscussion = () => {
   const [replyMessage, setReplyMessage] = useState<
     GroupMessageSerializer | Message
   >(null);
-  const { userToken } = useAuth();
+  const { userToken, userProfile } = useAuth();
 
   const [message, setMessage] = React.useState("");
+  const [emojiOpen, setEmojiOpen] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -53,10 +54,10 @@ const ActiveDiscussion = () => {
 
   useEffect(() => {
     if (socket) {
-      socket.onopen = (e) => {
+      socket.onopen = () => {
         console.log("Connection established");
       };
-      socket.onclose = (e) => {
+      socket.onclose = () => {
         console.log("Connection Close");
       };
       socket.onmessage = (e: MessageEvent<any>) => {
@@ -163,7 +164,24 @@ const ActiveDiscussion = () => {
         .finally(() => setReplyMessage(null));
     }
   };
-
+  const handleEmogiClick = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    setEmojiOpen(true);
+  };
+  const handleKeydown = (
+    e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => {
+    const username = userProfile.user.username;
+    socket.send(
+      JSON.stringify({ typing: true, message: `${username} is typing` })
+    );
+  };
+  const handleKeyup = (
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    socket.send(JSON.stringify({ typing: false, message: `` }));
+  };
   return (
     <Grid
       item
@@ -194,6 +212,9 @@ const ActiveDiscussion = () => {
         onSendClick={handleSend}
         msgToReply={replyMessage}
         onCancleReplyMsg={() => setReplyMessage(null)}
+        onEmojiClick={handleEmogiClick}
+        onKeyDown={handleKeydown}
+        onBlur={handleKeyup}
       />
       <input
         type="file"
@@ -201,6 +222,25 @@ const ActiveDiscussion = () => {
         style={{ display: "none" }}
         onChange={handleFileChange}
       />
+      {emojiOpen && (
+        <Box sx={{ position: "absolute", bottom: "10%", left: "5%" }}>
+          <Box position={"relative"}>
+            <EmojiPicker
+              emojiStyle="native"
+              onEmojiClick={(emojiObject, event) => {
+                console.log(emojiObject.emoji);
+                setMessage(message + emojiObject.emoji);
+              }}
+            />
+            <IconButton
+              sx={{ position: "absolute", right: 0, bottom: "3%", zIndex: 999 }}
+              onClick={() => setEmojiOpen(false)}
+            >
+              <Close />
+            </IconButton>
+          </Box>
+        </Box>
+      )}
     </Grid>
   );
 };
@@ -236,7 +276,7 @@ const NoActiveChat = () => {
   );
 };
 
-const DiscussionChat = (props: Props) => {
+const DiscussionChat = () => {
   const { chatId } = useChat();
 
   if (chatId) {
