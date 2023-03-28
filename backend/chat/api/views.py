@@ -31,6 +31,7 @@ from .serializers import (
     ChatGroupImageSerializer,
     CreateConversationSerializer,
     ConversationSerializer,
+    MessageListSerializer,
     MessageSerializer,
     MessageCreateSerializer,
     GroupMessageListSerializer,
@@ -292,7 +293,7 @@ class DisussionMessageApiView(APIView):
 
         msg = Message.objects.create(**newMessage)
 
-        msg_serializer = MessageSerializer(msg, context={"request": request})
+        msg_serializer = MessageListSerializer(msg, context={"request": request})
 
         return Response(
             {
@@ -356,8 +357,6 @@ class CreateDiscussionView(APIView):
         serializer.is_valid(raise_exception=True)
 
         user = serializer.validated_data["with_user"]
-
-        print(user, request.user.profile)
 
         disc = Conversation.objects.create()
         disc.participants.add(user)
