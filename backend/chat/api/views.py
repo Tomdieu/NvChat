@@ -8,6 +8,8 @@ from rest_framework.mixins import (
 
 from rest_framework.generics import CreateAPIView
 
+import asyncio
+from channels.layers import get_channel_layer
 
 from chat.models import (
     GroupMember,
@@ -149,6 +151,21 @@ class AddMemberToGroupViewSet(CreateAPIView, GenericViewSet):
         chatGroup = ChatGroup.objects.get(id=group.pk)
 
         chatGroup.add_member(user)
+
+        channel_layer = get_channel_layer()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(
+            channel_layer.group_send(
+                f"user_{user.id}",
+                {
+                    "type": "NEW_GROUP",
+                    "group": ChatGroupSerializer(
+                        ChatGroup.objects.get(id=group.pk), context={"request": request}
+                    ).data,
+                },
+            )
+        )
 
         return Response(
             {"message": "added member to group", "success": True},
@@ -353,6 +370,7 @@ class CreateDiscussionView(APIView):
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def post(self, request, *args, **kwargs):
+
         serializer = DiscussionCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -364,6 +382,19 @@ class CreateDiscussionView(APIView):
 
         serializer = ConversationSerializer(
             Conversation.objects.get(id=disc.id), context={"request": request}
+        )
+
+        channel_layer = get_channel_layer()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(
+            channel_layer.group_send(
+                f"user_{user.id}",
+                {
+                    "type": "NEW_CONVERSATION",
+                    "conversation": serializer.data,
+                },
+            )
         )
 
         return Response(serializer.data)
