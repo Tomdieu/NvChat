@@ -140,7 +140,10 @@ const ActiveDiscussion = () => {
           // wsRef.current.send(JSON.stringify({ message: data.data }));
         })
         .catch((err) => console.log(err))
-        .finally(() => setReplyMessage(null));
+        .finally(() => {
+          setReplyMessage(null);
+          setEmojiOpen(false);
+        });
     }
   };
 
@@ -161,7 +164,10 @@ const ActiveDiscussion = () => {
           // wsRef.current.send(JSON.stringify({ message: data.data }));
         })
         .catch((err) => console.log(err))
-        .finally(() => setReplyMessage(null));
+        .finally(() => {
+          setReplyMessage(null);
+          setEmojiOpen(false);
+        });
     }
   };
   const handleEmogiClick = (

@@ -3,24 +3,18 @@ import {
   Dialog,
   Paper,
   Button,
-  TextField,
   Typography,
-  Avatar,
   IconButton,
   InputBase,
   CircularProgress,
 } from "@mui/material";
 import React, { useRef, useState } from "react";
-import {
-  Camera,
-  CameraEnhance,
-  Cancel,
-  EmojiEmotions,
-  Save,
-} from "@mui/icons-material";
+import { Cancel, Close, EmojiEmotions, Save } from "@mui/icons-material";
 import ApiService from "utils/ApiService";
 import { useAuth } from "context/AuthContext";
 import { useGroup } from "context/GroupContext";
+
+import EmojiPicker from "emoji-picker-react";
 
 type Props = {
   open: boolean;
@@ -37,6 +31,8 @@ const CreateGroupDialog = (props: Props) => {
 
   const fileRef = useRef<HTMLInputElement>(null);
   const iconRef = useRef<HTMLImageElement>(null);
+
+  const [emojiOpen, setEmojiOpen] = useState(false);
 
   const { userToken } = useAuth();
   const { setGroups } = useGroup();
@@ -131,7 +127,7 @@ const CreateGroupDialog = (props: Props) => {
               "&:focus-within": { borderBottomColor: "#5376f0" },
             }}
           />
-          <IconButton>
+          <IconButton onClick={() => setEmojiOpen(true)}>
             <EmojiEmotions />
           </IconButton>
         </Box>
@@ -184,6 +180,39 @@ const CreateGroupDialog = (props: Props) => {
           ref={fileRef}
           onChange={handleSelectedFile}
         />
+        {emojiOpen && (
+          <Dialog open={emojiOpen}>
+            <Box
+              sx={{
+                // position: "absolute",
+                bottom: "10%",
+                left: "5%",
+                zIndex: 99,
+              }}
+            >
+              <Box position={"relative"}>
+                <EmojiPicker
+                  emojiStyle="native"
+                  onEmojiClick={(emojiObject, event) => {
+                    console.log(emojiObject.emoji);
+                    setName(name + emojiObject.emoji);
+                  }}
+                />
+                <IconButton
+                  sx={{
+                    position: "absolute",
+                    right: 0,
+                    bottom: "3%",
+                    zIndex: 999,
+                  }}
+                  onClick={() => setEmojiOpen(false)}
+                >
+                  <Close />
+                </IconButton>
+              </Box>
+            </Box>
+          </Dialog>
+        )}
       </Box>
     </Dialog>
   );
