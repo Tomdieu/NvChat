@@ -6,6 +6,7 @@ import {
   Grid,
   IconButton,
   InputBase,
+  Typography,
 } from "@mui/material";
 import React, { useEffect, useLayoutEffect } from "react";
 import { useStyles } from "./styles";
@@ -82,7 +83,9 @@ const ChatSidebar = (props: Props) => {
     <Grid item md={3} height={"100vh"} className={classes.sidebar}>
       <Box className={classes.sidebarWrapper}>
         <Box className={classes.sidebarTop}>
-          <span className={classes.title}>Nv Chat</span>
+          <Typography className={classes.title} variant="h4">
+            Nv Chat
+          </Typography>
           <IconButton className={classes.iconBtn}>
             <MoreVert />
           </IconButton>

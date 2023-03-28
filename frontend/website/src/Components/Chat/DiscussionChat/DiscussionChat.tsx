@@ -10,6 +10,7 @@ import { TextMessage } from "types/AbstractMessage";
 import { Message } from "types/Message";
 
 import Picker from "emoji-picker-react";
+import { GroupMessageSerializer } from "types/GroupMessageSerializer";
 
 type Props = {};
 
@@ -25,8 +26,9 @@ const ActiveDiscussion = () => {
   } = useChat();
 
   const [socket, setSocket] = useState<WebSocket>(null);
-
-  const [respondMessage, setRespondMessage] = useState(null);
+  const [replyMessage, setReplyMessage] = useState<
+    GroupMessageSerializer | Message
+  >(null);
   const { userToken } = useAuth();
 
   const [message, setMessage] = React.useState("");
@@ -125,6 +127,10 @@ const ActiveDiscussion = () => {
         formData.append("resourcetype", "FileMessage");
       }
 
+      if (replyMessage) {
+        formData.append("parent_message_id", replyMessage.id.toString());
+      }
+
       setMessage("");
       ApiService.sendDiscussionMessage(formData, chatId, userToken)
         .then((res) => res.json())
@@ -132,7 +138,8 @@ const ActiveDiscussion = () => {
           socket.send(JSON.stringify({ message: data.data }));
           // wsRef.current.send(JSON.stringify({ message: data.data }));
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.log(err))
+        .finally(() => setReplyMessage(null));
     }
   };
 
@@ -141,6 +148,9 @@ const ActiveDiscussion = () => {
       const formData = new FormData();
       formData.append("text", message);
       formData.append("resourcetype", "TextMessage");
+      if (replyMessage) {
+        formData.append("parent_message_id", replyMessage.id.toString());
+      }
       setMessage("");
 
       ApiService.sendDiscussionMessage(formData, chatId, userToken)
@@ -149,7 +159,8 @@ const ActiveDiscussion = () => {
           socket.send(JSON.stringify({ message: data.data }));
           // wsRef.current.send(JSON.stringify({ message: data.data }));
         })
-        .catch((err) => console.log(err));
+        .catch((err) => console.log(err))
+        .finally(() => setReplyMessage(null));
     }
   };
 
@@ -171,12 +182,18 @@ const ActiveDiscussion = () => {
         icon={selectedDiscussion?.imageUrl}
         onClick={() => setIsRightOpen(!isRightOpen)}
       />
-      <MessagesList messages={selectedDiscussion.messages} type="DISCUSSION" />
+      <MessagesList
+        messages={selectedDiscussion.messages}
+        type="DISCUSSION"
+        onMsgClick={(message) => setReplyMessage(message)}
+      />
       <MessageInput
         text={message}
         onChange={handleChange}
         onFileClick={() => fileInputRef.current.click()}
         onSendClick={handleSend}
+        msgToReply={replyMessage}
+        onCancleReplyMsg={() => setReplyMessage(null)}
       />
       <input
         type="file"

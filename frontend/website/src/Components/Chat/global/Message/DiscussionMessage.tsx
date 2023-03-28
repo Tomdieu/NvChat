@@ -29,6 +29,7 @@ import AudioMessage from "./AudioMessage";
 import { Message } from "types/Message";
 import moment from "moment";
 import FileMessage from "./FileMessage";
+import ParentMessage from "./ParentMessage";
 
 export const useStyles = makeStyles((theme) => ({
   messageWrapper: {
@@ -112,6 +113,12 @@ const DiscussionMessage = (props: Props) => {
             <MoreHoriz />
           </IconButton>
         </div>
+        {discussionMessage.parent_message && (
+          <ParentMessage
+            message={discussionMessage.parent_message}
+            isMine={isMine}
+          />
+        )}
         {isText &&
           discussionMessage?.message.resourcetype === "TextMessage" && (
             <TextMessage text={discussionMessage.message.text} />
