@@ -59,7 +59,7 @@ export const useStyles = makeStyles((theme) => ({
     width: 48,
     height: 48,
     borderRadius: "50%",
-    backgroundColor: "green",
+    backgroundColor: "#0b60ea",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",

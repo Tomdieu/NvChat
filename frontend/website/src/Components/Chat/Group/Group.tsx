@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
     height: "60px",
     borderRadius: "50%",
     border: "1px solid #ccc",
-    objectFit: "contain",
+    objectFit: "cover",
     backgroundColor: "#ffffff47",
   },
   groupInfo: {

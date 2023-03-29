@@ -20,6 +20,7 @@ type Props = {
 const TopGroupBar = (props: Props) => {
   const classes = useStyles();
   const { name, participants, typing, icon, onClick, ...other } = props;
+  const { userProfile } = useAuth();
   const isTyping = Boolean(typing);
   return (
     <Box className={classes.topbar} {...other}>
@@ -39,7 +40,11 @@ const TopGroupBar = (props: Props) => {
               }}
             >
               {participants
-                ?.map((participant, index) => participant.user.user.username)
+                ?.map((participant, index) =>
+                  participant.user.user.username === userProfile.user.username
+                    ? "You"
+                    : participant.user.user.username
+                )
                 .join(", ")}
             </Typography>
           ) : (

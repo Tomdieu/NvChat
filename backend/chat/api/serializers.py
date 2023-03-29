@@ -288,7 +288,10 @@ class ConversationSerializer(serializers.ModelSerializer):
                 imageUrl = server_address + group.image.url
             names = []
             for member in group.members.all():
-                names.append(member.user.username)
+                if member.user.username == me.user.username:
+                    names.append("You")
+                else:
+                    names.append(member.user.username)
             groups.append(
                 {
                     "chat_name": group.chat_name,
@@ -459,11 +462,11 @@ class GMSerializer(serializers.Serializer):
 
         return _group.first()
 
-class DiscussionCreateSerializer(serializers.Serializer):
 
+class DiscussionCreateSerializer(serializers.Serializer):
     with_user = serializers.IntegerField()
 
-    def validate_with_user(self,with_user_id):
+    def validate_with_user(self, with_user_id):
         _user = UserProfile.objects.filter(id=with_user_id)
         if not _user.exists():
             raise serializers.ValidationError({"with_user": "this user doesn't exits"})

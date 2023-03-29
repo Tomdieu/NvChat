@@ -138,9 +138,6 @@ const CreateDiscussion = (props: Props) => {
           >
             Close
           </Button>
-          <Button disabled={loading} variant="contained">
-            Start
-          </Button>
         </Box>
       </Box>
     </Dialog>

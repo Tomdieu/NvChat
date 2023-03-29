@@ -244,7 +244,7 @@ const GroupAddMember = (props: Props) => {
                 disabled={Boolean(selectedFriends.length < 1)}
                 onClick={handleAddMembers}
               >
-                Save
+                Add Members
               </Button>
             </Box>
           ) : (
