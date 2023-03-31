@@ -1,20 +1,17 @@
 from channels.generic.websocket import (
     AsyncWebsocketConsumer,
-    AsyncJsonWebsocketConsumer,
 )
 import json
 
+from django.contrib.auth import get_user_model
+
 from .models import UserProfile
 
-
-def set_user_online(user: UserProfile):
-    user.online = True
-    user.save()
+from channels.db import database_sync_to_async
+from asgiref.sync import sync_to_async
 
 
-def set_user_offline(user: UserProfile):
-    user.online = False
-    user.save()
+User = get_user_model()
 
 
 class UserConsumer(AsyncWebsocketConsumer):
@@ -24,7 +21,8 @@ class UserConsumer(AsyncWebsocketConsumer):
 
         user = self.scope["user"]
 
-        set_user_online(user.profile)
+        # Set the user online
+        await self.set_user_online(user)
 
         # Join room conversation
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
@@ -33,7 +31,8 @@ class UserConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, code):
         user = self.scope["user"]
 
-        set_user_online(user.profile)
+        # Set the user offline
+        await self.set_user_offline(user.profile)
 
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
@@ -47,6 +46,19 @@ class UserConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             {"type": "send_notification", "message": message, "type": type},
         )
+
+    @database_sync_to_async
+    def set_user_online(self, user: User):
+        # This function is use to set a user online when the users connects to his socket channel
+        profile = user.profile
+        profile.online = True
+        return profile.save()
+
+    @database_sync_to_async
+    def set_user_offline(self, user: User):
+        profile = user.profile
+        profile.online = False
+        return profile.save()
 
     async def send_notification(self, event: dict):
         message = event["message"]
