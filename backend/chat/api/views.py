@@ -160,7 +160,7 @@ class AddMemberToGroupViewSet(CreateAPIView, GenericViewSet):
                 f"user_{user.id}",
                 {
                     "type": "NEW_GROUP",
-                    "group": ChatGroupSerializer(
+                    "message": ChatGroupSerializer(
                         ChatGroup.objects.get(id=group.pk), context={"request": request}
                     ).data,
                 },
@@ -392,7 +392,7 @@ class CreateDiscussionView(APIView):
                 f"user_{user.id}",
                 {
                     "type": "NEW_CONVERSATION",
-                    "conversation": serializer.data,
+                    "message": serializer.data,
                 },
             )
         )
