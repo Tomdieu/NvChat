@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import ApiService from "utils/ApiService";
 import { Conversation } from "types/ConversationSerializer";
+import { useAuth } from "./AuthContext";
 
 type ChatContextTypes = {
   discussions: Conversation[];
@@ -30,6 +31,15 @@ export const ChatProvider = (props: ChatProviderProps) => {
     useState<Conversation>(null);
   const [chatId, setChatId] = useState<number>(null);
   const [isRightOpen, setIsRightOpen] = useState<boolean>(false);
+
+  const { newDiscussion, setNewDiscussion } = useAuth();
+
+  useEffect(() => {
+    if (newDiscussion) {
+      setDiscussions([...discussions, newDiscussion]);
+      setNewDiscussion(null);
+    }
+  }, [newDiscussion]);
 
   return (
     <ChatContext.Provider

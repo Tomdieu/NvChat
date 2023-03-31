@@ -1,6 +1,7 @@
 import ApiService from "utils/ApiService";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { GroupSerializer } from "types/GroupSerializer";
+import { useAuth } from "./AuthContext";
 
 type groupContextType = {
   groups: GroupSerializer[];
@@ -31,6 +32,15 @@ export const GroupContextProvider = (props: Props) => {
   );
   const [isRightOpen, setIsRightOpen] = useState(false);
   const [groupId, setGroupId] = useState<number | null>(null);
+
+  const { newGroup, setNewGroup } = useAuth();
+
+  useEffect(() => {
+    if (newGroup) {
+      setGroups([...groups, newGroup]);
+      setNewGroup(null);
+    }
+  }, [newGroup]);
 
   const toggle = () => {
     setIsRightOpen(!isRightOpen);

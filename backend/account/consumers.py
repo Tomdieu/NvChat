@@ -39,29 +39,35 @@ class UserConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         text_data_json: dict = json.loads(text_data)
         message = text_data_json["message"]
-        type = text_data_json.get("type", None)
+        type = text_data_json.get("msgType", None)
 
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
-            {"type": "send_notification", "message": message, "type": type},
+            {"type": "send_notification", "message": message, "msgType": type},
         )
+
+    async def send_notification(self, event: dict):
+        message = event["message"]
+        type = event["msgType"]
+
+        self.send(text_data=json.dumps({"message": message, "msgType": type}))
 
     @database_sync_to_async
     def set_user_online(self, user: User):
         # This function is use to set a user online when the users connects to his socket channel
-        profile = user.profile
-        profile.online = True
-        return profile.save()
+        try:
+            profile = user.profile
+            profile.online = True
+            return profile.save()
+        except:
+            pass
 
     @database_sync_to_async
     def set_user_offline(self, user: User):
-        profile = user.profile
-        profile.online = False
-        return profile.save()
-
-    async def send_notification(self, event: dict):
-        message = event["message"]
-        type = event["type"]
-
-        self.send(text_data=json.dumps({"message": message, "type": type}))
+        try:
+            profile = user.profile
+            profile.online = False
+            return profile.save()
+        except:
+            pass

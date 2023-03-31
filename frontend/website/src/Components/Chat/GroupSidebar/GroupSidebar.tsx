@@ -48,6 +48,8 @@ const GroupSidebar = (props: Props) => {
       ApiService.getGroups(token)
         .then((res) => res.json())
         .then((data) => {
+          localStorage.setItem("selectedGroup", null);
+          localStorage.setItem("groupId", null);
           setGroups(data.data);
           setLoading(false);
           if (selectedGroup) {
@@ -57,9 +59,12 @@ const GroupSidebar = (props: Props) => {
             );
             if (_selectedGroup) {
               setSelectedGroup(_selectedGroup);
+              setGroupId(_selectedGroup.id);
             } else {
               localStorage.removeItem("selectedGroup");
+              localStorage.removeItem("groupId");
               setSelectedGroup(null);
+              setGroupId(null);
             }
           }
         })

@@ -3,6 +3,8 @@ import SnackBar from "Components/SnackBar";
 import ApiService from "utils/ApiService";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { UserProfile } from "types/UserProfile";
+import { GroupSerializer } from "types/GroupSerializer";
+import { Conversation } from "types/ConversationSerializer";
 
 type AuthContextType = {
   userToken: string;
@@ -20,6 +22,10 @@ type AuthContextType = {
     icon: React.ReactNode,
     severity: AlertColor
   ) => void;
+  setNewGroup: React.Dispatch<React.SetStateAction<GroupSerializer>>;
+  newGroup: GroupSerializer;
+  newDiscussion: Conversation;
+  setNewDiscussion: React.Dispatch<React.SetStateAction<Conversation>>;
 };
 
 export const AuthContext = createContext<AuthContextType>(null);
@@ -40,6 +46,59 @@ export const AuthContextProvider = (props: Props) => {
   const [icon, setIcon] = useState<React.ReactNode>(null);
   const [open, setOpen] = React.useState(false);
   const [message, setMessage] = useState(null);
+
+  const [newGroup, setNewGroup] = useState<GroupSerializer>(null);
+  const [newDiscussion, setNewDiscussion] = useState<Conversation>(null);
+
+  const [socket, setSocket] = useState<WebSocket>(null);
+
+  useEffect(() => {
+    if (userProfile) {
+      const ws = new WebSocket(
+        ApiService.wsEndPoint +
+          `ws/notification/${userProfile.id}/?token=${userToken}`
+      );
+      setSocket(ws);
+      return () => {
+        ws.close();
+      };
+    }
+  }, [userProfile]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.onopen = (e) => {
+        console.log("Connection Establised For User");
+      };
+      socket.onclose = (e) => {
+        console.log("Connection closed For User");
+      };
+      // socket.onclose = (e) => {
+      //   const ws = new WebSocket(
+      //     ApiService.wsEndPoint +
+      //       `ws/notification/${userProfile.id}/?token=${userToken}`
+      //   );
+      //   setSocket(ws);
+      // };
+      socket.onmessage = (e) => {
+        console.log(e);
+        const notification = JSON.parse(e.data);
+        console.log("New Message ", { notification });
+
+        if (notification.msgType === "NEW_GROUP") {
+          setNewGroup(notification.message);
+        } else if (notification.msgType === "NEW_CONVERSATION") {
+          setNewDiscussion(notification.message);
+        }
+      };
+      if (userToken === null) {
+        socket.close();
+      }
+      window.onclose = () => {
+        socket.close();
+      };
+    }
+  }, [socket]);
 
   const login = async (username: string, password: string) => {
     const res = await ApiService.login(username, password);
@@ -114,6 +173,10 @@ export const AuthContextProvider = (props: Props) => {
         setOpen,
         setMessage,
         showBar,
+        newGroup,
+        setNewGroup,
+        newDiscussion,
+        setNewDiscussion,
       }}
     >
       <>

@@ -164,8 +164,9 @@ const GroupAddMember = (props: Props) => {
             />
           </Box>
           <Box display={"flex"} flexWrap={"wrap"} gap={0.5} mb={2}>
-            {selectedFriends.map((friend) => (
+            {selectedFriends.map((friend, index) => (
               <Box
+                key={index}
                 display="flex"
                 alignItems="center"
                 component={"div"}
@@ -196,8 +197,9 @@ const GroupAddMember = (props: Props) => {
             ))}
           </Box>
           <Box mb={1}>
-            {friends.map((friend) => (
+            {friends.map((friend, index) => (
               <Box
+                key={index}
                 onClick={() => {
                   if (!selected(friend) && !isGroupMember(friend)) {
                     handleClick(friend);

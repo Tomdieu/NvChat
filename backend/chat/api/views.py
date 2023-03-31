@@ -159,7 +159,8 @@ class AddMemberToGroupViewSet(CreateAPIView, GenericViewSet):
             channel_layer.group_send(
                 f"user_{user.id}",
                 {
-                    "type": "NEW_GROUP",
+                    "type": "send_notification",
+                    "msgType": "NEW_GROUP",
                     "message": ChatGroupSerializer(
                         ChatGroup.objects.get(id=group.pk), context={"request": request}
                     ).data,
@@ -370,7 +371,6 @@ class CreateDiscussionView(APIView):
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def post(self, request, *args, **kwargs):
-
         serializer = DiscussionCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -391,7 +391,8 @@ class CreateDiscussionView(APIView):
             channel_layer.group_send(
                 f"user_{user.id}",
                 {
-                    "type": "NEW_CONVERSATION",
+                    "type": "send_notification",
+                    "msgType": "NEW_CONVERSATION",
                     "message": serializer.data,
                 },
             )
