@@ -11,8 +11,9 @@ import {
   Menu,
   MenuItem,
   CircularProgress,
+  InputBase,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useStyles } from "./styles";
 import {
   Cancel,
@@ -42,6 +43,7 @@ const GroupSidebar = (props: Props) => {
   } = useGroup();
   const [groupToDisplay, setGroupToDisplay] = useState<GroupSerializer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchGroupName, setSearchGroupName] = useState("");
   useEffect(() => {
     const token = localStorage.getItem("userToken");
     if (token) {
@@ -83,15 +85,17 @@ const GroupSidebar = (props: Props) => {
     );
   };
 
-  useEffect(() => {
-    setGroupToDisplay(
-      groups.sort((a, b) => {
-        var keyA = getLastestMessage(a);
-        var keyB = getLastestMessage(b);
+  const sortedGroups = useMemo<GroupSerializer[]>(() => {
+    return groups.sort((a, b) => {
+      var keyA = getLastestMessage(a);
+      var keyB = getLastestMessage(b);
 
-        return keyB.getTime() - keyA.getTime();
-      })
-    );
+      return keyB.getTime() - keyA.getTime();
+    });
+  }, [groups]);
+
+  useEffect(() => {
+    setGroupToDisplay(sortedGroups);
   }, [groups, selectedGroup, groupId]);
 
   const handleClose = () => {
@@ -106,6 +110,17 @@ const GroupSidebar = (props: Props) => {
     setAnchorEl(null);
   };
   const menuOpen = Boolean(anchorEl);
+
+  useEffect(() => {
+    if (searchGroupName) {
+      setGroupToDisplay(
+        groupToDisplay.filter((group) => group.chat_name.match(searchGroupName))
+      );
+    } else {
+      setGroupToDisplay(sortedGroups);
+    }
+  }, [searchGroupName]);
+
   return (
     <Grid item md={3} sm={4} className={classes.sidebar}>
       <Box className={classes.sidebarWrapper}>
@@ -205,6 +220,20 @@ const GroupSidebar = (props: Props) => {
             >
               <GroupAdd sx={{ width: 28, height: 28, color: "#fff" }} />
             </IconButton>
+          </Box>
+          <Box px={1}>
+            <InputBase
+              sx={{
+                bgcolor: "#fff",
+                fontSize: "1.2em",
+                px: 0.5,
+                borderRadius: 1,
+              }}
+              placeholder="search ..."
+              fullWidth
+              value={searchGroupName}
+              onChange={(e) => setSearchGroupName(e.target.value)}
+            />
           </Box>
           <Box className={classes.groupList}>
             {loading ? (
