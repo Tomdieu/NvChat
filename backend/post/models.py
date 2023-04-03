@@ -28,6 +28,11 @@ class File(models.Model):
         return self.file.name
 
 
+class Location(models.Model):
+    lat = models.DecimalField(decimal_places=6, max_digits=9)
+    lng = models.DecimalField(decimal_places=6, max_digits=9)
+
+
 class Post(models.Model):
     author = models.ForeignKey(
         UserProfile, on_delete=models.CASCADE, related_name="posts"
@@ -40,6 +45,8 @@ class Post(models.Model):
     images = models.ManyToManyField(Image, blank=True)
     files = models.ManyToManyField(File, blank=True)
     video = models.ManyToManyField(Video, blank=True)
+
+    is_comment_able = models.BooleanField(default=True)
 
     views = models.ManyToManyField(
         UserProfile, through="PostView", blank=True, related_name="view_by"
