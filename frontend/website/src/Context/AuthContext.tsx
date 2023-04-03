@@ -70,18 +70,9 @@ export const AuthContextProvider = (props: Props) => {
       socket.onopen = (e) => {
         console.log("Connection Establised For User");
       };
-      socket.onclose = (e) => {
-        console.log("Connection closed For User");
-      };
-      // socket.onclose = (e) => {
-      //   const ws = new WebSocket(
-      //     ApiService.wsEndPoint +
-      //       `ws/notification/${userProfile.id}/?token=${userToken}`
-      //   );
-      //   setSocket(ws);
-      // };
+
       socket.onmessage = (e) => {
-        console.log(e);
+        console.log("Message Recieve ");
         const notification = JSON.parse(e.data);
         console.log("New Message ", { notification });
 
@@ -90,6 +81,9 @@ export const AuthContextProvider = (props: Props) => {
         } else if (notification.msgType === "NEW_CONVERSATION") {
           setNewDiscussion(notification.message);
         }
+      };
+      socket.onclose = (e) => {
+        console.log("Connection closed For User");
       };
       if (userToken === null) {
         socket.close();
