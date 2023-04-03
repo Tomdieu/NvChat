@@ -8,16 +8,29 @@ import {
   Typography,
 } from "@mui/material";
 import { useChat } from "context/ChatContext";
-import React from "react";
+import React, { useMemo } from "react";
 import { useStyles } from "./styles";
 import moment from "moment";
 
 type Props = {};
 
 const ChatRightbar = (props: Props) => {
-  const { isRightOpen } = useChat();
+  const { isRightOpen, setIsRightOpen } = useChat();
   const { selectedDiscussion } = useChat();
   const classes = useStyles();
+  const r = useMemo(() => {
+    return Math.round(Math.random() * 254);
+  }, []);
+  const g = useMemo(() => {
+    return Math.round(Math.random() * 254);
+  }, []);
+  const b = useMemo(() => {
+    return Math.round(Math.random() * 254);
+  }, []);
+
+  const a = useMemo(() => {
+    return Math.random();
+  }, []);
   return (
     <Grid
       className={classes.rightbar}
@@ -27,10 +40,10 @@ const ChatRightbar = (props: Props) => {
     >
       <Box className={classes.rightbarWrapper}>
         <Box className={classes.rightbarTop}>
-          <IconButton>
+          <IconButton onClick={() => setIsRightOpen(false)}>
             <Close />
           </IconButton>
-          <span>{selectedDiscussion.title} Info</span>
+          <span>{selectedDiscussion.title.toLocaleUpperCase()} Detail</span>
         </Box>
         <Box className={classes.rightbarBottom}>
           <Box
@@ -42,7 +55,26 @@ const ChatRightbar = (props: Props) => {
             p={5}
             sx={{ borderRadius: 0, with: "100%" }}
           >
-            <img src={selectedDiscussion.imageUrl} className={classes.image} />
+            {selectedDiscussion.imageUrl && (
+              <img
+                src={selectedDiscussion.imageUrl}
+                className={classes.image}
+              />
+            )}
+            {!selectedDiscussion.imageUrl && (
+              <Avatar
+                sx={{
+                  width: 300,
+                  height: 300,
+                  backgroundColor: `rgba(${r},${g},${b},${a})`,
+                }}
+              >
+                <Typography variant="h1">
+                  {selectedDiscussion.title.charAt(0).toUpperCase()}
+                </Typography>
+              </Avatar>
+            )}
+
             <span className={classes.title}>{selectedDiscussion.title}</span>
             <Box
               width={"100%"}

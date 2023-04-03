@@ -1,5 +1,5 @@
 import { Avatar, Box, BoxProps, Typography } from "@mui/material";
-import React from "react";
+import React, { useMemo } from "react";
 import { Conversation } from "types/ConversationSerializer";
 import { useStyles } from "./styles";
 import ChatLatestMessage from "./ChatLatestMessage";
@@ -14,15 +14,40 @@ const Discussion = (props: Props) => {
   const { disc, ...other } = props;
   const classes = useStyles();
   const { chatId } = useChat();
+  const r = useMemo(() => {
+    return Math.round(Math.random() * 254);
+  }, []);
+  const g = useMemo(() => {
+    return Math.round(Math.random() * 254);
+  }, []);
+  const b = useMemo(() => {
+    return Math.round(Math.random() * 254);
+  }, []);
+
+  const a = useMemo(() => {
+    return Math.random();
+  }, []);
+
   return (
     <Box className={classes.discussion} component={"div"} {...other}>
       <Box position={"relative"}>
         <Avatar
           className={classes.discImg}
           alt={disc.title}
-          src={disc.imageUrl}
-          sx={{ color: "#fff", border: "1px solid #ccc" }}
-        />
+          src={disc.imageUrl && disc.imageUrl}
+          sx={{
+            color: "#fff",
+            width: "60px",
+            height: "60px",
+            borderRadius: "50%",
+            border: "1px solid #ccc",
+            objectFit: "cover",
+            // backgroundColor: "#ffffff47",
+            backgroundColor: `rgba(${r},${g},${b},${a})`,
+          }}
+        >
+          {disc.title.charAt(0).toUpperCase()}
+        </Avatar>
         {disc.online && <span className={classes.online}></span>}
       </Box>
       <Box
@@ -35,9 +60,9 @@ const Discussion = (props: Props) => {
           className={
             chatId ? classes.discussionNameSelected : classes.discussionName
           }
-          style={{ display: "block" }}
+          style={{ display: "block", color: "#fff", fontWeight: "bold" }}
         >
-          {disc.title}
+          {disc.title.toUpperCase()}
         </span>
         {disc.latest_message ? (
           <Typography variant="caption">
