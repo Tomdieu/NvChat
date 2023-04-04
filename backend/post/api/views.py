@@ -1,0 +1,44 @@
+from rest_framework.response import Response
+
+from rest_framework.mixins import (
+    CreateModelMixin,
+    ListModelMixin,
+    UpdateModelMixin,
+    DestroyModelMixin,
+    RetrieveModelMixin,
+)
+
+from rest_framework.viewsets import GenericViewSet
+
+from rest_framework.permissions import IsAuthenticated
+
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+
+from rest_framework.parsers import FormParser, MultiPartParser
+
+from ..models import Post, PostComment, PostLike
+
+from .serializers import PostSerializer, PostListSerializer
+
+
+class PostViewSet(
+    CreateModelMixin,
+    RetrieveModelMixin,
+    UpdateModelMixin,
+    ListModelMixin,
+    DestroyModelMixin,
+    GenericViewSet,
+):
+    permission_classes = [IsAuthenticated]
+
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    parser_classes = [FormParser, MultiPartParser]
+
+    def get_serializer_class(self):
+        if self.request.method in ["GET"]:
+            return PostListSerializer
+        return PostSerializer
+
+    def get_queryset(self):
+        return Post.objects.all()
