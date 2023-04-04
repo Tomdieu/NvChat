@@ -57,6 +57,7 @@ urlpatterns = [
                 path("account/", include("account.urls")),
                 path("friends/", include("friends.urls")),
                 path("notifications/", include("notifications.urls")),
+                path("posts/", include("post.urls")),
                 path(
                     "docs/",
                     include(
