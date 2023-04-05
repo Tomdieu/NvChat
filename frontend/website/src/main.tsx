@@ -9,7 +9,13 @@ import { AuthContextProvider } from "context/AuthContext";
 
 import { BrowserRouter } from "react-router-dom";
 
-const theme = responsiveFontSizes(createTheme());
+const theme = responsiveFontSizes(
+  createTheme({
+    typography: {
+      fontFamily: "Fira Code",
+    },
+  })
+);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

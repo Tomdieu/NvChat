@@ -20,12 +20,13 @@ export const useStyles = makeStyles((theme) => ({
   shareInput: {
     border: "none",
     width: "80%",
-    borderRadius: theme.shape.borderRadius,
+    // borderRadius: theme.shape.borderRadius,
     padding: theme.spacing(2),
     fontSize: "18px",
     "&:focus": {
       outline: "none",
     },
+    borderBottom: "1px solid #ccc",
   },
   shareHr: {
     margin: "20px",

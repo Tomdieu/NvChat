@@ -17,6 +17,7 @@ export const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: theme.spacing(2),
+    minHeight: "55px",
   },
   title: {
     fontSize: "2.3rem",

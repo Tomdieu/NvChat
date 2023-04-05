@@ -4,11 +4,12 @@ export const useStyles = makeStyles((theme) => ({
   sidebarContainer: {
     flex: 3,
     position: "sticky",
-    top: "64px",
+    marginTop: "64px",
     bottom: 0,
     left: 0,
-    height: "calc(100vh - 64px)",
+    height: "100vh",
     overflowY: "auto",
+    backgroundColor: "red",
     "&::-webkit-scroll-bar": {
       width: "5px",
     },
@@ -21,6 +22,9 @@ export const useStyles = makeStyles((theme) => ({
   },
   sidebarWrapper: {
     padding: theme.spacing(3),
+    [theme.breakpoints.down("ms")]: {
+      padding: theme.spacing(0.1),
+    },
   },
   sidebarList: {
     padding: 0,
@@ -46,11 +50,22 @@ export const useStyles = makeStyles((theme) => ({
     "& ::selection": {
       backgroundColor: "transparent",
     },
+    [theme.breakpoints.down("md")]: {
+      width: "fit-content",
+      justifyContent: "center",
+    },
   },
   sidebarIcon: {
     marginRight: theme.spacing(1.5),
+    [theme.breakpoints.down("md")]: {
+      marginRight: theme.spacing(0),
+    },
   },
-  sidebarListItemText: {},
+  sidebarListItemText: {
+    [theme.breakpoints.down("sm")]: {
+      display: "none",
+    },
+  },
   sidebarFriendList: {
     padding: 0,
     margin: 0,
@@ -67,5 +82,14 @@ export const useStyles = makeStyles((theme) => ({
   },
   sidebarFriendName: {
     fontWeight: "bolder",
+    [theme.breakpoints.down("md")]: {
+      display: "none",
+    },
+  },
+  sidebarbtnFriendShowMore: {
+    [theme.breakpoints.down("md")]: {
+      display: "none",
+      backgroundColor: "black",
+    },
   },
 }));

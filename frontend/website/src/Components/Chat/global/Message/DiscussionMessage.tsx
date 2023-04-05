@@ -101,7 +101,7 @@ const DiscussionMessage = (props: Props) => {
           }}
         >
           <span style={{ fontWeight: "600", cursor: "pointer" }}>
-            ~ {discussionMessage.sender.user.username}
+            {isMine ? " " : <>~ {discussionMessage.sender.user.username}</>}
           </span>
           <IconButton
             id="message-menu"
@@ -188,7 +188,7 @@ const DiscussionMessage = (props: Props) => {
             </Box>
           </MenuItem>
 
-          <MenuItem
+          {/* <MenuItem
             sx={{ display: !isMine ? "none" : "block" }}
             onClick={handleClose}
           >
@@ -205,9 +205,9 @@ const DiscussionMessage = (props: Props) => {
               <RemoveRedEye />
               <Typography>View By</Typography>
             </Box>
-          </MenuItem>
+          </MenuItem> */}
 
-          <Divider sx={{ display: !isMine ? "none" : "block" }} />
+          {/* <Divider sx={{ display: !isMine ? "none" : "block" }} />
           <MenuItem
             sx={{ display: !isMine ? "none" : "block" }}
             onClick={handleClose}
@@ -243,7 +243,7 @@ const DiscussionMessage = (props: Props) => {
               <Delete />
               <Typography>Delete</Typography>
             </Box>
-          </MenuItem>
+          </MenuItem> */}
         </Menu>
       </Box>
     </Box>

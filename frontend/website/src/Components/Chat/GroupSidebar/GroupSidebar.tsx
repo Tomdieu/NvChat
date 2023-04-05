@@ -151,7 +151,12 @@ const GroupSidebar = (props: Props) => {
             horizontal: "right",
           }}
         >
-          <MenuItem onClick={handleCloseMenu}>
+          <MenuItem
+            onClick={() => {
+              setOpen(true);
+              handleCloseMenu();
+            }}
+          >
             <Box
               display="flex"
               // justifyContent={"flex-end"}
@@ -228,6 +233,8 @@ const GroupSidebar = (props: Props) => {
                 fontSize: "1.2em",
                 px: 0.5,
                 borderRadius: 1,
+                py: 0.8,
+                pl: 1,
               }}
               placeholder="search ..."
               fullWidth

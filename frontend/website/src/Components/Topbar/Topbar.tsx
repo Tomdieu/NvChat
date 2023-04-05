@@ -10,25 +10,40 @@ import {
 import React from "react";
 import { Search, Message, Notifications, Person } from "@mui/icons-material";
 import { useStyles } from "./styles";
+import { BsDot } from "react-icons/bs";
 
 type Props = {};
 
 const Topbar = (props: Props) => {
   const classes = useStyles();
   return (
-    <Box className={classes.container}>
+    <Box className={classes.container} id="topBar">
       <Box className={classes.leftContainer}>
         <Typography
-          sx={{
-            // fontFamily: "poppins",
-            // fontSize: "2rem",
+          sx={(theme) => ({
             fontWeight: "bold",
             cursor: "pointer",
-          }}
+            [theme.breakpoints.down("md")]: {
+              display: "none",
+            },
+          })}
           variant="h4"
         >
           <span style={{ color: "#599ee3" }}>N</span>v{" "}
           <span style={{ color: "tomato" }}>S</span>ocial
+        </Typography>
+        <Typography
+          sx={(theme) => ({
+            fontWeight: "bold",
+            cursor: "pointer",
+            [theme.breakpoints.up("md")]: {
+              display: "none",
+            },
+          })}
+          variant="h4"
+        >
+          <span style={{ color: "#599ee3" }}>N</span>{" "}
+          <span style={{ color: "tomato" }}>S</span>
         </Typography>
       </Box>
 
