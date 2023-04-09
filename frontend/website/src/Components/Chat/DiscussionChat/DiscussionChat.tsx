@@ -42,27 +42,28 @@ const ActiveDiscussion = () => {
     setMessage(e.target.value);
   };
   useEffect(() => {
-    setMessage("");
-    const ws = new WebSocket(
-      ApiService.wsEndPoint + `ws/discussion_chat/${chatId}/?token=${userToken}`
-    );
-    setSocket(ws);
-    return () => {
-      ws.close();
-    };
+    (async () => {
+      setMessage("");
+      const ws = new WebSocket(
+        ApiService.wsEndPoint +
+          `ws/discussion_chat/${chatId}/?token=${userToken}`
+      );
+      setSocket(ws);
+      return () => {
+        ws.close();
+      };
+    })();
   }, [chatId]);
 
   useEffect(() => {
     if (socket) {
-      socket.onopen = () => {
-        console.log("Connection established");
-      };
-      socket.onclose = () => {
-        console.log("Connection Close");
-      };
+      // socket.onopen = () => {
+      //   console.log("Connection established");
+      // };
+      // socket.onclose = () => {
+      //   console.log("Connection Close");
+      // };
       socket.onmessage = (e: MessageEvent<any>) => {
-        console.log("Message Recieved ");
-
         const newMessage = JSON.parse(e.data);
         if (newMessage.message && newMessage.message.id) {
           addNewMessage(newMessage.message);
@@ -188,6 +189,9 @@ const ActiveDiscussion = () => {
   ) => {
     socket.send(JSON.stringify({ typing: false, message: `` }));
   };
+  const getUniqueMessages = (data: any[], key: any) => {
+    return [...new Map(data.map((x) => [key(x), x])).values()];
+  };
   return (
     <Grid
       item
@@ -207,7 +211,10 @@ const ActiveDiscussion = () => {
         onClick={() => setIsRightOpen(!isRightOpen)}
       />
       <MessagesList
-        messages={selectedDiscussion.messages}
+        messages={getUniqueMessages(
+          selectedDiscussion.messages,
+          (msg: Message) => msg.id
+        )}
         type="DISCUSSION"
         onMsgClick={(message) => setReplyMessage(message)}
       />

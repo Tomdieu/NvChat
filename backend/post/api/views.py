@@ -16,9 +16,11 @@ from rest_framework.authentication import TokenAuthentication, SessionAuthentica
 
 from rest_framework.parsers import FormParser, MultiPartParser
 
-from ..models import Post, PostComment, PostLike
+from rest_framework.views import APIView
 
-from .serializers import PostSerializer, PostListSerializer
+from ..models import Post, PostComment, PostLike, PostView
+
+from .serializers import PostSerializer, PostListSerializer, PostViewSerializer
 
 
 class PostViewSet(
@@ -42,3 +44,30 @@ class PostViewSet(
 
     def get_queryset(self):
         return Post.objects.all()
+
+
+class PostCommentView(APIView):
+    """
+    This represent the post comment view where we can add a post comment
+    """
+
+    def post(self, request, *args, **kwargs):
+        pass
+
+
+class LikePostView(APIView):
+    """
+    This represent the post like view where a post can be like
+    """
+
+    def post(self, request, *args, **kwargs):
+        pass
+
+
+class ViewPostView(APIView):
+    """
+    This represent the post views where we can identify who viewed a post
+    """
+
+    def post(self, request, *args, **kwargs):
+        pass

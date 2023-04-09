@@ -4,7 +4,10 @@ import { GroupSerializer } from "types/GroupSerializer";
 import moment from "moment";
 import LatestMessage from "./LatestMessage";
 import { useGroup } from "context/GroupContext";
-import React from "react";
+import React, { useEffect, useLayoutEffect } from "react";
+import ApiService from "utils/ApiService";
+import { useAuth } from "context/AuthContext";
+import { GroupMessageSerializer } from "types/GroupMessageSerializer";
 
 const useStyles = makeStyles((theme) => ({
   groupItem: {
@@ -68,7 +71,10 @@ type Props = {
 const Group = (props: Props) => {
   const { group, onClick } = props;
   const classes = useStyles();
-  const { groupId } = useGroup();
+  const { groupId, setGroups } = useGroup();
+
+  const [socket, setSocket] = React.useState<WebSocket>(null);
+
   const formattedDate = moment(group?.latest_message?.created_at).format(
     "DD/MM/YYYY"
   );
@@ -79,6 +85,58 @@ const Group = (props: Props) => {
   )
     ? "Today"
     : formattedDate;
+
+  const { userToken } = useAuth();
+
+  useLayoutEffect(() => {
+    (async () => {
+      var ws: WebSocket;
+      if (groupId != group.id) {
+        ws = new WebSocket(
+          ApiService.wsEndPoint +
+            `ws/group_chat/${group.id}/?token=${userToken}`
+        );
+        setSocket(ws);
+        return () => {
+          ws.close();
+        };
+      } else {
+        setSocket(null);
+      }
+    })();
+  }, [groupId]);
+
+  useLayoutEffect(() => {
+    if (socket) {
+      socket.onmessage = (message) => {
+        const messageData = JSON.parse(message.data);
+        if (messageData.typing === undefined) {
+          const _groups = localStorage.getItem("groups");
+
+          if (_groups) {
+            const groups: GroupSerializer[] = JSON.parse(_groups);
+
+            const filteredGroupChat: GroupSerializer = groups.find(
+              (_group) => _group.id === group.id
+            );
+
+            const msg = messageData;
+            filteredGroupChat.latest_message = msg.message;
+            filteredGroupChat.messages.push(msg.message);
+            const otherGroups = groups.filter(
+              (_group) => _group.id !== group.id
+            );
+
+            otherGroups.push(filteredGroupChat);
+            console.log(otherGroups);
+
+            setGroups(otherGroups);
+          }
+        }
+      };
+    }
+  }, [socket]);
+
   return (
     <Box
       className={classes.groupItem}
@@ -87,7 +145,15 @@ const Group = (props: Props) => {
     >
       <img className={classes.groupIcon} src={group?.image} />
       <Box className={classes.groupInfo}>
-        <span className={classes.groupName}>{group?.chat_name}</span>
+        <span
+          className={classes.groupName}
+          style={{
+            textOverflow: "ellipsis",
+            maxWidth: "80%",
+          }}
+        >
+          {group?.chat_name}
+        </span>
         <Typography
           variant="caption"
           className={classes.groupLatestMessage}

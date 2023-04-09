@@ -6,6 +6,7 @@ import { Route, Routes } from "react-router-dom";
 
 import Group from "pages/chat/Group";
 import Discussion from "pages/chat/Discussion";
+import Post from "pages/post/Post";
 
 import { GroupContextProvider } from "context/GroupContext";
 import { ChatProvider } from "context/ChatContext";
@@ -22,6 +23,8 @@ const index = (props: Props) => {
           <Route path="register" element={<Register />} />
         </Route>
         <Route path="" element={<Home />} />
+        <Route path="post" element={<Post />} />
+
         <Route
           path="groups"
           element={

@@ -43,6 +43,14 @@ class PostViewSerializer(serializers.ModelSerializer):
         # fields = "__all__"
 
 
+class _PostViewSerializer(serializers.ModelSerializer):
+    view_by = UserProfileSerializer()
+
+    class Meta:
+        model = PostView
+        exclude = ["post"]
+
+
 class _PostLikeSerializer(serializers.ModelSerializer):
     user = UserProfileSerializer()
 
@@ -129,6 +137,7 @@ class PostListSerializer(serializers.ModelSerializer):
     images = ImageSerializer(read_only=True, many=True)
     videos = VideoSerializer(read_only=True, many=True)
     files = FileSerializer(read_only=True, many=True)
+    viewed_by = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -144,3 +153,6 @@ class PostListSerializer(serializers.ModelSerializer):
         return _PostCommentSerializer(
             PostComment.objects.filter(Q(post=obj) & Q(parent_comment=None)), many=True
         ).data
+
+    def get_viewed_by(self, obj: Post):
+        return _PostViewSerializer(obj.views.all()).data

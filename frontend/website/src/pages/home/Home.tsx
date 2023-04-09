@@ -27,14 +27,15 @@ const Home = (props: Props) => {
         <Feed />
         <Rightbar />
       </Box> */}
-      <Grid container>
+      <Grid container justifyContent={"space-between"}>
         <Grid item md={3}>
           <Sidebar />
         </Grid>
-        <Grid item md={5.5} sm={9}>
+        {/* 7.5 */}
+        <Grid item md={6} sm={9}>
           <Feed />
         </Grid>
-        <Grid item md={3.5}>
+        <Grid item md={3}>
           <Rightbar />
         </Grid>
       </Grid>

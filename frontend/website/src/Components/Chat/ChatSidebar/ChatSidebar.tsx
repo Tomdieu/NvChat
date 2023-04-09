@@ -8,7 +8,7 @@ import {
   InputBase,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useLayoutEffect } from "react";
+import React, { useEffect, useLayoutEffect, useMemo } from "react";
 import { useStyles } from "./styles";
 import { Message, MoreVert, Search } from "@mui/icons-material";
 import { useChat } from "context/ChatContext";
@@ -78,6 +78,29 @@ const ChatSidebar = (props: Props) => {
       setFilterDiscussions(discussions);
     }
   }, [searchName]);
+
+  const getLastestMessage = (disc: Conversation) => {
+    return (
+      (disc.latest_message &&
+        new Date(disc.latest_message.message.created_at)) ||
+      new Date(disc.created_at)
+    );
+  };
+
+  const sortedDiscussions = useMemo<Conversation[]>(() => {
+    return discussions.sort((a, b) => {
+      var keyA = getLastestMessage(a);
+      var keyB = getLastestMessage(b);
+
+      return keyB.getTime() - keyA.getTime();
+    });
+  }, [discussions]);
+
+  useEffect(() => {
+    (async () => {
+      setFilterDiscussions(sortedDiscussions);
+    })();
+  }, [discussions]);
 
   return (
     <Grid item md={3} height={"100vh"} className={classes.sidebar}>

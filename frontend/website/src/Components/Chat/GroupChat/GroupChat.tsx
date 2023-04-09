@@ -41,14 +41,16 @@ const GroupChatBox = (props: Props) => {
   const [socket, setSocket] = useState<WebSocket>(null);
 
   useLayoutEffect(() => {
-    setMessage("");
-    const ws = new WebSocket(
-      ApiService.wsEndPoint + `ws/group_chat/${groupId}/?token=${userToken}`
-    );
-    setSocket(ws);
-    return () => {
-      ws.close();
-    };
+    (async () => {
+      setMessage("");
+      const ws = new WebSocket(
+        ApiService.wsEndPoint + `ws/group_chat/${groupId}/?token=${userToken}`
+      );
+      setSocket(ws);
+      return () => {
+        ws.close();
+      };
+    })();
   }, [groupId]);
 
   const username = React.useMemo(() => {

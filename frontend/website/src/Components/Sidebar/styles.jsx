@@ -2,14 +2,13 @@ import { makeStyles } from "@mui/styles";
 
 export const useStyles = makeStyles((theme) => ({
   sidebarContainer: {
-    flex: 3,
     position: "sticky",
+    top: "64px",
     marginTop: "64px",
-    bottom: 0,
-    left: 0,
-    height: "100vh",
+    // backgroundColor: "#2358af",
+    height: "100% ",
+    border: "1px solid #ddd",
     overflowY: "auto",
-    backgroundColor: "red",
     "&::-webkit-scroll-bar": {
       width: "5px",
     },
@@ -21,7 +20,7 @@ export const useStyles = makeStyles((theme) => ({
     },
   },
   sidebarWrapper: {
-    padding: theme.spacing(3),
+    padding: theme.spacing(1),
     [theme.breakpoints.down("ms")]: {
       padding: theme.spacing(0.1),
     },

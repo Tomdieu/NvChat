@@ -1,13 +1,8 @@
 import {
-  Avatar,
   Box,
   Grid,
   IconButton,
   Typography,
-  Dialog,
-  Paper,
-  TextField,
-  Button,
   Menu,
   MenuItem,
   CircularProgress,
@@ -15,13 +10,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
 import { useStyles } from "./styles";
-import {
-  Cancel,
-  GroupAdd,
-  MoreVert,
-  Save,
-  Settings,
-} from "@mui/icons-material";
+import { GroupAdd, MoreVert } from "@mui/icons-material";
 import CreateGroupDialog from "../CreateGroupDialog";
 import Group from "../Group/Group";
 import { useGroup } from "context/GroupContext";
@@ -95,7 +84,9 @@ const GroupSidebar = (props: Props) => {
   }, [groups]);
 
   useEffect(() => {
-    setGroupToDisplay(sortedGroups);
+    (async () => {
+      setGroupToDisplay(sortedGroups);
+    })();
   }, [groups, selectedGroup, groupId]);
 
   const handleClose = () => {
