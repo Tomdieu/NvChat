@@ -61,7 +61,6 @@ const Discussion = (props: Props) => {
         const newMessage = JSON.parse(e.data);
         const message = newMessage.message;
         if (newMessage.message && newMessage.message.id) {
-          // addNewMessage(newMessage.message);
           const filterChats = discussions.find((chat) => chat.id === disc.id);
 
           filterChats.latest_message = message;
